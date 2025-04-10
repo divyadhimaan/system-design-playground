@@ -1,5 +1,17 @@
 # Caching
 
+- [Introduction](#introduction)
+- [Why Caching is important?](#why-caching-is-important)
+- [How Caching works?](#how-caching-works)
+- [What are drawbacks of caching?](#what-are-drawbacks-of-caching)
+- [Placement for Cache in a Distributed System](#placement-for-cache-in-a-distributed-system)
+- [Write Policy](#write-back-policy-write-behind)
+  - [Write Back Policy](#write-back-policy)
+  - 
+
+
+## Introduction 
+
 Caching is storing frequently accessed data in temporary storage.
 
 Two important things for caching are:
@@ -7,7 +19,7 @@ Two important things for caching are:
   - Write Policy:  How to sync for writes among cache and DB
   - Eviction/Replacement Policy, What to kick out. (LRU, LFU, ..)
 
-## Why Caching?
+## Why Caching is important?
 - Caching improves page load times and can reduce the load on your servers and databases. 
   
 - Databases often benefit from a uniform distribution of reads and writes across its partitions. Popular items can skew the distribution, causing bottlenecks. Putting a cache in front of a database can help absorb uneven loads and spikes in traffic.
@@ -36,7 +48,7 @@ The application is responsible for reading and writing from storage. The cache d
 - Need to maintain consistency between caches and the source of truth such as the database through cache invalidation (Eventual Consistency)
 - Potential Thrashing - 
 
-## Placement for Cache
+## Placement for Cache in a Distributed System
 
 - In memory Cache
 - Global Cache
@@ -51,7 +63,7 @@ A write policy is triggered when there is a write operation in the cache.
 A write request means some entry is added, updated or deleted in the cache. But because a cache is a source of truth each of the write requests will impact the entire system.
 
 
-### Write Back Policy
+### Write Back Policy (Write Behind)
 
 If the key-value pair that is to be updated is present in the cache then it is updated. However, the key-value pair is not immediately updated in the database. 
 
@@ -104,24 +116,24 @@ To Avoid this problem, we use:
 
 
 <p align="center">
-    <img src="../diagrams/write-back-policy.png">
+    <img src="../diagrams/write-back-policy.png" alt="write-back-policy">
     <br/>
     <i>Sample for Write back Policy</i>
 </p>
 
-  <details>
-  <summary>Disadvantages</summary>
-      
-  ### Data Loss on Cache Failure
-   
-  Since modified data is not immediately written to main memory, a cache crash or power failure can result in loss of unsaved changes.
-   
-  ### Complexity in Data Coherency
-  Maintaining consistency between the cache and main memory becomes more complex, especially in multi-core or distributed systems where multiple caches might hold different versions of the same data.
+<details>
+<summary>Disadvantages</summary>
+  
+### Data Loss on Cache Failure
 
-  Look for other policies (Write-aside/ write-through)
+Since modified data is not immediately written to main memory, a cache crash or power failure can result in loss of unsaved changes.
 
-  ### Increased Latency on Eviction
-   When a dirty block is evicted, the system must write it back to main memory, potentially delaying the fetch of new data.
-   
-  </details>
+### Complexity in Data Coherency
+Maintaining consistency between the cache and main memory becomes more complex, especially in multi-core or distributed systems where multiple caches might hold different versions of the same data.
+
+Look for other policies (Write-aside/ write-through)
+
+### Increased Latency on Eviction
+When a dirty block is evicted, the system must write it back to main memory, potentially delaying the fetch of new data.
+
+</details>

@@ -2,10 +2,10 @@
 
 This repository contains notes, diagrams, and code snippets created while learning system design concepts. It's intended as a personal reference for revision and interview preparation. Topics include high-level design patterns, scalability principles, common system architectures, and more.
 
-## 📂 Table of Contents
+## Table of Contents
 
 - [System Design](#system-design)
-  - [📂 Table of Contents](#-table-of-contents)
+  - [Table of Contents](#table-of-contents)
   - [Concepts](#concepts)
   - [Resources](#resources)
   - [How to Use This Repo](#how-to-use-this-repo)
