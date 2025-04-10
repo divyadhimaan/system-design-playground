@@ -14,7 +14,9 @@ This repository contains notes, diagrams, and code snippets created while learni
 
 ## Concepts
 
-
+- [Databases](./concepts/databases.md)
+- [Consistency in Distributed Systems](./concepts/consistency.md)
+- [Caches](./concepts/caching.md)
 
 ## Resources
 

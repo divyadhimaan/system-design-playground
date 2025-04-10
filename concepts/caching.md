@@ -104,7 +104,7 @@ To Avoid this problem, we use:
 
 
 <p align="center">
-    <img src="../images/write-back-policy.png">
+    <img src="../diagrams/write-back-policy.png">
     <br/>
     <i>Sample for Write back Policy</i>
 </p>
