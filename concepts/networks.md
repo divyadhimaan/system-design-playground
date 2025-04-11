@@ -27,12 +27,27 @@
     - [TCP/IP](#tcpip)
     - [UDP](#udp)
     - [TCP vs UDP](#tcp-vs-udp)
+  - [How do Servers communicate internally?](#how-do-servers-communicate-internally)
+  - [How do we query the microservcies?](#how-do-we-query-the-microservcies)
+    - [REST](#rest)
+    - [GraphQL](#graphql)
+    - [REST vs GraphQL](#rest-vs-graphql)
+  - [How do microservices communicate internally?](#how-do-microservices-communicate-internally)
+  - [Video Transmission](#video-transmission)
+    - [Why HTTP is not helpful?](#why-http-is-not-helpful)
+    - [HTTP - Dash](#http---dash)
+    - [Web RTC](#web-rtc)
+      - [How does peer-to-peer communication work?](#how-does-peer-to-peer-communication-work)
+  - [Requirements for Network Protocol](#requirements-for-network-protocol)
   - [Glossary](#glossary)
     - [DDoS - distributed denial-of-service](#ddos---distributed-denial-of-service)
     - [NIC - Network Interface Card](#nic---network-interface-card)
     - [NAT - Network Address Translation](#nat---network-address-translation)
     - [Websocket](#websocket)
     - [XMPP](#xmpp)
+    - [Head of Line Blocking](#head-of-line-blocking)
+      - [How HTTP2.0 Solves this problem?](#how-http20-solves-this-problem)
+      - [Further Enhancement](#further-enhancement)
 
 
 ## Introduction 
@@ -290,6 +305,104 @@ A content delivery network relies on three types of servers.
         <i>TCP vs UDP</i>
     </p>
 
+
+## How do Servers communicate internally?
+
+- Different services can be written in different languages, but we need one common language to define the object for communication. (intermediate language)
+
+## How do we query the microservcies?
+
+### REST
+
+- A REST API is an `application programming interface (API)` that follows the design principles of the REST architectural style.
+- REST is short for `representational state transfer`, and is a set of rules and guidelines about how you should build a web API.
+- REST is a set of architectural constraints, not a protocol or a standard. 
+
+### GraphQL
+
+- GraphQL is a query language and `server-side` runtime for `application programming interfaces (APIs)` that prioritizes giving clients exactly the data they request and no more. 
+  
+- GraphQL is designed to make APIs fast, flexible, and developer-friendly. 
+  
+-  As an alternative to REST, GraphQL lets developers construct requests that pull data from multiple data sources in a single API call. 
+-  
+
+### REST vs GraphQL
+
+| Feature/Aspect                 | REST                                                                  | GraphQL                                                               |
+|-------------------------------|-----------------------------------------------------------------------|------------------------------------------------------------------------|
+| **Architecture Style**        | Resource-based (each resource has its own endpoint)                   | Query-based (single endpoint with flexible queries)                    |
+| **Data Fetching**             | May over-fetch or under-fetch data                                    | Client fetches exactly what it needs                                   |
+| **Endpoints**                 | Multiple endpoints for different resources                            | Single endpoint for all data                                           |
+| **Request Format**            | Fixed structure (usually JSON)                                        | Custom structure defined by the client                                 |
+| **Flexibility**               | Less flexible – server defines response structure                     | Highly flexible – client defines response structure                    |
+| **Versioning**                | Needs versioning for API updates (e.g., `/v1/`, `/v2/`)               | No versioning needed – evolves via schema changes                      |
+| **Use Case Fit**              | Simple, CRUD-based microservices                                      | Complex data relationships or frontend-driven apps                     |
+| **Caching**                   | Easy with HTTP caching (GET requests)                                 | More complex; often needs custom caching logic                         |
+| **Error Handling**            | Standard HTTP status codes                                            | Errors returned in response body with partial data possible            |
+
+
+## How do microservices communicate internally?
+gRPC - google Remote Procedure Call
+
+
+## Video Transmission
+
+- Video files are large and cannot be sent in a single response. They have to be broken into packets.
+
+### Why HTTP is not helpful?
+
+
+- Videos are broken into chunks. Since HTTP is stateless, the client has to specify which chunk it wants because the server does not know about the previous requests.
+
+- НТТР is written over TCP which is not optimal for live streaming. Because in live streaming, if the video packet does not reach the client then there is no point in retrying because the data is old.
+  
+- So UDP is better for live-streaming. However, in some cases where we need, guaranteed delivery TCP is preferred.
+
+
+### HTTP - Dash
+- DASH stands for` Dynamic Adaptive Streaming over HTTP`
+- This protocol runs over TCP. So there is guaranteed delivery and ordering.
+
+
+> The basic idea is, **that the client sends a signal to the main server based on the data you can handle.**
+
+For example:
+- if the client can handle a video up to 720p resolution then the main server will send the client a video up to 720p resolution. 
+- If the client's network is very slow then the main server will send videos in lower resolution to maintain connectivity.
+
+`In Mac devices, HLS is used`. It is very similar to HTTP-DASH.
+
+
+### Web RTC
+
+For video conferencing, sending video streams to the other client through a server is a bad idea because:
+- It will increase the network congestion on the server-side.
+- Video streaming will be slow.
+- The server acts as a single point of failure.
+
+So to solve these issues we use `WebRTC`.
+It is a `peer-to-peer protocol` so no server is required to send data.
+
+#### How does peer-to-peer communication work?
+- First, the clients get the addresses of the other clients from the server.
+- Then the server sends the information to both the clients.
+- Clients use this information to connect.
+
+Since it does not require a server
+- It is fast.
+- It saves bandwidth.
+- It is more robust because even if the server crashes, clients can keep talking to each other.
+
+
+## Requirements for Network Protocol
+To send a message from A to B:
+- Choose a language
+- Find out location (IP address) of B
+- Find an efficient way to connect.
+
+For these 3 requirements, we have to choose the above protocols on their merits.
+
 ## Glossary
 
 ### DDoS - distributed denial-of-service 
@@ -326,3 +439,25 @@ A content delivery network relies on three types of servers.
 ### XMPP
 
 - `Extensible Messaging and Presence Protocol` (XMPP) is an open XML technology for real-time communication, which powers a wide range of applications including instant messaging, presence and collaboration.
+
+### Head of Line Blocking
+
+Head-Of-Line blocking occurs when the message/data packet at the head of the queue cannot move forward due to congestion even if other messages/packets behind this could.
+
+- Example:
+  - First A sends a message to B.
+  - B fails to process the message (or maybe it fails to send an acknowledgment).
+  - Since A did not get back any acknowledgment, A keeps retrying until B sends an acknowledgment.
+  - Other messages in A's queue are going to be waiting (because of ordered delivery)
+
+#### How HTTP2.0 Solves this problem?
+- HTTP 2.0 solves this problem using Multiplexing. 
+- It implements multiplexing by breaking the messages/data packets into frames and are sent in streams. 
+- Each stream has a stream ID. So, when you get a message of a stream ID, that stream is going to be blocked until all the messages having the stream IDs are processed.
+
+#### Further Enhancement
+
+- HTTP 2.0 solved Head of Line Blocking, but it is still written over TCP. Even though data packets are broken into logical streams, they are not independent because they are running on the same TCP queue. If there was a drop-in packet in one of the streams, other packets in this stream will still be blocked.
+  
+- To solve this problem, `HTTP 3.0(QUIC)` uses UDP instead of TCP. Itused UPD because there are no
+acknowledgments. It provides streams, ordered delivery and all other features of НТТР 2.0. НТТР 3.0 will be called QUIC.
