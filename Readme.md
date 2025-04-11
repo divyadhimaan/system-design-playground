@@ -10,7 +10,7 @@ This repository contains notes, diagrams, and code snippets created while learni
   - [Resources](#resources)
   - [How to Use This Repo](#how-to-use-this-repo)
   - [Contributing](#contributing)
----
+
 
 ## Concepts
 
@@ -29,7 +29,6 @@ A collection of materials referred to while learning:
 <!-- - [Grokking the System Design Interview](https://www.designgurus.io/course/system-design) -->
 - Articles and whitepapers (linked per topic)
 
----
 
 ## How to Use This Repo
 
@@ -38,7 +37,6 @@ A collection of materials referred to while learning:
 - Use markdown files as revision notes before interviews.
 - Refer to example architectures for designing systems in projects.
 
----
 
 ## Contributing
 

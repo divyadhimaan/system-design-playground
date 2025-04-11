@@ -22,9 +22,17 @@
     - [How CDN works?](#how-cdn-works)
     - [Functions of CDN](#functions-of-cdn)
     - [Benefis of CDN](#benefis-of-cdn)
+  - [HTTP](#http)
+  - [Internet Protocols](#internet-protocols)
+    - [TCP/IP](#tcpip)
+    - [UDP](#udp)
+    - [TCP vs UDP](#tcp-vs-udp)
   - [Glossary](#glossary)
     - [DDoS - distributed denial-of-service](#ddos---distributed-denial-of-service)
     - [NIC - Network Interface Card](#nic---network-interface-card)
+    - [NAT - Network Address Translation](#nat---network-address-translation)
+    - [Websocket](#websocket)
+    - [XMPP](#xmpp)
 
 
 ## Introduction 
@@ -165,6 +173,13 @@ It involves:
 7. The authoritative server returns the IP address of the web server hosting your app (usually via an `A record` for IPv4 or `AAAA record` for IPv6)
 8. Now that the browser has the IP address, it sends an `HTTP/HTTPS request` to your web application server.
 9. Your web server (like one hosted on AWS, Heroku, or your own VPS) processes the request and sends back the website or web app content.
+    
+
+    <p align="center">
+        <img src="../diagrams/dns-working.png" alt="CDN">
+        <br/>
+        <i>DNS working</i>
+    </p>
 
 </details>
 
@@ -220,9 +235,60 @@ A content delivery network relies on three types of servers.
 
 
 
+## HTTP
+
+- HTTP is a protocol for fetching resources such as HTML documents. 
+- It is the foundation of any data exchange on the Web and it is a client-server protocol, which means requests are initiated by the recipient, usually the Web browser.
+- Clients and servers communicate by exchanging individual messages (as opposed to a stream of data). 
+- The messages sent by the client are called requests and the messages sent by the server as an answer are called responses.
+  
+<p align="center">
+    <img src="../images/http.png" alt="HTTP">
+    <br/>
+    <i><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Overview">Web Overview</a></i>
+</p>
+
+
+## Internet Protocols
+### TCP/IP
+- The `Transmission Control Protocol (TCP)` is a transport protocol that is used on top of IP to ensure reliable transmission of packets.
+- TCP includes mechanisms to solve many of the problems that arise from packet-based messaging, such as lost packets, out of order packets, duplicate packets, and corrupted packets.
+- Since TCP is the protocol used most commonly on top of IP, the Internet protocol stack is sometimes referred to as TCP/IP.
+- Used for 
 
 
 
+    <p align="center">
+        <img src="../images/tcp-ip.png" alt="TCP/IP">
+        <br/>
+        <i><a href="https://www.khanacademy.org/computing/computers-and-internet/xcae6f4a7ff015e7d:the-internet/xcae6f4a7ff015e7d:transporting-packets/a/transmission-control-protocol--tcp">TCP Model</a></i>
+    </p>
+
+
+### UDP 
+
+- The `User Datagram Protocol (UDP)` is a lightweight data transport protocol that works on top of IP.
+  
+- UDP provides a mechanism to detect corrupt data in packets, but it does not attempt to solve other problems that arise with packets, such as lost or out of order packets. That's why UDP is sometimes known as the Unreliable Data Protocol.
+  
+- UDP is simple but fast, at least in comparison to other protocols that work over IP. It's often used for `time-sensitive applications` (such as real-time video streaming) where speed is more important than accuracy.
+
+### TCP vs UDP
+
+| Feature                     | TCP                                                                 | UDP                                                             |
+|-----------------------------|----------------------------------------------------------------------|------------------------------------------------------------------|
+| Connection Type          | Connection-oriented (establishes a connection before data transfer) | Connectionless (no connection setup)                            |
+| Reliability              | Reliable – ensures data is delivered correctly and in order         | Unreliable – no guarantee of delivery, order, or error checking |
+| Data Transmission        | Data is sent as a stream of bytes (continuous flow)                 | Data is sent as discrete packets (datagrams)                    |
+| Error Checking & Recovery| Error detection, acknowledgment, and retransmission                 | Basic error checking (checksum), no retransmission              |
+| Speed                    | Slower due to overhead                                              | Faster – minimal overhead                                       |
+| Use Cases                | Web browsing (HTTP/HTTPS), email (SMTP), file transfer (FTP)       | Streaming (video/audio), online gaming, VoIP, DNS               |
+
+<p align="center">
+        <img src="../images/tcp-vs-udp.png" alt="TCP vs UDP">
+        <br/>
+        <i>TCP vs UDP</i>
+    </p>
 
 ## Glossary
 
@@ -239,3 +305,24 @@ A content delivery network relies on three types of servers.
 - Hardware Device which allows the device to connect to the network.
 
 - It enables data transmission and reception between the computer and other network devices.
+
+### NAT - Network Address Translation
+
+- It is a process in which one or more `local IP addresses` are `translated` into one or more `Global IP addresses` and vice versa to provide Internet access to the local hosts.
+
+- Used in routers. Router can have a public address, while all the devices in the same local network can have private IP addresses assigned by router.
+
+- NAT translated IP addresses to and fro requests (private -> public or vice versa) for internet access.
+
+- NAT saves from IP address exhaustion, as limited amount of IPv4 public IP address (2^32) are available
+
+- Future ->  IPv6 (128 bit addresses instead of IPv4 - 32bit addresses)
+
+### Websocket
+
+- The WebSocket API makes it possible to open a two-way interactive communication session between the user's browser and a server. 
+- With this API, you can send messages to a server and receive responses without having to poll the server for a reply.
+
+### XMPP
+
+- `Extensible Messaging and Presence Protocol` (XMPP) is an open XML technology for real-time communication, which powers a wide range of applications including instant messaging, presence and collaboration.
