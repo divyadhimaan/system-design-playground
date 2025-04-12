@@ -18,6 +18,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Consistency in Distributed Systems](./concepts/consistency.md)
 - [Caches](./concepts/caching.md)
 - [Networks](./concepts/networks.md)
+- [Database Replication and Migration](./concepts/database-replication.md)
 
 ## Resources
 
