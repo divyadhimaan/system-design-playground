@@ -252,7 +252,7 @@ A content delivery network relies on three types of servers.
 
 ## HTTP
 
-- HTTP is a protocol for fetching resources such as HTML documents. 
+- HTTP is a method for encoding and transporting data between a client and a server.
 - It is the foundation of any data exchange on the Web and it is a client-server protocol, which means requests are initiated by the recipient, usually the Web browser.
 - Clients and servers communicate by exchanging individual messages (as opposed to a stream of data). 
 - The messages sent by the client are called requests and the messages sent by the server as an answer are called responses.
