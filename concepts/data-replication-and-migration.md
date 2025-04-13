@@ -126,3 +126,7 @@ This is going to be more complex engineering, but worth it the savings in downti
 5. Now point the proxy to the new database.
 6. Point clients to the new database directly (this requires a deployment or server restart).
 7. Delete the proxy.
+
+- Updates can be a problem 
+  - either dont allow updates, 
+  - Or make all clients point to new database/view at same time to avoid inconsistency

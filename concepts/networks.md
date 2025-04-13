@@ -48,6 +48,7 @@
     - [Head of Line Blocking](#head-of-line-blocking)
       - [How HTTP2.0 Solves this problem?](#how-http20-solves-this-problem)
       - [Further Enhancement](#further-enhancement)
+    - [HLS - HTTP Live Streaming](#hls---http-live-streaming)
 
 
 ## Introduction 
@@ -256,6 +257,8 @@ A content delivery network relies on three types of servers.
 - It is the foundation of any data exchange on the Web and it is a client-server protocol, which means requests are initiated by the recipient, usually the Web browser.
 - Clients and servers communicate by exchanging individual messages (as opposed to a stream of data). 
 - The messages sent by the client are called requests and the messages sent by the server as an answer are called responses.
+
+
   
 <p align="center">
     <img src="../images/http.png" alt="HTTP">
@@ -461,3 +464,8 @@ Head-Of-Line blocking occurs when the message/data packet at the head of the que
   
 - To solve this problem, `HTTP 3.0(QUIC)` uses UDP instead of TCP. Itused UPD because there are no
 acknowledgments. It provides streams, ordered delivery and all other features of НТТР 2.0. НТТР 3.0 will be called QUIC.
+
+
+### HLS - HTTP Live Streaming
+
+It is a media streaming protocol developed by Apple for delivering video and audio content over the internet
