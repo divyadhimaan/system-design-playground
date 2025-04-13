@@ -76,4 +76,3 @@ Root cause analysis is the process of understanding what went wrong when a syste
 - Machine Learning & Outsourcing:
   - Some solutions use machine learning techniques or external services.
   - Example: Amazon SageMaker employing algorithms like isolation trees to detect anomalies.
-- 
