@@ -19,6 +19,11 @@ In distributed systems, security refers to the measures and mechanisms used to p
     - [ACLs - Access Control lists](#acls---access-control-lists)
     - [Rule Engines](#rule-engines)
     - [Secret Keys](#secret-keys)
+  - [Attack Vectors](#attack-vectors)
+    - [Hackers (DDoS Attacks)](#hackers-ddos-attacks)
+    - [Employees](#employees)
+    - [Malicious Code](#malicious-code)
+  - [Preventing unauthorized access to videos on a CDN](#preventing-unauthorized-access-to-videos-on-a-cdn)
 
 ## Verification
 
@@ -199,3 +204,45 @@ Authorization is the process of defining and enforcing access permissions to res
 - Use Case:
   - Best for secure authentication between systems or clients.  
   - Example: Authenticating microservices or API access.
+
+## Attack Vectors
+Types of attackers and how to protect resources from them:
+### Hackers (DDoS Attacks)
+- Threat:
+  - Distributed Denial of Service (DDoS) attacks by hackers flood the system with requests.
+- Mitigation Techniques:
+  - Distributed Rate Limiting: Controls the rate of incoming requests to prevent overload.
+  - Web Application Firewalls (WAF): Verify the authenticity of users and block malicious requests.
+
+### Employees
+
+- Threat:
+  - Employees, whether intentionally or accidentally, can pose security risks.
+- Mitigation Techniques:
+  - Access Control Lists (ACLs): Limit actions employees can take.
+  - Resource Restriction:
+    - Open only necessary entry points.
+    - Limit database access to only relevant servers.
+  - Minimizing Attack Surface: Reduce available pathways to prevent unauthorized actions.
+
+### Malicious Code
+- Threat:
+  - Execution of malicious code can compromise the system.
+- Mitigation Techniques:
+  - Resource Restrictions: Control and limit access to critical resources.
+  - Rule Engines: Enforce rules to prevent illegal code modifications.
+  - Integrity Checks: Regularly verify system integrity.
+  - Code Reviews: Conduct thorough reviews to identify vulnerabilities.
+
+---
+
+
+
+## Preventing unauthorized access to videos on a CDN
+
+| **Aspect**        | **Token-Based Authentication**                                                                                                                                           | **Domain-Based Authentication**                                                                                                                                          | **Server-Side Authentication**                                                                                                                                                                    |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Process**       | - CDN forwards user requests to the main server for authentication. <br>- Main server verifies credentials and issues a token. <br>- CDN serves the video upon verification. | - CDN examines the request’s origin domain. <br>- Video is served if the domain is allowed; otherwise, access is denied.                                                   | - User’s request is authenticated directly by the main server. <br>- Server generates a token signed with a private key. <br>- CDN verifies the token using the public key. <br>- Includes token refresh intervals. |
+| **Advantages**    | - Strong, thorough authentication.                                                                                                                                    | - Simple and fast; decision is based solely on the request’s domain.                                                                                                     | - Balances robust security with efficiency through periodic token validation.                                                                                                                   |
+| **Disadvantages** | - Slower performance due to extra round-trip to the main server. <br>- Risk that the CDN could potentially access and misuse the token.                                     | - Vulnerable to domain spoofing. <br>- Does not provide user-specific authorization.                                                                                    | - More complex integration. <br>- Requires additional backend mechanisms for token generation and refresh.                                                                                      |
+| **Use Cases**     | - Ideal for secure API communications between services where strong authentication is needed. <br>- Suitable when a slight delay is acceptable in exchange for stronger verification. | - Best for controlled environments with trusted domains. <br>- Works well when only basic access control is required.                                                     | - Suitable for systems needing both robust security and efficiency (e.g., premium content delivery platforms). <br>- Effective when timely token renewals help prevent unauthorized sharing.|
