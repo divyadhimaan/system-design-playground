@@ -15,6 +15,10 @@ In distributed systems, security refers to the measures and mechanisms used to p
     - [Token Based Auth](#token-based-auth)
     - [SSO - Single Sign On](#sso---single-sign-on)
     - [OAuth - Open Authentication](#oauth---open-authentication)
+  - [Authorization](#authorization)
+    - [ACLs - Access Control lists](#acls---access-control-lists)
+    - [Rule Engines](#rule-engines)
+    - [Secret Keys](#secret-keys)
 
 ## Verification
 
@@ -135,3 +139,63 @@ Below are the common authentication mechanisms,
 - Widely adopted
 
 - Plan a fallback scenario - scenarios when the external service is unavailable.
+
+
+## Authorization
+
+Authorization is the process of defining and enforcing access permissions to resources or data within a system.
+
+
+### ACLs - Access Control lists
+
+- ACLs are lists that define the `actions allowed on objects.`
+
+- Types of ACLs:
+  - `User-Based`: Specific users have certain permissions.
+  - `Role-Based`: Users in a particular role have certain permissions.
+  - `Group-Based`: Groups of users or resources have certain permissions.
+
+- ACLs combine to form the access control matrix, which outlines the complete permission model of the system.
+
+- Ensure ACLs cover all necessary objects and actions to prevent unauthorized access.
+
+- But it difficult to maintain the ACLs.
+
+- Use cases:
+  - Ideal for static, straightforward permission management.
+  - Example: File system permissions or access to specific features in an application.
+
+---
+
+### Rule Engines
+
+- Rule engines use a set of rules—often implemented as if statements—to decide if a user or resource has permission to perform an action.
+
+- Key Benefits:
+  - `Handles Complexity`: Suitable for managing complex authorization requirements.
+  - `Efficiency`: Can process multiple objects and rules effectively.
+  - `Centralization`: Allows centralization of common rules. A centralized rule engine simplifies maintenance and troubleshooting.
+  - `Ease of Modification`: Rules can be updated without needing to modify ACLs directly.
+
+- Use Cases:
+  - Suitable when authorization rules are complex, conditional, or require frequent updates.
+  - Example: Dynamic access controls in a multi-tenant system or context-aware permission models.
+
+---
+
+### Secret Keys
+
+- Secret keys, also known as client keys, add an extra layer of security for authentication and authorization.
+
+- Authentication is performed using a key or token rather than a traditional username and password.
+
+- Provides additional protection by requiring the secret key for access.
+- Not considered sufficient as the sole method of security; usually used alongside other authentication methods.
+
+- Key Management:
+  - Ensure secret keys are securely stored and rotated regularly.
+  - Use best practices to avoid exposure in code or configuration files.
+
+- Use Case:
+  - Best for secure authentication between systems or clients.  
+  - Example: Authenticating microservices or API access.

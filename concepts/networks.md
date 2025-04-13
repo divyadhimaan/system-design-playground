@@ -88,7 +88,7 @@ It involves:
 - The physical layer consists of the basic networking hardware transmission technologies of a network. 
 - It is a fundamental layer underlying the logical data structures of the higher level functions in a network.
 
-
+---
 ### Data Link Layer
 
 - This layer is the protocol layer that transfers data between adjacent network nodes in a wide area network (WAN) or between nodes on the same local area network (LAN) segment.
@@ -96,27 +96,34 @@ It involves:
 - In the Internet Protocol Suite (TCP/IP), the data link layer functionality is contained within the link layer, the lowest layer of the descriptive model.
 - MAC addresses
   
+  ---
 ### Network Layer
 
 - The network layer is responsible for packet forwarding including routing through intermediate routers, since it knows the address of neighboring network nodes, and it also manages quality of service (QoS), and recognizes and forwards local host domain messages to the Transport layer (layer 4)
 - IP Addresses
 
-
+---
 ### Transport Layer
 
 - The protocols of the layer provide host-to-host communication services for applications.
 - It provides services such as connection-oriented data stream support, reliability, flow control, and multiplexing.
 - The best-known transport protocol of TCP/IP is the Transmission Control Protocol (TCP), and lent its name to the title of the entire suite. It is used for connection-oriented transmissions, whereas the connectionless User Datagram Protocol (UDP) is used for simpler messaging transmissions. 
 
+---
 ### Session/Behavioral layer
 
 - The session layer provides the mechanism for opening, closing and managing a session between end-user application processes, i.e., a semi-permanent dialogue.
 - Communication sessions consist of requests and responses that occur between applications. 
 
+---
+
 ### Presentation Layer
 
 - The presentation layer is responsible for the delivery and formatting of information to the application layer for further processing or display. 
 - It relieves the application layer of concern regarding syntactical differences in data representation within the end-user systems.
+
+
+---
 
 ### Application Layer
 
@@ -208,6 +215,7 @@ A content delivery network (CDN) is a group of geographically distributed server
 
 - Because getting content everytime for multiple users from the destination requires high bandwidth.
 
+---
 
 ### How CDN works? 
 A content delivery network relies on three types of servers.
@@ -240,6 +248,8 @@ A content delivery network relies on three types of servers.
   - Larger and more widely distributed CDNs are able to deliver website content more quickly and reliably by putting the content as close to the end user as possible.
 - Balance loads.
   - Load balancing enables content providers to handle increases in demand and large traffic spikes while still providing high-quality user experiences and avoiding downtime.
+
+---
 
 ### Benefis of CDN
 
@@ -321,6 +331,8 @@ A content delivery network relies on three types of servers.
 - REST is short for `representational state transfer`, and is a set of rules and guidelines about how you should build a web API.
 - REST is a set of architectural constraints, not a protocol or a standard. 
 
+---
+
 ### GraphQL
 
 - GraphQL is a query language and `server-side` runtime for `application programming interfaces (APIs)` that prioritizes giving clients exactly the data they request and no more. 
@@ -362,6 +374,7 @@ gRPC - google Remote Procedure Call
   
 - So UDP is better for live-streaming. However, in some cases where we need, guaranteed delivery TCP is preferred.
 
+---
 
 ### HTTP - Dash
 - DASH stands for` Dynamic Adaptive Streaming over HTTP`
@@ -376,6 +389,7 @@ For example:
 
 `In Mac devices, HLS is used`. It is very similar to HTTP-DASH.
 
+---
 
 ### Web RTC
 
@@ -414,13 +428,15 @@ For these 3 requirements, we have to choose the above protocols on their merits.
 
 - The purpose of DDoS attacks is to severely slow down or stop legitimate traffic from reaching its intended destination. For example, this could mean stopping a user from accessing a website, buying a product or service, watching a video, or interacting on social media.
 
-
+---
 
 ### NIC - Network Interface Card
 
 - Hardware Device which allows the device to connect to the network.
 
 - It enables data transmission and reception between the computer and other network devices.
+
+---
 
 ### NAT - Network Address Translation
 
@@ -434,14 +450,21 @@ For these 3 requirements, we have to choose the above protocols on their merits.
 
 - Future ->  IPv6 (128 bit addresses instead of IPv4 - 32bit addresses)
 
+---
+
 ### Websocket
 
 - The WebSocket API makes it possible to open a two-way interactive communication session between the user's browser and a server. 
 - With this API, you can send messages to a server and receive responses without having to poll the server for a reply.
 
+---
+
 ### XMPP
 
 - `Extensible Messaging and Presence Protocol` (XMPP) is an open XML technology for real-time communication, which powers a wide range of applications including instant messaging, presence and collaboration.
+
+
+---
 
 ### Head of Line Blocking
 
@@ -452,7 +475,7 @@ Head-Of-Line blocking occurs when the message/data packet at the head of the que
   - B fails to process the message (or maybe it fails to send an acknowledgment).
   - Since A did not get back any acknowledgment, A keeps retrying until B sends an acknowledgment.
   - Other messages in A's queue are going to be waiting (because of ordered delivery)
-
+  - 
 #### How HTTP2.0 Solves this problem?
 - HTTP 2.0 solves this problem using Multiplexing. 
 - It implements multiplexing by breaking the messages/data packets into frames and are sent in streams. 
@@ -465,6 +488,7 @@ Head-Of-Line blocking occurs when the message/data packet at the head of the que
 - To solve this problem, `HTTP 3.0(QUIC)` uses UDP instead of TCP. Itused UPD because there are no
 acknowledgments. It provides streams, ordered delivery and all other features of НТТР 2.0. НТТР 3.0 will be called QUIC.
 
+---
 
 ### HLS - HTTP Live Streaming
 

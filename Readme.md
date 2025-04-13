@@ -8,6 +8,7 @@ This repository contains notes, diagrams, and code snippets created while learni
   - [Table of Contents](#table-of-contents)
   - [Concepts](#concepts)
   - [Resources](#resources)
+  - [Articles](#articles)
   - [How to Use This Repo](#how-to-use-this-repo)
   - [Contributing](#contributing)
 
@@ -29,8 +30,10 @@ A collection of materials referred to while learning:
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
 - [System Desin Interview - Alex Xu (Part 1)](https://shorturl.at/4coTo)
 <!-- - [Grokking the System Design Interview](https://www.designgurus.io/course/system-design) -->
-- Articles and whitepapers (linked per topic)
 
+
+## Articles
+- 
 
 ## How to Use This Repo
 
