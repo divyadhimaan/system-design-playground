@@ -22,6 +22,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Data Replication and Migration](./concepts/data-replication-and-migration.md)
 - [Security in Distributed Systems](./concepts/security.md)
 - [Observability in Distributed Systems](./concepts/observability.md)
+- [Rate Limiting](./concepts/rate-limiting.md)
 
 ## Resources
 
