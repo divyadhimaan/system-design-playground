@@ -23,6 +23,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Security in Distributed Systems](./concepts/security.md)
 - [Observability in Distributed Systems](./concepts/observability.md)
 - [Rate Limiting](./concepts/rate-limiting.md)
+- [Tradeoffs](./concepts/tradeoffs.md)
 
 ## Resources
 
