@@ -12,8 +12,9 @@ Below are the required components for Auth and user access.
 
 - Has an internal cache for service info.
 - Registers services via register.
-- Updates its cache from Service Registry via updateCache.
-
+- Uses **local cache** (fetched from Service Registry) to:
+  - Route requests to the correct **service IP** based on endpoint.
+  - Reduce registry lookup on each request.
 ## Service Registry:
 
 
@@ -32,6 +33,12 @@ Below are the required components for Auth and user access.
 
 - Stores OTPs with timestamps.
 
+### Secrets & Authentication
+- Upon successful authentication, a **secret is generated and stored per user** in the **Session Table**.
+- This **secret token** is required in future requests to validate and maintain the user session (i.e., stateless authentication).
+
+---
+
 ## ProfileService
 
 - Handles profile creation via createProfile endpoint.
@@ -49,7 +56,7 @@ Below are the required components for Auth and user access.
 - Stores messages sent (timestamp, type, user, text).
 
 
-![Alt text](../../diagrams/service-regis-proxy.png)
+![Alt text](../../diagrams/email-service-1.png)
 
 
 
