@@ -7,6 +7,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [System Design](#system-design)
   - [Table of Contents](#table-of-contents)
   - [Concepts](#concepts)
+  - [System Design Problems](#system-design-problems)
   - [Resources](#resources)
   - [Articles](#articles)
   - [How to Use This Repo](#how-to-use-this-repo)
@@ -25,6 +26,8 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Rate Limiting](./concepts/rate-limiting.md)
 - [Tradeoffs](./concepts/tradeoffs.md)
 
+## System Design Problems
+
 ## Resources
 
 A collection of materials referred to while learning:
@@ -36,7 +39,8 @@ A collection of materials referred to while learning:
 
 
 ## Articles
-- 
+- [Optimizing Netflix APIs](https://netflixtechblog.com/optimizing-the-netflix-api-5c9ac715cf19)
+- [Service Discovery](https://www.f5.com/company/blog/nginx/service-discovery-in-a-microservices-architecture)
 
 ## How to Use This Repo
 
