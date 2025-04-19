@@ -24,6 +24,7 @@
   - Scans email content
   - Sets tags like `[Spam]`, `[Promotion]`, `[Work]`, etc.
 - Tags are stored in the **Preference Store** mapped to Email ID
+  - The `Preference Store` is a central service/database that stores user-specific settings and preferences in JSON format.
 
 ### Manual Tagging:
 - Users can manually tag emails via UI
@@ -41,3 +42,12 @@
 4. **Email Service** fetches metadata and content for these IDs
 5. Attachments (if needed) are fetched using `getAttachmentsInBulk` from the **Drive Service**
 
+---
+
+
+| Function         | Flow                                                             |
+|------------------|------------------------------------------------------------------|
+| **Send Email**   | Gateway → Email Service → Drive Service + Event Queue           |
+| **Auto Tagging** | emailSentEvent → Spam Detector → Tags → Preference Store        |
+| **Manual Tagging** | User UI → Gateway → Preference Store                          |
+| **Search Email** | Gateway → Search Engine → Email Service + Drive (if attachments)|

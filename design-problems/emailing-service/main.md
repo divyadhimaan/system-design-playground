@@ -4,3 +4,4 @@
 - [Service Registration and Proxies](./service-registration-and-proxies.md)
 - [Authentication and global Cache](./auth-global-cache.md)
 - [API Contracts and Versioning](./api-contracts-and-versioning.md)
+- [Tagging, Sending and Searching emails](./tagging-sending-searching.md)
