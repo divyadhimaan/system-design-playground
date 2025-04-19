@@ -27,7 +27,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Tradeoffs](./concepts/tradeoffs.md)
 
 ## System Design Problems
-
+- [Email Service](./design-problems/emailing-service/main.md)
 ## Resources
 
 A collection of materials referred to while learning:
