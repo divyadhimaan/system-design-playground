@@ -5,3 +5,4 @@
 - [Authentication and global Cache](./auth-global-cache.md)
 - [API Contracts and Versioning](./api-contracts-and-versioning.md)
 - [Tagging, Sending and Searching emails](./tagging-sending-searching.md)
+- [Contacts and Groups](./contacts-and-groups.md)

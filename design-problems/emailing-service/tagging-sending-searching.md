@@ -14,6 +14,7 @@
    - Files are uploaded through the **Drive Service**
    - **Virus Detector** scans them before storage
 5. After processing, an `emailSentEvent` is pushed into the **Sent Email Event Queue**.
+    - Event Queue can be kafka
 
 
 ## Tagging Emails
@@ -51,3 +52,22 @@
 | **Auto Tagging** | emailSentEvent → Spam Detector → Tags → Preference Store        |
 | **Manual Tagging** | User UI → Gateway → Preference Store                          |
 | **Search Email** | Gateway → Search Engine → Email Service + Drive (if attachments)|
+
+
+
+
+
+---
+
+### Preference Store
+The Preference Store is a central service/database that stores user-specific settings and preferences in JSON format.
+
+Example Use Case Flow: 
+1. User sends email
+→ Email Service emits emailSentEvent
+→ Spam Detector scans it
+→ If spam → updates Preference Store with [Spam] tag
+
+2. User logs in on mobile
+→ Gateway fetches UI layout from Preference Store
+→ Renders the app accordingly
