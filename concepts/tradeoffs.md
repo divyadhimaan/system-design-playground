@@ -13,8 +13,8 @@
     - [Balanced Approach](#balanced-approach)
   - [Consistency vs. Availability](#consistency-vs-availability)
     - [Tradeoff](#tradeoff-3)
-  - [| **Tradeoff Scenario**      | User might get “error” or wait if data isn’t synced          | User gets older data instantly (better UX, less accurate)  |](#-tradeoff-scenario-------user-might-get-error-or-wait-if-data-isnt-synced-----------user-gets-older-data-instantly-better-ux-less-accurate--)
     - [Balanced Approach (in Distributed Systems)](#balanced-approach-in-distributed-systems)
+  - [Latency vs accuracy](#latency-vs-accuracy)
 
 ## Pull vs Push Architecture
 
@@ -109,8 +109,28 @@ A hybrid model often uses message queues or event streams to balance between pus
 | **Suitable for**           | Banking, inventory, order processing                         | Social media, content delivery                             |
 | **Example in Instagram**   | Ensuring a DM is only marked “seen” after delivery confirmation | Viewing a feed or stories even if one region’s DB is down |
 | **Tradeoff Scenario**      | User might get “error” or wait if data isn’t synced          | User gets older data instantly (better UX, less accurate)  |
+
 ---
 ### Balanced Approach (in Distributed Systems)
 - Use **eventual consistency** where strong consistency isn’t critical.
 - Design **fallback mechanisms** (e.g., show cached feed if DB is unreachable).
 - **Partitioned system** may prefer availability (AP) or consistency (CP) depending on context.
+
+
+## Latency vs accuracy
+
+| **Aspect**           | **Latency**                                                                 | **Accuracy**                                                                 |
+|----------------------|------------------------------------------------------------------------------|-------------------------------------------------------------------------------|
+| **Definition**        | Time delay between input and output                                          | How correct or precise the result/output is                                  |
+| **Goal**              | Make the system respond **faster**                                           | Make the system respond **more correctly**                                   |
+| **Unit**              | Measured in **milliseconds (ms)** or seconds                                 | Measured in **percentage (%)** or error metrics (precision, recall, etc.)     |
+| **Value Interpretation**  | **High latency** ~ **Slow response**                                                            | **High accuracy** ~ **Better output correctness**                                             |
+| **Critical In**       | Real-time systems where response time matters                                | Decision-making systems where correctness matters                             |
+| **Use Cases**         |  Gaming, Voice assistants, Self-driving cars,  High-frequency trading, typing autocomplete  |  Medical diagnosis, Fraud detection,  Credit scoring, Image classification |
+| **Optimization**      | Model compression, edge computing, caching                                   | Data quality improvement, larger/deeper models, advanced training methods     |
+| **Example**           | How quickly a chatbot replies to a message                                   | Whether the chatbot gives the **right** answer                                |
+
+
+> Reducing latency involves avoiding blocking or waiting for resources. Sacrificing accuracy for faster responses involves making guesses on past data.
+
+---
