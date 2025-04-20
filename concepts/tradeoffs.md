@@ -15,6 +15,13 @@
     - [Tradeoff](#tradeoff-3)
     - [Balanced Approach (in Distributed Systems)](#balanced-approach-in-distributed-systems)
   - [Latency vs accuracy](#latency-vs-accuracy)
+  - [Tradeoffs](#tradeoffs)
+    - [Memory](#memory)
+    - [Throughput](#throughput)
+    - [Cost](#cost)
+    - [Latency](#latency)
+    - [Consistency](#consistency)
+    - [Availability](#availability)
 
 ## Pull vs Push Architecture
 
@@ -134,3 +141,35 @@ A hybrid model often uses message queues or event streams to balance between pus
 > Reducing latency involves avoiding blocking or waiting for resources. Sacrificing accuracy for faster responses involves making guesses on past data.
 
 ---
+
+
+## Tradeoffs
+
+### Memory
+- Increasing memory allows more data to be cached.
+- ✅ Lowers latency.
+- ⚠️ Raises cost.
+- Impact on consistency/availability depends on cache policies.
+
+### Throughput
+- Inversely related to latency.
+- ⬇️ Latency → ⬇️ Throughput.
+- No significant link with cost or availability.
+
+### Cost
+- ⬆️ Cost may reduce latency by allocating better resources.
+- ❌ No direct link to throughput, consistency, or availability.
+
+### Latency
+- ⬇️ Latency possible with ⬆️ cost, but not guaranteed.
+- Inversely related to consistency: tolerating inconsistency allows faster response.
+
+### Consistency
+- Inversely related to availability (CAP theorem).
+- ⬆️ Consistency → ⬇️ Availability.
+- More dependent on algorithms than on cost (e.g., Paxos, Raft).
+
+### Availability
+- Inversely related to consistency.
+- Requires partition tolerance.
+- Real-world systems aim for acceptable levels of both based on SLAs.
