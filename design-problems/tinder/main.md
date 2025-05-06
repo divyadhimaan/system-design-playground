@@ -1,20 +1,19 @@
 # Tinder
 
-## Requirement
-
+Requirements
 - Storing Profiles
 - Recommend Profiles
 - Note Matches
 - Direct Messaging
 
 
-## Tinder Feature breakdown
+# Tinder Feature breakdown
 
-### Image Storing
+## Image Storing
 
 How images are stored in DB. If we assume there are 5 images uploaded per user. Its a large number.
 
-#### File vs Blob (Binary Large Object)
+### File vs Blob (Binary Large Object)
 
  > Features provided by database when store images as BLOB
 
@@ -26,7 +25,7 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 | Access control | Storing images as BLOB's in database provides us access control, but we can achieve the same mechanisms using the file system. |
 
 
-#### Why file is better
+### Why file is better
 - File is cheaper
 - faster as store large files seperately
 - Use CDNs for faster access, since files are static
@@ -34,7 +33,7 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 > We Use Distributed File System
 
 
-### Profile Creation, authentication
+## Profile Creation, authentication
 
 - First the system should allow a new user to create an account and once the account has been created then it needs to provide the user with an authentication token. 
 - This token will be used by the API gateway to validate the user.
@@ -42,7 +41,7 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
   - We can store images as file in File systems
   - We can store images as BLOB in databases.
 
-#### Components Required
+### Components Required
 
 - API Gateway Service
 - DFS Image Storing
@@ -52,20 +51,20 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 
 ---
 
-### One to One Chat Messaging
+## One to One Chat Messaging
 
 - System should allow one to one chat messaging between two users if and only if they have matched. So we have to connect one client to another.
 - To achieve this we use XMPP protocol that allows peer to peer communication.
   - Direct Messaging or chatting with matches can be done using the XMPP protocol, which uses web sockets to have peer to peer communications between client and server. 
   - Each connection is built over TCP, ensuring that the connection is maintained. 
 
-#### Components required
+### Components required
 - Relational database
   - We will use this database to store the user ID and connection ID
 - Cache
   - We do not want to access database every time a client sends a message, so we can use a cache to store the user ID and connection ID.
 
-#### Trade-offs
+### Trade-offs
 
 - Use of HTTP for chat v/s Use of XMPP for one to one messaging
 
@@ -81,7 +80,7 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 
 ---
 
-### Matched Users Data
+## Matched Users Data
 
 - Server should store the following information
   - Users who have matched (both have right swiped each other)
@@ -89,12 +88,12 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 - This service would also allow the chat service to check if the users are matched and then allow one to one chat messaging.
 
 
-#### Components required
+### Components required
 - Relational database
   - We will use this database to store the user IDs of both the user
   - We will use indexes on the user ID to make queries faster.
   - 
-#### Trade-offs
+### Trade-offs
 - Storing match details on the client v/s Storing match details on the server
   - One benefit of storing the match details on the client we save storage on the server side.
   However, as we are storing only the user IDs it is not significant.
@@ -107,3 +106,39 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 ![Alt text](./../../diagrams/tinder-3.png)
 
 ----
+
+## Recommendations
+
+- Server should be able to recommend profiles to users. 
+- These recommendations should take into consideration the age and gender preferences. 
+- Server should also be able to recommend profiles that are geographically close to the user.
+  
+### Components required
+- Relational database
+  - We can do horizontal partitioning (sharding) on the database based on the location. Also, we can put indexes on the name and age, so we can do efficient query processing.
+  - For every database partition we will have a master slave architecture. This will allow the application to work even if the primary database fails.
+
+![Alt text](./../../diagrams/tinder-4.png)
+
+--- 
+## Final Design
+
+![Alt text](./../../diagrams/tinder-5.png)
+
+## Required APIs
+
+- Profile service
+  - `POST /user/signup` - Creates new account
+  - `GET /user/login` - Sends the user authentication token
+  - `GET /user/:userID` - Gets the profile of the user ID
+  - `PUT /user/:userlD` - Update user details 
+  - `DELETE /user/:userlD` - Removes the user account
+- Session service
+  - `GET /session/users/:connectionID `- Returns both the users that have the connection ID.
+  - `DELETE /session/connection/:connectionID` - Deletes all the data that have the connection ID.
+  - `POST /session/connection/:userlD1/:userlD2` - Adds user ID1 and user ID2 with the same connection ID.
+- Matcher service
+  - `GET /match` - Return all the matches of the logged-in user.
+  - `DELETE /match/:userlD` - Deletes the user ID from the match list.
+  Recommendation service
+  - `GET /recommendation` - Returns a collection of most appropriate profiles for logged-in user.
