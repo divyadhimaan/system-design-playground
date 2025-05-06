@@ -33,3 +33,20 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 - Store File url in DB
 > We Use Distributed File System
 
+
+### Profile Creation, authentication
+
+- First the system should allow a new user to create an account and once the account has been created then it needs to provide the user with an authentication token. 
+- This token will be used by the APl gateway to validate the user.
+- System needs to store profile name, age, location and description in a relational database. However, there are 2 ways to store images.
+  - We can store images as file in File systems
+  - We can store images as BLOB in databases.
+
+#### Components Required
+
+- API Gateway Service
+- DFS Image Storing
+- Relational Database for User details
+
+![Alt text](./../../diagrams/tinder-1.png)
+
