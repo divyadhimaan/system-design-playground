@@ -12,6 +12,8 @@ This repository contains notes, diagrams, and code snippets created while learni
   - [Articles](#articles)
   - [How to Use This Repo](#how-to-use-this-repo)
   - [Contributing](#contributing)
+  - [Glossary](#glossary)
+    - [Consistent Hashing](#consistent-hashing)
 
 
 ## Concepts
@@ -25,6 +27,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Observability in Distributed Systems](./concepts/observability.md)
 - [Rate Limiting](./concepts/rate-limiting.md)
 - [Tradeoffs](./concepts/tradeoffs.md)
+
 
 ## System Design Problems
 - [Email Service](./design-problems/emailing-service/main.md)
@@ -55,3 +58,9 @@ A collection of materials referred to while learning:
 This is a personal learning repo, but feel free to open issues or PRs if you spot something helpful to add.
 
 ---
+
+## Glossary
+
+### Consistent Hashing
+
+Consistent Hashing maps servers to the key space and assigns requests(mapped to relevant buckets, called load) to the next clockwise server. Servers can then store relevant request data in them while allowing the system flexibility and scalability.
