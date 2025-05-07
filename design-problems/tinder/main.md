@@ -131,14 +131,14 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
   - `POST /user/signup` - Creates new account
   - `GET /user/login` - Sends the user authentication token
   - `GET /user/:userID` - Gets the profile of the user ID
-  - `PUT /user/:userlD` - Update user details 
-  - `DELETE /user/:userlD` - Removes the user account
+  - `PUT /user/:userID` - Update user details 
+  - `DELETE /user/:userID` - Removes the user account
 - Session service
   - `GET /session/users/:connectionID `- Returns both the users that have the connection ID.
   - `DELETE /session/connection/:connectionID` - Deletes all the data that have the connection ID.
-  - `POST /session/connection/:userlD1/:userlD2` - Adds user ID1 and user ID2 with the same connection ID.
+  - `POST /session/connection/:userID1/:userID2` - Adds user ID1 and user ID2 with the same connection ID.
 - Matcher service
   - `GET /match` - Return all the matches of the logged-in user.
-  - `DELETE /match/:userlD` - Deletes the user ID from the match list.
-  Recommendation service
+  - `DELETE /match/:userID` - Deletes the user ID from the match list.
+- Recommendation service
   - `GET /recommendation` - Returns a collection of most appropriate profiles for logged-in user.
