@@ -132,3 +132,4 @@ E.g. if the last seen of user X is 3sec and the threshold is 5sec then other use
 ## Optimizations
 - `Graceful degradations`: On some occasions, our system might get so many messages that systems get overloaded. In such cases, we can temporarily shut down services that are not critical to our service (like sending read receipts or last seen status, etc).
 - `Rate Limiting`: In some situations, it might happen that we cannot handle any more requests. In such cases, we can rate-limit the number of requests and drop extra requests. However, this results in a bad user experience.
+

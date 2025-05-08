@@ -119,3 +119,14 @@ For large users, these are the requirements
 
 
 
+3. How do you serve dynamic ads to different user cohorts in real-time?
+
+      > Virtual advertising is the use of digital technology to insert virtual advertising content into a live or pre-recorded television show, often in sports events. 
+      > 
+      > This technique is often used to allow broadcasters to overlay existing physical advertising panels (on the playfield) with virtual content on the screen when broadcasting the same event in multiple regions
+
+- Identify user cohort based on attributes (e.g., location, age, behavior, device).
+- Call an ad server (or DSP) that selects the best ad using real-time bidding (RTB) or rules.
+- The ad server returns a personalized ad (video, banner, etc.) tailored to that user group.
+- Ads are delivered via ad tags or dynamically inserted into streams (using VAST, SSAI/DAI for video).
+- For real-time streams (like live video), Server-Side Ad Insertion (SSAI) is used to stitch ads without buffering.
