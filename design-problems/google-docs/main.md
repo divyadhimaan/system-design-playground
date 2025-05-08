@@ -81,14 +81,41 @@ To manage document content efficiently, we should use a tree-based structure rat
 
   - These are lightweight and make real-time collaboration efficient.
   - Deltas also allow the undo feature to be used.
+  
 - Full snapshot versions (checkpointing):
   - Store a full snapshot of the document after every N edits or T time interval.
   - Example:
-    - Every 100 edits or every 5 minutes, whichever comes first
+    - Every 100 edits or every 30 minutes, whichever comes first (Cron Job)
   - Snapshots make it faster to restore or go back in history.
+  - We have to keep in mind not to cause `Thundering herd problem`.
+  
 - We should have a hybrid model of storing both.
   - Efficient: Storing deltas keeps storage small.
   - Recoverable: Snapshots prevent the need to replay millions of deltas.
   - Scalable: Works even for massive docs with thousands of updates per hour.
   
 > We store every edit as a delta (insert/delete op), and periodically checkpoint the document as a full snapshot every 100-500 edits or every 5-10 minutes to balance storage efficiency and recovery speed.
+
+
+#### Thundering Herds in Crons
+
+- Thundering Herd happens when many cron jobs (or tasks) all start at the same time (e.g., at 00:00).
+
+- They all compete for CPU, DB, disk, or network at once → causing spikes and system overload.
+
+
+    > Example - Suppose you have 10,000 users and every user’s daily backup cron is scheduled for midnight (00:00).
+    > 
+    > Result at 00:00:
+    > - 10,000 jobs hit the server/DB at the same second
+    > - Causes traffic spike, DB lock contention, possible failures or slowdowns.
+
+
+- Solution
+  - Avoid all jobs starting at once -> Spread them evenly over time.
+
+  - Use `cron indexes` (a unique number per job) to calculate staggered timings.(Staggered time means spreading tasks over different times instead of running them all at once.)
+  - cron index -> (total documents/time)
+  
+- We assign each cron job a unique cron index and compute its schedule by spreading execution time across available minutes/hours using modulo arithmetic, effectively avoiding thundering herd problems.
+
