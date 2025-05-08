@@ -17,9 +17,7 @@
 7. Offline and Collaborative Editing
 
 
-## Reading and Writing Documents
-
-Document Schema
+## Document Schema
 
 We can essentially store document info as below. But the data column will be very big and is not queries as often as the other metadata. 
 ![Alt text](./../../images/gd-1.png)
@@ -44,3 +42,53 @@ A SQL database is used for storing content/data of the document.
 
 This way we can store the data and metadata of the document as a json.
 ![Alt text](./../../images/gd-4.png)
+
+
+## Storing Document Content
+
+### How large can a document be?
+
+- A document can be up to 1.02 million characters(according to google docs specs). But we can define a document limit of 1 million chars.
+- Also keeping in mind images and other media, they donot contribute to the char limit. But a limit can be added (like 100MB).
+
+### How do we store a document of any size?
+
+- `Chunking`: This allows large documents to scale and makes real-time collaboration efficient. 
+To manage document content efficiently, we should use a tree-based structure rather than a linked list:
+
+  - `Rope Data Structure`: A balanced binary tree where each leaf node stores a text chunk. This allows efficient random access, insertion, and deletion in O(log n) time.
+
+  - Advantages over LinkedList: Supports both forward and backward traversal, avoids propagation issues during edits, and scales well for documents with millions of characters.
+
+  - Real-world systems (e.g., collaborative editors) use similar tree or piece-table structures to handle concurrent editing and large-scale content management.
+
+
+
+### What type of database is suitable for this?
+
+- NoSQL DB (e.g., MongoDB, Cassandra, DynamoDB)
+- Good if you want flexible schema + high write throughput.
+-  Used in systems where eventual consistency is acceptable for some parts
+
+
+## Version History
+
+- Keeping the original document in the storage as is, we would maintain a seperate table for storing the versions of the document. (version-id -> content)
+### Versioning Strategy
+
+- Delta-based saving (per edit or per batch):
+  - Store small diffs (deltas) for each user edit (e.g., insert/delete ops).
+
+  - These are lightweight and make real-time collaboration efficient.
+  - Deltas also allow the undo feature to be used.
+- Full snapshot versions (checkpointing):
+  - Store a full snapshot of the document after every N edits or T time interval.
+  - Example:
+    - Every 100 edits or every 5 minutes, whichever comes first
+  - Snapshots make it faster to restore or go back in history.
+- We should have a hybrid model of storing both.
+  - Efficient: Storing deltas keeps storage small.
+  - Recoverable: Snapshots prevent the need to replay millions of deltas.
+  - Scalable: Works even for massive docs with thousands of updates per hour.
+  
+> We store every edit as a delta (insert/delete op), and periodically checkpoint the document as a full snapshot every 100-500 edits or every 5-10 minutes to balance storage efficiency and recovery speed.
