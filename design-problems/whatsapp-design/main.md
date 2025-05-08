@@ -1,5 +1,6 @@
 # Whatsapp - Chat Application
 
+> Check the final architecture Diagram [here](./final-architecture.png)
 
 ## Requirements
 - One to One Chat
@@ -126,7 +127,6 @@ E.g. if the last seen of user X is 3sec and the threshold is 5sec then other use
 - Store File url in DB
 > We Use Distributed File System
 
-![Alt text](./../../diagrams/wa-4.png)
 
 
 ## Optimizations

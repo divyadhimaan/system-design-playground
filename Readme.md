@@ -55,6 +55,7 @@ A collection of materials referred to while learning:
 ## Articles
 - [Optimizing Netflix APIs](https://netflixtechblog.com/optimizing-the-netflix-api-5c9ac715cf19)
 - [Service Discovery](https://www.f5.com/company/blog/nginx/service-discovery-in-a-microservices-architecture)
+- [Estimations - Numbers everyone should know](https://highscalability.com/numbers-everyone-should-know/)
 
 ## How to Use This Repo
 

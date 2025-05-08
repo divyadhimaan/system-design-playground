@@ -1,5 +1,7 @@
 # Tinder
 
+> Check the final architecture Diagram [here](./final-architecture.png)
+
 Requirements
 - Storing Profiles
 - Recommend Profiles
@@ -121,9 +123,6 @@ How images are stored in DB. If we assume there are 5 images uploaded per user. 
 ![Alt text](./../../diagrams/tinder-4.png)
 
 --- 
-## Final Design
-
-![Alt text](./../../diagrams/tinder-5.png)
 
 ## Required APIs
 

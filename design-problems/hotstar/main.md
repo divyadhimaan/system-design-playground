@@ -1,5 +1,7 @@
 # Hotstar - Live Streaming
 
+> Check the final architecture Diagram [here](./final-architecture.png)
+
 For large users, these are the requirements
 - Ingest live HD video.
 - Transform video for different users.
@@ -71,6 +73,7 @@ For large users, these are the requirements
 
 - We want CDNs to take care of the Caching of videos
 - We can cache the user requested endpoints. `(userId, liveStreamId) -> endpoint`.
+- cache hot video segments in memory (Servers - layer 2)
 
 
 ### Tradeoffs
@@ -81,3 +84,38 @@ For large users, these are the requirements
     | ---------- | ----------------------- | --------------- | ---------------------------- | --------------------------------------------- |
     | **CMAF (HLS/DASH)**   | HTTP-based streaming    | Low (2-5s)      | **TCP** (HTTP-based)         | Scalable live streaming (sports, events)      |
     | **WebRTC** | Real-time communication | Ultra-low (<1s) | **UDP** (uses SRTP over UDP) | Video calls, gaming, interactive live streams |
+
+
+### Diagram
+
+![Alt text](./../../diagrams/hotstar-2.png)
+
+---
+
+### FAQs
+---
+1.  How the video captured by camera finally reaches the transformation service?
+
+
+
+    - Modern IP cameras have in-built RTMP encoders so they can directly post the video frames to backend.
+
+    - Otherwise, need an encoder that initiates RTMP requests for posting the frames.
+
+    - Cameras (Video Captures) output to HDMI/USB connected to → Mixer (Software/Hardware) (optional) -> Encoder (Software/Hardware) converts to H.264 and initates → RTMP Stream → Backend Server (RTMP Server)
+
+    - When you have multiple cameras, Mixer is used by broadcaster to mix all inputs of video/audio feeds to produce a single output
+
+
+
+    - For authentication, the initial request comes in with user_id and video_id.
+    - For security, use RTMPS which is secured version (similar to SSL/TLS)
+---
+2. Why are we not chunking the video into pieces on the ingestion side?
+   - The original video will be broken into chunks of equal size, and assigned to different worker nodes in the system. 
+   - As these chunks are processed into different resolutions and codecs, we push the results to a distributed file system like S3.
+   - We are mainly interested in the hot chunks of the video (last 60 seconds) as most of our viewers want to view the video live.
+ ---
+
+
+
