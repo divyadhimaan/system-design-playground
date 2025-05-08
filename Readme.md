@@ -17,6 +17,8 @@ This repository contains notes, diagrams, and code snippets created while learni
     - [FFMPEG](#ffmpeg)
     - [AVI](#avi)
     - [Homebrew](#homebrew)
+    - [HLS](#hls)
+    - [DASH](#dash)
 
 
 ## Concepts
@@ -84,3 +86,13 @@ AVI, or Audio Video Interleave, is a multimedia container format developed by Mi
 ### Homebrew
 
 Homebrew is a package manager for macOS (and Linux) that simplifies the installation, updating, and management of software on your system.
+
+### HLS
+- HLS, or HTTP Live Streaming, is a widely used video streaming protocol developed by Apple that delivers audio and video content over the internet. 
+- It's known for its adaptability to changing network conditions, reliability, and compatibility with various devices and browsers. 
+- HLS works by breaking down video files into smaller segments, which are then downloaded and played sequentially by a video player.
+
+### DASH
+
+- Dynamic Adaptive Streaming over HTTP (DASH) is a streaming technology that adapts video quality in real-time based on network conditions, delivering high-quality video over the internet using standard HTTP servers. 
+- It achieves this by breaking down video content into segments, each with varying bitrates, and allowing the client device to dynamically select the most appropriate segment for the current network bandwidth
