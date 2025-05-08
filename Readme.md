@@ -14,6 +14,9 @@ This repository contains notes, diagrams, and code snippets created while learni
   - [Contributing](#contributing)
   - [Glossary](#glossary)
     - [Consistent Hashing](#consistent-hashing)
+    - [FFMPEG](#ffmpeg)
+    - [AVI](#avi)
+    - [Homebrew](#homebrew)
 
 
 ## Concepts
@@ -33,6 +36,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Email Service](./design-problems/emailing-service/main.md)
 - [Tinder Design](./design-problems/tinder/main.md)
 - [Whatsapp Design](./design-problems/whatsapp-design/main.md)
+- 
 
 
 
@@ -69,3 +73,14 @@ This is a personal learning repo, but feel free to open issues or PRs if you spo
 ### Consistent Hashing
 
 Consistent Hashing maps servers to the key space and assigns requests(mapped to relevant buckets, called load) to the next clockwise server. Servers can then store relevant request data in them while allowing the system flexibility and scalability.
+
+### FFMPEG
+FFmpeg is a powerful, free, and open-source multimedia framework used for decoding, encoding, transcoding, and streaming audio and video files.
+
+### AVI
+
+AVI, or Audio Video Interleave, is a multimedia container format developed by Microsoft to store both audio and video data in a single file, allowing for synchronized playback. 
+
+### Homebrew
+
+Homebrew is a package manager for macOS (and Linux) that simplifies the installation, updating, and management of software on your system.
