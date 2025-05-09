@@ -73,7 +73,7 @@ To manage document content efficiently, we should use a tree-based structure rat
 
 ## Version History
 
-- Keeping the original document in the storage as is, we would maintain a seperate table for storing the versions of the document. (version-id -> content)
+Keeping the original document in the storage as is, we would maintain a seperate table for storing the versions of the document. (version-id -> content)
 ### Versioning Strategy
 
 - Delta-based saving (per edit or per batch):
@@ -118,4 +118,96 @@ To manage document content efficiently, we should use a tree-based structure rat
   - cron index -> (total documents/time)
   
 - We assign each cron job a unique cron index and compute its schedule by spreading execution time across available minutes/hours using modulo arithmetic, effectively avoiding thundering herd problems.
+
+
+## Cost Optimization
+
+> We compress document versions to save storage and speed up transfer, while caching the most recent version in-memory for fast access. We balance compression level to avoid excessive CPU cost during decompression.
+
+### 1. Compression
+   - `Why?` Storing full document versions or deltas consumes a lot of storage.
+
+   - `What we do`: Compress versions before storing (using gzip, brotli, zstd).
+
+   - Result (Pros): 
+     - Storage cost drops (smaller files).
+     - Faster network transfer (less data over wire).
+   - Cons:
+     - Extra CPU cost: Decompressing takes processing time
+     - Slower reads if overdone:	Frequent decompressing can slow queries
+   - Use lightweight compression for frequently accessed data, and strong compression for cold storage.
+
+### 2. Caching the Most Recent Version
+  - `Why?` Most reads/edits happen on the latest version.
+
+  - `What we do:` Cache latest version in-memory (using Redis, Memcached).
+
+  - Result (Pros):
+    - Instant access to most common version.
+    - Reduces DB/storage load.
+  
+## Logging Operations
+
+> We log user operations (insert, delete, format) as lightweight events for fast writes. Reads reconstruct the document by applying logs on top of periodic snapshots, allowing efficient versioning and collaborative editing.
+
+>To balance log size and read speed, we periodically create snapshots and prune old logs.
+
+`Why?` Instead of rewriting the whole document on every change -> we log only the user operations (insert, delete, format, etc.)
+
+- This gives us:
+  - Fast writes (small logs instead of big writes)
+
+  - Fast reads (can reconstruct latest version quickly)
+
+- Working
+  - Each Edit = Logged Operation
+    - User types "a" -> we log:
+{ op: "insert", char: "a", pos: 5, user: "u1", timestamp: T }
+    - User deletes -> { op: "delete", pos: 3, user: "u2", timestamp: T2 }
+  - Log Structure
+    - Stored as an ordered list (by timestamp or operation version).
+    - Often backed by:
+      - Log-structured storage (like LSM Trees)
+      - Or append-only systems (like Kafka, Write-Ahead Log)
+
+
+### Benefits
+
+| Feature                 | Why it's Good                                         |
+| ----------------------- | ----------------------------------------------------- |
+| **Fast writes**         | Just append small operation logs (cheap I/O)          |
+| **Fast reads**          | Can replay logs or use snapshot + logs                |
+| **Collaborative edits** | Multiple user ops merge nicely with OT/CRDT           |
+| **Versioning**          | Easy to reconstruct any past version by replaying ops |
+
+
+### Challenges
+
+| Problem             | Solution                                               |
+| ------------------- | ------------------------------------------------------ |
+| **Log grows big**   | Periodic **snapshots** (checkpointing)                 |
+| **Merge conflicts** | Use **Operational Transform (OT)** or **CRDT**         |
+| **Latency**         | Cache **latest document state** (logs applied up to T) |
+
+
+## Concurrent Writes with locks
+
+- If **2 users edit same doc**:
+  - Write locks = only 1 can edit -> others must wait (`pessimistic lock`).
+  - `Optimistic lock` = both edit, but loser must retry -> **wasteful**.
+- **Exclusive locks** on the document = kills concurrent writes -> **too slow**.
+-  **Locking doesn’t scale** for real-time collaborative editing.
+
+
+- Locking (optimistic or pessimistic) is **not suitable** for collaborative docs.
+- Need to use **operation-based syncing models** like **OT (Operational Transformation)** or **CRDT (Conflict-free Replicated Data Types)** instead of locking.
+
+
+|                       | **Optimistic Locking**                          | **Pessimistic Locking**                        |
+|-----------------------|---------------------------------------------------|--------------------------------------------------|
+| **How it works**   | Reads record with version, checks version before write | Locks record exclusively until transaction finishes |
+| **Atomicity**      | Updates only if version matches                   | No concurrent writes allowed during lock         |
+| **On conflict**    | Aborts, transaction must retry or fail             | Blocks other writers until lock is released      |
+| **Best for**       | High-volume systems, stateless 3-tier apps         | Direct DB connections (2-tier), distributed TxIDs |
+| **Drawbacks**      | Wasteful retries if high concurrency               | Slow, causes contention and risk of deadlocks    |
 
