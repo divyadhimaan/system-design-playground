@@ -211,3 +211,57 @@ Keeping the original document in the storage as is, we would maintain a seperate
 | **Best for**       | High-volume systems, stateless 3-tier apps         | Direct DB connections (2-tier), distributed TxIDs |
 | **Drawbacks**      | Wasteful retries if high concurrency               | Slow, causes contention and risk of deadlocks    |
 
+--- 
+## Permissions
+
+We use a permission manager service to keep track off all permissions in a document, stored in a NoSQL store.
+
+![Alt text](./../../images/gd-5.png)
+
+### Step 1: Client Sends Request
+- User 123 sends a request from the **Client** to access a document.
+- The request is routed to the central **Gateway**.
+
+---
+
+### Step 2: Gateway Checks Permissions
+- The **Gateway** queries the **Permission Manager** to check:
+  - Does **User 123** have permission to access this document?
+  - What **role** do they have? (Owner / Reader / Editor)
+
+---
+
+### Permission Manager Lookup
+- Permissions are stored in a **NoSQL store** (or cache like Redis).
+- Example `access_permissions` stored as JSON:
+
+```json
+{
+  "123": "Owner",
+  "456": "Read",
+  "*": "Read"  // Anyone with the link can read
+}
+```
+---
+
+### Step 3: Unauthorized Flow
+
+
+If User 123 is not in the permissions list -> Gateway returns 401 Unauthorized.
+
+---
+
+### Anonymous Link Access
+- An Anonymous user using a link triggers:
+  - Permission Manager checks the rule (*: "Read").
+  - If the doc is Open to all, they get read-only access.
+
+---
+
+### Step 4: Valid Access
+- Once verified:
+  - The Gateway routes the request to the Document Service.
+  - Document Service serves doc content based on the user’s role:
+    - Editor -> Can edit.
+    - Viewer -> Can only view.
+    - Commenter -> Can comment.
