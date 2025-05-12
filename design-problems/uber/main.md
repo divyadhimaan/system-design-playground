@@ -9,3 +9,7 @@
 5. Estimate time of arrival
 
 The system design is centered around a user who books a cab from point A to point B, and the use case can be extended to other apps such as food delivery and pick-up/drop-off services.
+
+
+## Pricing
+
