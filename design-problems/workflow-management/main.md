@@ -89,3 +89,24 @@ Architecture`.
 
 ## Final Architecture Diagram 
 ![Alt text](./final-architecture.png)
+
+---
+
+
+## How can we extend this architecture to rank restaurants in real time? What are some factors to consider when ranking a restaurant in real-time? 
+
+- The delivery_time comes from delivery database and status comes from payment database
+  
+    ![Alt text](./../../images/wm-1.png)
+
+- We perform join on both DBs
+  
+    ![Alt text](image.png)
+
+
+- Next, we filter based on delivery_time and status.
+  
+    ![Alt text](./../../images/wm-2.png) ![Alt text](./../../images/wm-3.png)
+
+- Reduce based on counting the filtered rows.
+    ![Alt text](./../../images/wm-4.png)
