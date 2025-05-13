@@ -95,18 +95,32 @@ Architecture`.
 
 ## How can we extend this architecture to rank restaurants in real time? What are some factors to consider when ranking a restaurant in real-time? 
 
-- The delivery_time comes from delivery database and status comes from payment database
+- `Requirement`: Rank restaurants in real-time based on metrics like failed deliveries where:
+    - delivery_time > 30 minutes
+    - status = customer_cancelled
+
+- `Flow`
+1. Data Sources
+  - Two main databases in the data lake:
+    - Delivery Database: contains delivery time
+    - Payments Database: contains order status
   
     ![Alt text](./../../images/wm-1.png)
 
-- We perform join on both DBs
-  
+1. Join Phase
+
+   - Join records from both databases on a common key (e.g., order_id)
+    
     ![Alt text](image.png)
 
-
-- Next, we filter based on delivery_time and status.
+1. Filter Phase
+- Apply filters to the joined data:
+  - Filter 1: delivery_time > 30 minutes
+  - Filter 2: status = 'customer_cancelled'
   
     ![Alt text](./../../images/wm-2.png) ![Alt text](./../../images/wm-3.png)
 
-- Reduce based on counting the filtered rows.
+1. Reduce Phase
+
+- Count the number of filtered rows (i.e., failed deliveries)
     ![Alt text](./../../images/wm-4.png)
