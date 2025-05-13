@@ -40,7 +40,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Whatsapp Design - Chat Application](./design-problems/whatsapp-design/main.md)
 - [Google Docs - Collaborative Editor Design](./design-problems/google-docs/main.md)
 - [Uber - Cab Aggregator App](./design-problems/uber/main.md)
-- [Recommendation Engine](./design-problems/recommendation-engine/main.md)
+- [Recommendation Engine](./design-problems/workflow-management/main.md)
 
 
 
