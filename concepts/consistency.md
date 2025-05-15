@@ -34,6 +34,7 @@ In distributed systems, consistency means how up-to-date a piece of data is.
     - [Benefits](#benefits-3)
     - [Drawbacks](#drawbacks-3)
     - [Implementation](#implementation-3)
+- [Data Consistency Levels Tradeoffs](#data-consistency-levels-tradeoffs)
 
 ## Why is consistency important? 
 
@@ -256,3 +257,13 @@ If the system uses quorum rules like `R + W > N`, for example:
 - **Write quorum (W)**: System writes the update to `W` replicas before confirming success.
 - Quorum ensures strong consistency when `R + W > N`.
 - Used in systems like **Apache Cassandra**, **Amazon DynamoDB**, **Riak**, and **MongoDB (with read/write concern settings)**.
+
+
+# Data Consistency Levels Tradeoffs
+
+| **Level**              | **Consistency**                                                  | **Efficiency**                                                  |
+|------------------------|------------------------------------------------------------------|-----------------------------------------------------------------|
+| **Linearizable**       | Highest                                                          | Lowest                                                          |
+| **Eventual Consistency** | Lowest                                                           | Highest                                                         |
+| **Causal Consistency** | Higher than eventual consistency but lower than linearizable     | Higher than linearizable but lower than eventual consistency    |
+| **Quorum**             | Configurable                                                     | Configurable                                                    |
