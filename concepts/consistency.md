@@ -2,6 +2,39 @@
 
 In distributed systems, consistency means how up-to-date a piece of data is.
 
+
+- [Consistency](#consistency)
+  - [Why is consistency important?](#why-is-consistency-important)
+- [Consistency Levels](#consistency-levels)
+  - [Linearizable Consistency](#linearizable-consistency)
+    - [Definition](#definition)
+    - [Example](#example)
+    - [Benefits](#benefits)
+    - [Drawbacks](#drawbacks)
+    - [Implementation](#implementation)
+  - [Eventual Consistency](#eventual-consistency)
+      - [Definition](#definition-1)
+    - [Use Case](#use-case)
+    - [Example](#example-1)
+    - [Benefits](#benefits-1)
+    - [Drawbacks](#drawbacks-1)
+    - [Implementation](#implementation-1)
+  - [Causal Consistency](#causal-consistency)
+    - [Definition](#definition-2)
+    - [Use Case](#use-case-1)
+    - [Example](#example-2)
+    - [Benefits](#benefits-2)
+    - [Drawbacks](#drawbacks-2)
+    - [Aggregation Limitation Example](#aggregation-limitation-example)
+    - [Implementation](#implementation-2)
+  - [Quorum](#quorum)
+    - [Definition](#definition-3)
+    - [Use Case](#use-case-2)
+  - [Example](#example-3)
+    - [Benefits](#benefits-3)
+    - [Drawbacks](#drawbacks-3)
+    - [Implementation](#implementation-3)
+
 ## Why is consistency important? 
 
 - A highly consistent system reflects all updates to data, while an inconsistent system provides stale data. 
@@ -106,7 +139,7 @@ Here, the read is served `before` the write has fully propagated to all replicas
 
 - It is especially useful in collaborative applications, chat apps, and systems that require **partial ordering** of events.
 
-### Real Example  
+### Example  
 Consider the following operations:
 
 ```
@@ -163,9 +196,63 @@ Depending on the order of execution:
 
 This inconsistency happens because **causal consistency tracks per-key dependencies**, but **aggregation involves multiple keys**, leading to incorrect results.
 
-## Implementation  
+### Implementation  
 - **Track causal dependencies**: using vector clocks, version vectors, or Lamport timestamps.
 - **Group related operations** on the same key or context together to preserve their order.
 - Systems like **Cassandra (with tuning)**, **COPS**, **Bayou**, and **Orleans** offer causal consistency features.
 - **Client-based tracking**: Clients may carry dependency metadata to help servers maintain order.
  
+
+ ## Quorum
+
+### Definition  
+- Quorum consistency is a consistency model used in distributed systems where **multiple replicas** of data exist, and **read/write operations require agreement (or a "quorum")** from a subset of those replicas. 
+- The system uses a voting or consensus-like mechanism to determine the correct value, typically by querying a minimum number of replicas.
+
+- Quorum systems are typically **eventually consistent**, but can be tuned to provide **strong consistency** using the formula: `R + W > N`
+Where:
+  - **R** = Minimum number of replicas to read from  
+  - **W** = Number of replicas to write to  
+  - **N** = Total number of replicas  
+  
+> If `R + W ≤ N`, system becomes **eventually consistent**.
+
+### Use Case  
+- Used in distributed databases where you want a trade-off between **availability**, **fault tolerance**, and **consistency**. 
+- Quorum is particularly useful in systems that need to survive **node failures** while maintaining **some level of consistency**.
+
+
+## Example  
+Consider 3 replicas:
+```
+Replica 1: x = 20
+Replica 2: x = 40 (after update)
+Replica 3: x = 20
+```
+- A read request comes in after Replica 2 crashes.
+- System reads from Replica 1 and 3 → returns x = 20 (stale data).
+- Once Replica 2 comes back online, the correct value (x = 40) is available.
+- System becomes consistent **eventually**.
+
+If the system uses quorum rules like `R + W > N`, for example:
+- `N = 5`, `W = 2`, then `R` should be `≥ 4` for strong consistency.
+- If only 3 nodes respond during a read, system throws an **error** or delays until quorum is met.
+
+
+### Benefits  
+- **Fault-tolerant**: Works even if some replicas are down.
+- **Configurable consistency**: Balance between performance, availability, and consistency.
+- **Scalable**: Suitable for large distributed systems.
+
+### Drawbacks  
+- **High cost**: Requires maintaining multiple replicas.
+- **Split-brain risk**: An even number of replicas may cause inconsistent decisions (tie votes).
+- **Latency**: Higher read/write latency due to quorum requirement.
+- **Stale reads**: If quorum isn't correctly configured, may return outdated data.
+
+### Implementation  
+- **Replica-based design**: Each data item is stored on multiple nodes.
+- **Read quorum (R)**: System must get responses from `R` replicas to process a read.
+- **Write quorum (W)**: System writes the update to `W` replicas before confirming success.
+- Quorum ensures strong consistency when `R + W > N`.
+- Used in systems like **Apache Cassandra**, **Amazon DynamoDB**, **Riak**, and **MongoDB (with read/write concern settings)**.
