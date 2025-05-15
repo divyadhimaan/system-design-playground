@@ -47,3 +47,45 @@ A linearizable system guarantees the following:
 - **Consensus protocols**: Use Paxos or Raft to maintain a globally agreed-upon order of operations.
 - **Replicated state machines**: All replicas apply operations in the same order.
 - **Quorum-based systems**: Ensure majority of nodes agree on the value before confirming read/write (e.g., read/write quorums).
+
+## Eventual Consistency
+
+#### Definition  
+- Eventual consistency is a **weaker consistency model** used in distributed systems. 
+- It allows the system to return **stale (outdated) data** temporarily, with the guarantee that, if no new updates are made to the data, **all replicas will eventually become consistent** and reflect the latest value.
+
+- During the inconsistency window, different nodes may return different values for the same data, but the system will **converge** to the latest state over time.
+
+### Use Case  
+Used in systems where `high availability`, `scalability`, and `low latency` are more important than immediate consistency — especially in scenarios where **temporary staleness is acceptable**.
+
+Examples include social media feeds, product recommendation engines, or shopping cart updates.
+
+### Example  
+Suppose a system initially has `x = 5`. Now:
+```
+write x = 10 # initiated
+read x → returns 5 # processed before write takes effect
+(read returns stale data)
+...time passes...
+read x → returns 10 # all replicas eventually updated
+```
+
+
+Here, the read is served `before` the write has fully propagated to all replicas, so stale data (`x = 5`) is returned. Later, the system catches up, and all subsequent reads return the correct data (`x = 10`).
+
+### Benefits  
+- **Highly available**: Can serve reads even during network partitions.
+- **Low latency**: Faster response since reads can be served from any replica.
+- **Scalable**: Suitable for large-scale distributed systems.
+
+### Drawbacks  
+- Clients may observe stale data temporarily.
+- Not suitable for scenarios requiring strong consistency (e.g., financial apps).
+- Developers must handle convergence and possible read-after-write inconsistencies.
+
+### Implementation  
+- **Asynchronous replication**: Writes propagate in the background across replicas.
+- **Concurrent processing**: Reads and writes processed in parallel using multi-threaded or multi-node setups.
+- **Conflict resolution mechanisms**: For resolving divergent states (e.g., last-write-wins, vector clocks, CRDTs).
+- Used by systems like **Amazon DynamoDB**, **Cassandra**, **Riak**, and **Couchbase**.
