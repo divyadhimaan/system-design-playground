@@ -8,6 +8,7 @@ In distributed systems, consistency means how up-to-date a piece of data is.
 - Consistency is important because highly consistent systems are easier to reason about and provide a better user experience.
 
 
+# Consistency Levels
 ## Linearizable Consistency
 
 ### Definition
@@ -70,7 +71,7 @@ read x → returns 5 # processed before write takes effect
 ...time passes...
 read x → returns 10 # all replicas eventually updated
 ```
-
+![Alt text](./../images/consistency-1.png)
 
 Here, the read is served `before` the write has fully propagated to all replicas, so stale data (`x = 5`) is returned. Later, the system catches up, and all subsequent reads return the correct data (`x = 10`).
 
@@ -89,3 +90,82 @@ Here, the read is served `before` the write has fully propagated to all replicas
 - **Concurrent processing**: Reads and writes processed in parallel using multi-threaded or multi-node setups.
 - **Conflict resolution mechanisms**: For resolving divergent states (e.g., last-write-wins, vector clocks, CRDTs).
 - Used by systems like **Amazon DynamoDB**, **Cassandra**, **Riak**, and **Couchbase**.
+
+
+## Causal Consistency
+
+### Definition  
+- Causal consistency is a **middle-ground consistency model** where operations that are **causally related** must be seen by all processes in the same order. 
+- However, operations that are **not causally related** can be seen in different orders on different nodes.
+
+- In simpler terms, if one operation potentially influences another (e.g., a read depending on a previous write), then all nodes must process them in that causal order. 
+- If there’s no causal link, then the order doesn't matter.
+
+### Use Case  
+- Causal consistency is used in distributed systems that need to maintain **data correctness across related operations** without the performance cost of strict consistency models like linearizability.
+
+- It is especially useful in collaborative applications, chat apps, and systems that require **partial ordering** of events.
+
+### Real Example  
+Consider the following operations:
+
+```
+1. update x = 20
+2. update y = 10
+3. read x
+4. update x = 2
+5. read y
+```
+
+- `read x` must reflect the result of `update x = 20` because they are causally related.
+- `update y` is independent of `x`, so it can be executed in any order relative to operations on `x`.
+
+Hence:
+- Operations (1, 3, 4) are executed on one thread/server.
+- Operations (2, 5) are executed on another thread/server.
+
+This preserves **causal ordering** for related operations, but allows **parallelism** for unrelated ones.
+
+### Benefits  
+- **Stronger than eventual consistency**: related updates maintain order.
+- **Better performance than linearizable consistency**: avoids global coordination and waiting for unrelated writes.
+- **Supports availability and partition tolerance** in distributed systems.
+
+### Drawbacks  
+- **Fails for aggregation queries** involving multiple keys or IDs.
+- **Complex to reason about** when operations span multiple unrelated entities.
+- **Partial ordering** is harder to implement and debug than total or no ordering.
+
+
+### Aggregation Limitation Example
+
+Consider a table:
+
+| uid | value |
+|-----|--------|
+| 1   | 20     |
+| 2   | 10     |
+| 3   | 30     |
+
+Now the operations:
+
+```
+i. read sum -> returns 60
+ii. update uid 1 = 10
+iii. read sum -> expected: 50
+iv. update uid 1 = 5
+```
+
+Depending on the order of execution:
+- If reads (i, iii) happen before updates, sum is 60 → 60 (wrong).
+- If reads happen after all updates, sum is 45 → 45 (wrong).
+- Only one specific ordering will give the correct result (60 → 50).
+
+This inconsistency happens because **causal consistency tracks per-key dependencies**, but **aggregation involves multiple keys**, leading to incorrect results.
+
+## Implementation  
+- **Track causal dependencies**: using vector clocks, version vectors, or Lamport timestamps.
+- **Group related operations** on the same key or context together to preserve their order.
+- Systems like **Cassandra (with tuning)**, **COPS**, **Bayou**, and **Orleans** offer causal consistency features.
+- **Client-based tracking**: Clients may carry dependency metadata to help servers maintain order.
+ 
