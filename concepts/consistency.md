@@ -53,6 +53,11 @@ In distributed systems, consistency means how up-to-date a piece of data is.
     - [Benefits](#benefits-6)
     - [Drawback](#drawback)
   - [Serializable](#serializable)
+    - [Example](#example-6)
+    - [Benefits](#benefits-7)
+    - [Drawback](#drawback-1)
+- [Summary](#summary)
+  - [Tradeoff](#tradeoff)
 
 ## Why is consistency important? 
 
@@ -394,3 +399,70 @@ In the same transaction (T2), reading x twice returned two different values, hen
 
 
 ## Serializable
+
+- Highest level of isolation in databases.
+
+- Ensures that transactions are executed serially or behave as if they were executed one after the other.
+
+- No other transaction can interfere—ensures complete isolation.
+
+- Avoids phantom reads (inserts/deletes by other transactions are not visible).
+
+- Uses locking or predicate-based locking to prevent other transactions from affecting the result.
+
+- Provides full serializability of concurrent transactions.
+
+- We use casual ordering
+
+### Example
+
+| ID | Value |
+| -- | ----- |
+| 1  | 20    |
+| 2  | 10    |
+
+
+Transactions
+
+| T1          | T2                      | Explanation                               |
+| ----------- | ----------------------- | ----------------------------------------- |
+| Sum         | --                      | T1 reads total = 30                       |
+| --          | Insert (ID=3, Value=30) | T2 inserts a new row                      |
+| --          | COMMIT                  | T2 commits                                |
+| Sum (again) | --                      | T1 reads total = 60 (phantom read occurs) |
+
+Serializable prevents this by blocking the insert or forcing the transactions to execute serially.
+
+It prevents either by `strict two-phase locking` (S2PL) or `timestamp-based ordering`.
+
+
+### Benefits
+
+Prevents:
+
+- Dirty reads 
+- Non-repeatable reads 
+- Phantom reads 
+
+
+
+### Drawback
+
+Least efficient/performance-heavy due to locking and blocking.
+
+
+
+# Summary
+
+| **Isolation Level**  | **Implementation**             | **Explanation**                                                                                                                                   |
+| -------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Read Uncommitted** | Single Data Entry              | A single copy of data exists; updates overwrite existing values directly, allowing dirty reads.                                                   |
+| **Read Committed**   | Local Copy of Changed Values   | The original value stays in the database; updated values are kept locally until commit, preventing dirty reads but allowing non-repeatable reads. |
+| **Repeatable Read** (Most Used)  | Versioning of Unchanged Values | For each key, versions are stored so unmodified values can be read consistently across a transaction. Prevents non-repeatable reads.              |
+| **Serializable**     | Queued Locks                   | Transactions involving the same data are ordered using locks or causal ordering to ensure strict serializability and prevent phantom reads.       |
+
+## Tradeoff
+- For Efficiency
+  > Read Uncommitted > Read Committed > Repeatable Read > Serializable
+- For Isolation
+  > Read Uncommitted < Read Committed < Repeatable Read < Serializable
