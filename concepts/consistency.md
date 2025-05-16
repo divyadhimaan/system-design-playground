@@ -30,11 +30,29 @@ In distributed systems, consistency means how up-to-date a piece of data is.
   - [Quorum](#quorum)
     - [Definition](#definition-3)
     - [Use Case](#use-case-2)
-  - [Example](#example-3)
+    - [Example](#example-3)
     - [Benefits](#benefits-3)
     - [Drawbacks](#drawbacks-3)
     - [Implementation](#implementation-3)
-- [Data Consistency Levels Tradeoffs](#data-consistency-levels-tradeoffs)
+  - [Data Consistency Levels Tradeoffs](#data-consistency-levels-tradeoffs)
+- [Transactions](#transactions)
+- [Isolation Levels](#isolation-levels)
+  - [Read Uncommitted](#read-uncommitted)
+    - [Use case](#use-case-3)
+    - [Example](#example-4)
+    - [Benefits](#benefits-4)
+    - [Drawbacks](#drawbacks-4)
+  - [Read Committed](#read-committed)
+    - [Use Case](#use-case-4)
+    - [Example](#example-5)
+    - [Benefits](#benefits-5)
+    - [Drawbacks](#drawbacks-5)
+  - [Repeatable Reads](#repeatable-reads)
+    - [Use Case](#use-case-5)
+    - [Optimistic Concurrency Control](#optimistic-concurrency-control)
+    - [Benefits](#benefits-6)
+    - [Drawback](#drawback)
+  - [Serializable](#serializable)
 
 ## Why is consistency important? 
 
@@ -223,7 +241,7 @@ Where:
 - Quorum is particularly useful in systems that need to survive **node failures** while maintaining **some level of consistency**.
 
 
-## Example  
+### Example  
 Consider 3 replicas:
 ```
 Replica 1: x = 20
@@ -259,7 +277,7 @@ If the system uses quorum rules like `R + W > N`, for example:
 - Used in systems like **Apache Cassandra**, **Amazon DynamoDB**, **Riak**, and **MongoDB (with read/write concern settings)**.
 
 
-# Data Consistency Levels Tradeoffs
+## Data Consistency Levels Tradeoffs
 
 | **Level**              | **Consistency**                                                  | **Efficiency**                                                  |
 |------------------------|------------------------------------------------------------------|-----------------------------------------------------------------|
@@ -267,3 +285,112 @@ If the system uses quorum rules like `R + W > N`, for example:
 | **Eventual Consistency** | Lowest                                                           | Highest                                                         |
 | **Causal Consistency** | Higher than eventual consistency but lower than linearizable     | Higher than linearizable but lower than eventual consistency    |
 | **Quorum**             | Configurable                                                     | Configurable                                                    |
+
+---
+
+# Transactions 
+- Transactions can be defined as a collection of queries that perform one unit of work.
+-  They are atomic which means either all queries in a transaction are executed or none of it is executed.
+   - `BEGIN` transaction marks the starting of transactions
+   - `COMMIT` transaction marks the end of the transaction and persists the changes to the database
+   - `ROLLBACK` transaction marks the end of the transaction and undoes all the changes to the database
+
+If two transactions are running concurrently and queries in one transaction do not affect the other transaction then the two transactions are said to be isolated from each other.
+# Isolation Levels
+
+## Read Uncommitted
+
+Read Uncommitted is the lowest level of isolation in database transactions where one transaction is allowed to read data that another transaction has written but not yet committed.
+
+### Use case
+
+Used when performance is more critical than accuracy, such as in read-heavy systems with relaxed consistency requirements, or during exploratory data analysis where data freshness matters more than correctness.
+
+
+### Example
+
+Suppose a database has `x = 20`.
+
+| Transaction T1 | Transaction T2 |
+| -------------- | -------------- |
+| BEGIN          | BEGIN          |
+| Write x = 10   | Read x => 10   |
+| ROLLBACK | COMMIT |
+
+Here, T2 reads `x = 10`, but T1 rolls back, reverting `x` back to `20`. T2 has read a value (`10`) that never existed permanently — this is called a **dirty read**.
+
+### Benefits
+- Fastest transaction execution.
+- Least locking and blocking overhead.
+- Ideal for systems prioritizing speed over strict data accuracy.
+
+### Drawbacks
+- **Dirty Reads**: Data read may be rolled back.
+- No guarantee of data accuracy.
+- Should not be used where data correctness is critical.
+
+## Read Committed
+
+At this isolation level, a transaction can only read data that has been committed by other transactions. This eliminates dirty reads.
+
+### Use Case
+
+- Applications where `dirty reads `must be avoided, but occasional `non-repeatable reads `are acceptable.
+
+- Systems prioritizing performance and concurrency over strict consistency.
+
+### Example
+
+Initial state: `x = 10`
+
+| T1           | T2               | Explanation                                          |
+| ------------ | ---------------- | ---------------------------------------------------- |
+| BEGIN        | BEGIN            | Transactions begin                                   |
+| Write x = 20 | Read x → gets 10 | T1 updates x to 20, T2 reads old value               |
+| COMMIT       | Some other query | T1 commits                                           |
+|              | Read x → gets 20 | Now T2 reads the updated value (non-repeatable read) |
+
+
+In the same transaction (T2), reading x twice returned two different values, hence a `non-repeatable read`.
+
+### Benefits
+- Prevents dirty reads
+- Faster and more concurrent than higher isolation levels
+
+### Drawbacks
+
+- Non-repeatable reads can occur:
+  - When a transaction reads the same row twice and gets different values due to updates from other committed transactions.
+
+## Repeatable Reads
+
+- Ensures that if a row is read once in a transaction, subsequent reads will return the same value, even if other transactions commit updates to that row.
+
+
+### Use Case
+
+- Each transaction works on a snapshot of the data (Snapshot Isolation).
+
+- Row-level locks or MVCC (Multi-Version Concurrency Control) are used.
+  
+- Other transactions' updates are not visible until the current transaction ends.
+
+- Phantom reads (new rows being added) can still occur unless further isolation is used (e.g., Serializable).
+
+
+### Optimistic Concurrency Control
+- If two concurrent transactions try to update the same row, only one will succeed; the other rolls back.
+
+- This technique is conflict detection-based, assuming conflicts are rare
+
+### Benefits
+
+- prevents dirty reads
+- prevents non-repeatable reads
+
+### Drawback
+
+- Allows phantom reads
+
+
+## Serializable
