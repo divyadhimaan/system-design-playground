@@ -13,6 +13,9 @@ This repository contains notes, diagrams, and code snippets created while learni
   - [How to Use This Repo](#how-to-use-this-repo)
   - [Contributing](#contributing)
   - [Glossary](#glossary)
+    - [CAP Theorem (Brewer's Theorem)](#cap-theorem-brewers-theorem)
+      - [CP - consistency and partition tolerance](#cp---consistency-and-partition-tolerance)
+      - [AP - availability and partition tolerance](#ap---availability-and-partition-tolerance)
     - [Consistent Hashing](#consistent-hashing)
     - [FFMPEG](#ffmpeg)
     - [AVI](#avi)
@@ -30,6 +33,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Data Replication and Migration](./concepts/data-replication-and-migration.md)
 - [Security in Distributed Systems](./concepts/security.md)
 - [Observability in Distributed Systems](./concepts/observability.md)
+- [Distributed Consensus](./concepts/distributed-consensus.md)
 - [Rate Limiting](./concepts/rate-limiting.md)
 - [Tradeoffs](./concepts/tradeoffs.md)
 
@@ -74,6 +78,29 @@ This is a personal learning repo, but feel free to open issues or PRs if you spo
 ---
 
 ## Glossary
+
+### CAP Theorem (Brewer's Theorem)
+
+In a distributed computer system, you can only support two of the following guarantees:
+
+- `Consistency` - Every read receives the most recent write or an error (All nodes see the same data at the same time.)
+- `Availability` - Every request receives a response, without guarantee that it contains the most recent version of the information (The system is always responsive.)
+- `Partition Tolerance` - The system continues to operate despite network failures or delays.
+(No data loss or crash due to communication break between nodes.)
+
+Networks aren't reliable, so you'll need to support partition tolerance. A distributed system must be partition-tolerant (P). So, a practical tradeoff is between Consistency (C) and Availability (A).
+
+#### CP - consistency and partition tolerance
+
+- Waiting for a response from the partitioned node might result in a timeout error. 
+- CP is a good choice if your business needs require atomic reads and writes.
+- Banking systems prefer CP
+
+#### AP - availability and partition tolerance
+
+- Responses return the most readily available version of the data available on any node, which might not be the latest. 
+- Writes might take some time to propagate when the partition is resolved.
+- social media feeds prefer AP.
 
 ### Consistent Hashing
 
