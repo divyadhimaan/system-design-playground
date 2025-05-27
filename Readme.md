@@ -16,6 +16,7 @@ This repository contains notes, diagrams, and code snippets created while learni
     - [CAP Theorem (Brewer's Theorem)](#cap-theorem-brewers-theorem)
       - [CP - consistency and partition tolerance](#cp---consistency-and-partition-tolerance)
       - [AP - availability and partition tolerance](#ap---availability-and-partition-tolerance)
+    - [ACID Properties](#acid-properties)
     - [Consistent Hashing](#consistent-hashing)
     - [FFMPEG](#ffmpeg)
     - [AVI](#avi)
@@ -101,6 +102,18 @@ Networks aren't reliable, so you'll need to support partition tolerance. A distr
 - Responses return the most readily available version of the data available on any node, which might not be the latest. 
 - Writes might take some time to propagate when the partition is resolved.
 - social media feeds prefer AP.
+
+### ACID Properties
+
+ACID is a set of properties that ensure reliable, consistent, and safe transactions in a database system.
+
+| Property    | Ensures...                           | Example                          | Use Case                                 |
+|-------------|--------------------------------------|----------------------------------|------------------------------------------|
+| Atomicity   | All or none execution                | Debit fails → entire txn rolled back | Bank transfers                          |
+| Consistency | Valid state transitions              | No violation of constraints      | E-commerce inventory updates             |
+| Isolation   | No interference between transactions | Prevents dirty reads/race conditions | Online booking systems                  |
+| Durability  | Changes survive system failures      | Data saved after commit          | Order confirmations in retail apps      |
+
 
 ### Consistent Hashing
 
