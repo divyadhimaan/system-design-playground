@@ -71,15 +71,14 @@ This explains the concept of **distributed consensus** in a system with:
 ### 7. Two-Phase Protocol
 
 The protocol works in **two distinct phases**:
-
 #### Phase 1: Locking
 - Servers **request the log line** and attempt to **lock it** by claiming ownership.
 
 #### Phase 2: Writing
-- The server that successfully locks the line **performs the write** operation.
+- The server that successfully locks the line performs the write operation.
 
-- Only **one server can own and write** to a particular log line at a time.
-- This prevents **inconsistencies and write conflicts**.
+- Only one server can own and write to a particular log line at a time.
+- This prevents inconsistencies and write conflicts.
 
 ### 8. Maintaining Consensus
 - Both the **log line ownership** and the **write operation** must be acknowledged by a **majority (at least 2/3) of the database servers**.
