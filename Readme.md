@@ -24,9 +24,7 @@ This repository contains notes, diagrams, and code snippets created while learni
     - [HLS](#hls)
     - [DASH](#dash)
 
-
 ## Concepts
-
 - [Databases](./concepts/databases.md)
 - [Consistency in Distributed Systems](./concepts/consistency.md)
 - [Caches](./concepts/caching.md)
@@ -50,7 +48,6 @@ This repository contains notes, diagrams, and code snippets created while learni
 
 
 ## Resources
-
 A collection of materials referred to while learning:
 
 - System Design Course by Gaurav Sen
@@ -65,7 +62,6 @@ A collection of materials referred to while learning:
 - [Estimations - Numbers everyone should know](https://highscalability.com/numbers-everyone-should-know/)
 
 ## How to Use This Repo
-
 - Browse by topic directories or use the table of contents above.
 - Diagrams are stored under `/diagrams` and topic-specific folders.
 - Use markdown files as revision notes before interviews.
@@ -73,15 +69,12 @@ A collection of materials referred to while learning:
 
 
 ## Contributing
-
 This is a personal learning repo, but feel free to open issues or PRs if you spot something helpful to add.
 
 ---
 
 ## Glossary
-
 ### CAP Theorem (Brewer's Theorem)
-
 In a distributed computer system, you can only support two of the following guarantees:
 
 - `Consistency` - Every read receives the most recent write or an error (All nodes see the same data at the same time.)
@@ -92,19 +85,16 @@ In a distributed computer system, you can only support two of the following guar
 Networks aren't reliable, so you'll need to support partition tolerance. A distributed system must be partition-tolerant (P). So, a practical tradeoff is between Consistency (C) and Availability (A).
 
 #### CP - consistency and partition tolerance
-
 - Waiting for a response from the partitioned node might result in a timeout error. 
 - CP is a good choice if your business needs require atomic reads and writes.
 - Banking systems prefer CP
 
 #### AP - availability and partition tolerance
-
 - Responses return the most readily available version of the data available on any node, which might not be the latest. 
 - Writes might take some time to propagate when the partition is resolved.
 - social media feeds prefer AP.
 
 ### ACID Properties
-
 ACID is a set of properties that ensure reliable, consistent, and safe transactions in a database system.
 
 | Property    | Ensures...                           | Example                          | Use Case                                 |
@@ -116,7 +106,6 @@ ACID is a set of properties that ensure reliable, consistent, and safe transacti
 
 
 ### Consistent Hashing
-
 Consistent Hashing maps servers to the key space and assigns requests(mapped to relevant buckets, called load) to the next clockwise server. Servers can then store relevant request data in them while allowing the system flexibility and scalability.
 
 ### FFMPEG
