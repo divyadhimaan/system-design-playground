@@ -7,6 +7,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [System Design](#system-design)
   - [Table of Contents](#table-of-contents)
   - [Concepts](#concepts)
+  - [Additional Concepts](#additional-concepts)
   - [System Design Problems](#system-design-problems)
   - [Resources](#resources)
   - [Articles](#articles)
@@ -35,6 +36,9 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Distributed Consensus](./concepts/distributed-consensus.md)
 - [Rate Limiting](./concepts/rate-limiting.md)
 - [Tradeoffs](./concepts/tradeoffs.md)
+
+## Additional Concepts
+- [API design](./concepts/api-design.md)
 
 ## System Design Problems
 - [Email Service](./design-problems/emailing-service/main.md)
