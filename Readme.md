@@ -36,7 +36,6 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Rate Limiting](./concepts/rate-limiting.md)
 - [Tradeoffs](./concepts/tradeoffs.md)
 
-
 ## System Design Problems
 - [Email Service](./design-problems/emailing-service/main.md)
 - [Tinder Design - Recommendation](./design-problems/tinder/main.md)
@@ -45,8 +44,6 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Uber - Cab Aggregator App](./design-problems/uber/main.md)
 - [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
 
-
-
 ## Resources
 A collection of materials referred to while learning:
 
@@ -54,7 +51,6 @@ A collection of materials referred to while learning:
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
 - [System Desin Interview - Alex Xu (Part 1)](https://shorturl.at/4coTo)
 <!-- - [Grokking the System Design Interview](https://www.designgurus.io/course/system-design) -->
-
 
 ## Articles
 - [Optimizing Netflix APIs](https://netflixtechblog.com/optimizing-the-netflix-api-5c9ac715cf19)

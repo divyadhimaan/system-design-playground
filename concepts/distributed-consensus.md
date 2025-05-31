@@ -88,3 +88,13 @@ The protocol works in **two distinct phases**:
   - Concurrent write requests
 
 ---
+
+
+### Improvements in algorithm
+
+The timestamp-based improvements enhance the original consensus algorithm by:
+
+- Prioritizing **recency of operations**
+- Preventing stale writes
+- Supporting **retry mechanisms and flexible ownership**
+- Maintaining consistency **without tight coupling between lock ownership and writes**
