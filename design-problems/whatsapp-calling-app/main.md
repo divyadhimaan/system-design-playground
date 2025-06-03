@@ -7,8 +7,9 @@ The features are listed below:
 3. Charge user for making calls
 4. Choose a provider for each call
 
+## Requirement 1: Users can call each other over VOIP or PSTN
 
-## Components Required
+### Components Required
 
 - `Switch` Whenever there is a call we get a receiver address and sender address. Switch bridges the
 connection between these two addresses.
@@ -22,6 +23,16 @@ processes the events one by one.
 This component is the brain of our system. It receives the call event from the switch .It receives the connection ID of both users from the session service and tells the switch which two connections it has to bridge. Apart from that it also checks what is the current state of call. Like, wether the call is terminated or is ongoing. This data is then provided to billing service.
 - `Session service` It pulls call events from the connection event queue. It stores the mapping of user to call session. And each session is mapped to a connection.
 
+### SIP - Signal Initiation Protocol
+It is a **signaling protocol** used to **initiate, manage, and terminate** real-time sessions involving:
+
+- **Voice calls**
+- **Video calls**
+- **Instant messaging**
+- **Multimedia conferences**
+
+It is widely used in **VoIP (Voice over IP)** systems.
+
 ### VoIP vs PSTN
 
 
@@ -34,3 +45,44 @@ This component is the brain of our system. It receives the call event from the s
 
 
 ![Alt text](./../../diagrams/wa-calling-1.png)
+
+## Requirement 2: Call Routing and Government Surveillance Support
+
+### Objective
+
+- Enable **routing of calls** from one user (sender) to another (receiver).
+- Allow **government bodies** to **record suspicious calls**.
+- Ensure **only authenticated users** can initiate calls.
+
+
+
+### Call Routing Process
+
+- Each call is initiated by a **sender with the receiver’s address**.
+- Calls are routed via **service providers** and **intermediate routers**:
+  - Routers **forward the call** to the next node in the path.
+  - This continues until the call reaches the **receiver**.
+  
+
+### Authentication
+
+- The system must **verify user credentials** before allowing call initiation.
+- Only **authenticated users** can place calls through the system.
+
+
+
+### Government Surveillance Requirement
+
+- For **suspicious calls**, the system should:
+  - **Open a separate connection** to allow **government agencies** to **record or monitor** the call.
+  - This connection is **independent** of the primary call flow.
+
+### State Machine
+
+![Alt text](./../../diagrams/wa-calling-3.png)
+- We need a state machine for calling.
+- Cannot place this logic in the switch, therefore, a State manager is required.
+  - The switch is stateless, It requests for call transitions through `call state manager (CSM)`
+  
+![Alt text](./../../diagrams/wa-calling-2.png)
+
