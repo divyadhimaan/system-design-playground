@@ -86,3 +86,71 @@ It is widely used in **VoIP (Voice over IP)** systems.
   
 ![Alt text](./../../diagrams/wa-calling-2.png)
 
+
+## Requirement 3: Charging Users for making calls
+
+We need to:
+
+- **Check the user's balance and maximum talk time**.
+- **Terminate the call** if the talk time exceeds the allowed limit.
+- **Generate an invoice** for completed calls.
+  
+### Functional Flow
+
+1. Before/during the call, the system:
+   - Checks **current balance** and **remaining talk time**.
+   - Monitors call duration.
+2. If user **exceeds allowed time**, the call is **terminated**.
+3. After the call ends, an **invoice is generated** and sent to the user.
+
+###  Data Persistence Options
+
+#### Option 1: Persist on Switch
+- **Pros**:
+  - Fewer API calls.
+  - Switch can **directly terminate** the call.
+- **Cons**:
+  - **Switch becomes overloaded** with responsibilities.
+  - Violates the **single-responsibility principle**.
+
+#### Option 2: Persist on Call State Manager (Recommended)
+- **Pros**:
+  - **CSM (Call State Manager)** acts as the **brain** of the system.
+  - Clear separation of concerns: **Switch handles bridging**, CSM handles **logic & decisions**.
+- **Cons**:
+  - Requires **more API calls**.
+  - Slight increase in **latency and complexity**.
+
+**Conclusion**: Persisting data in **Call State Manager** is preferred for better design and separation of concerns.
+
+### System Components Needed
+
+#### 1. Billing Service
+- Maintains:
+  - **Current balance**
+  - **Maximum allowed talk time**
+- Communicates with **Call State Manager (CSM)** to update or query balance/time.
+
+---
+
+#### 2. Invoice Service
+- Generates **invoices** after call ends.
+- Uses:
+  - **Call duration**
+  - **Cost per minute**
+- Data is fetched from **CSM**.
+
+---
+
+### 3. Message Queue
+- Acts as a bridge between:
+  - **Call State Manager** (producer of call events)
+  - **Invoice Service** (consumer)
+- Each call event has a **unique ID** to ensure **idempotency**.
+  - If the ID is already processed → skip invoice creation.
+  - This prevents **duplicate billing**.
+
+---
+
+
+![Alt text](./../../diagrams/wa-calling-4.png)
