@@ -47,6 +47,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Google Docs - Collaborative Editor Design](./design-problems/google-docs/main.md)
 - [Uber - Cab Aggregator App](./design-problems/uber/main.md)
 - [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
+- [Whatsapp Calling](./design-problems/whatsapp-calling-app/main.md)
 
 ## Resources
 A collection of materials referred to while learning:
