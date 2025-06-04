@@ -203,3 +203,13 @@ queue to get real time events (This architecture is called lambda architecture).
 - Minimal data movement during scaling.
 - Balanced load distribution.
 - Flexible architecture for dynamic systems.
+
+
+## Components
+
+- Service Discovery → Built using Zookeeper 
+- Recommendation Engine → Kafka can be used for data pipelines.
+ (Hadoop is useful for batch processing. Spark for real time processing.)
+- Telemetry and logging → ELK stack
+- Gateway → Elastic Load Balancer
+- Message Queue → Kafka

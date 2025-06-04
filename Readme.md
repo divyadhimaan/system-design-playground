@@ -24,6 +24,9 @@ This repository contains notes, diagrams, and code snippets created while learni
     - [Homebrew](#homebrew)
     - [HLS](#hls)
     - [DASH](#dash)
+    - [PSTN (Public Switched Telephone Network)](#pstn-public-switched-telephone-network)
+    - [VoIP (Voice over Internet Protocol)](#voip-voice-over-internet-protocol)
+    - [SIP (Session Initiation Protocol)](#sip-session-initiation-protocol)
 
 ## Concepts
 - [Databases](./concepts/databases.md)
@@ -105,27 +108,61 @@ ACID is a set of properties that ensure reliable, consistent, and safe transacti
 | Isolation   | No interference between transactions | Prevents dirty reads/race conditions | Online booking systems                  |
 | Durability  | Changes survive system failures      | Data saved after commit          | Order confirmations in retail apps      |
 
-
+---
 ### Consistent Hashing
 Consistent Hashing maps servers to the key space and assigns requests(mapped to relevant buckets, called load) to the next clockwise server. Servers can then store relevant request data in them while allowing the system flexibility and scalability.
 
+---
 ### FFMPEG
 FFmpeg is a powerful, free, and open-source multimedia framework used for decoding, encoding, transcoding, and streaming audio and video files.
 
+
+---
 ### AVI
 
 AVI, or Audio Video Interleave, is a multimedia container format developed by Microsoft to store both audio and video data in a single file, allowing for synchronized playback. 
+
+---
 
 ### Homebrew
 
 Homebrew is a package manager for macOS (and Linux) that simplifies the installation, updating, and management of software on your system.
 
+---
 ### HLS
 - HLS, or HTTP Live Streaming, is a widely used video streaming protocol developed by Apple that delivers audio and video content over the internet. 
 - It's known for its adaptability to changing network conditions, reliability, and compatibility with various devices and browsers. 
 - HLS works by breaking down video files into smaller segments, which are then downloaded and played sequentially by a video player.
+---
 
 ### DASH
 
 - Dynamic Adaptive Streaming over HTTP (DASH) is a streaming technology that adapts video quality in real-time based on network conditions, delivering high-quality video over the internet using standard HTTP servers. 
 - It achieves this by breaking down video content into segments, each with varying bitrates, and allowing the client device to dynamically select the most appropriate segment for the current network bandwidth
+
+---
+
+### PSTN (Public Switched Telephone Network)
+- Traditional circuit-switched telephone network.
+- Requires **telephone lines** and **dedicated bandwidth** per call.
+- **Cost depends** on distance and duration.
+- Generally **reliable but expensive**.
+- Example: Landline phone systems.
+
+---
+### VoIP (Voice over Internet Protocol)
+- Transmits voice calls over the **internet** using **packet-switching**.
+- Requires only **internet connectivity** (no phone lines).
+- **Cost-effective** and often **free**.
+- **Scalable and flexible**, but quality depends on internet speed.
+- Example: Skype, Zoom, WhatsApp calls.
+
+---
+### SIP (Session Initiation Protocol)
+- **Signaling protocol** used to establish, manage, and terminate **VoIP** calls.
+- Handles **call setup, teardown, and modifications**.
+- Works with other protocols (e.g., RTP for media transmission).
+- Used for **voice, video, and messaging sessions** over IP.
+- Example: Used in VoIP softphones and enterprise telephony systems.
+
+---
