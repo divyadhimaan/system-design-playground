@@ -142,7 +142,7 @@ We need to:
 
 ---
 
-### 3. Message Queue
+#### 3. Message Queue
 - Acts as a bridge between:
   - **Call State Manager** (producer of call events)
   - **Invoice Service** (consumer)
@@ -154,3 +154,52 @@ We need to:
 
 
 ![Alt text](./../../diagrams/wa-calling-4.png)
+
+## Requirement 4: Choosing right service provider for each call
+
+We need to consider two factors when choosing the right service provider. Call quality and service provider fee. Depending on what our needs are we need to choose the best service provider.
+
+### Recommendation service
+- It derives insights from the previous data and based on that finds a service provider with best call
+quality and minimum fee. 
+- It gets bulk data from call logs. It also subscribes to the call state change
+queue to get real time events (This architecture is called lambda architecture).
+
+![Alt text](./../../diagrams/wa-calling-5.png)
+
+## Consistent Hashing for caching call state
+
+**Load Balancing** is a critical concept in system design. One effective technique is **Consistent Hashing**, which maps requests to hash buckets (servers) while supporting flexible addition and removal of nodes.
+
+### Traditional Hashing
+- Maps objects directly to servers using a hash function.
+- Problem: **Adding or removing servers** can lead to **massive remapping** of objects.
+
+### Consistent Hashing
+- **Servers are placed on a hash ring**.
+- **Requests (keys)** are also hashed to the ring.
+- Each request is sent to the **next server in clockwise direction**.
+- Supports:
+  - **Fault Tolerance**: Handles node crashes gracefully.
+  - **Scalability**: Easily adds/removes nodes with **minimal disruption**.
+  
+    | Term              | Description |
+    |-------------------|-------------|
+    | **Hash Ring**     | Circular hash space where both keys and servers are placed |
+    | **Virtual Nodes** | Multiple points per physical server to distribute load better |
+    | **Request Allocation** | Mapping incoming requests to specific servers |
+    | **Fault Tolerance** | System continues to operate even when a server fails |
+    | **Scalability**   | Ability to add/remove servers without major disruptions |
+### How It Works
+
+1. Servers are hashed into a circular key space.
+2. Incoming requests are also hashed.
+3. A request is routed to the **nearest server clockwise** on the ring.
+4. When a server is added/removed, only a **fraction of the keys** are re-mapped.
+
+
+## Benefits
+
+- Minimal data movement during scaling.
+- Balanced load distribution.
+- Flexible architecture for dynamic systems.
