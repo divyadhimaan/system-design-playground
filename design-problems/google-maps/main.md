@@ -58,7 +58,7 @@ But! There are few challenges
   - Caching frequent routes,
   - Real-time edge weight updates.
 
-## 2. Splitting graph into regions
+## A. Splitting graph into regions
 
 This is to solve the porblem of too many routes.
 
@@ -89,7 +89,57 @@ This is to solve the porblem of too many routes.
 >
 > - The same approach is also used in public transport (e.g., bus/metro routing).
 
-### Resources
+## B. Fast Computation
+
+Algorithm used -> A* search
+
+- Why A*?
+  - A* search chooses paths based on:
+    - Actual cost so far: time(from, to)
+    - Estimated time (ET) from current to destination
+- This algorithm takes into account the time taken to move from one position to another as well as the estimated time to reach the final destination.
+
+- Lets suppose we are moving from S -> D
+  - from S -> x, At node x, consider 3 directions:
+  - ```
+        cost(x, D) = time(x, y) + ET(y, D)
+        cost(x, D) = time(x, p) + ET(p, D)
+        cost(x, D) = time(x, q) + ET(q, D)
+    ```
+  - Choose the direction with minimum total estimated cost.
+
+    ![Alt text](./../../images/maps-3.png)
+- The algorithm will give a good path -> of the edges have accurate time.
+
+### Q: How Do We Estimate Time Accurately?
+
+
+#### 1. Real Data (Preferred)
+  - Collect historical travel times from GPS/cellular networks.
+   - Use this for segments like time(A → x).
+    ![Alt text](./../../images/maps-4.png)
+#### 2. Estimation via Physics
+  - Use: Cartesian distance
+  - Assumed speed (from GPS or traffic APIs)
+    - For (x,B), we will take an approximation.
+
+    ![Alt text](./../../images/maps-5.png)
+
+
+>  Use a Graph Database like Neo4j
+> 
+> (Each point = Node, road = Weighted Edge)
+
+
+### When is A* helpful?
+- Fast and reasonably accurate
+- Uses heuristics to guide path selection
+- Works well if:
+  - Edge times are accurate (real/historic data)
+  - ET heuristic is admissible (doesn’t overestimate)
+
+
+## Resources
 - [Google's way of partitioning](https://research.google/blog/efficient-partitioning-of-road-networks/#:~:text=To%20understand%20how%20routing%20might,until%20it%20finds%20the%20destination.)
   - Short Summary: 
     - Road networks can be modeled as graphs, where intersections are nodes and roads are edges. Routing algorithms like Dijkstra become inefficient for long distances due to exhaustive searches. 
@@ -98,3 +148,4 @@ This is to solve the porblem of too many routes.
     - The partitioning algorithm recursively splits the graph into balanced parts while minimizing the number of inter-component roads (beacons), using random walks to identify natural boundaries (e.g., islands, isolated regions). 
     - These areas are then contracted into supernodes, and the graph is partitioned using the inertial flow algorithm to reduce beacon count. The result is faster routing by limiting the search to a smaller subset of the graph, with minimal loss in accuracy.
 - [Vehicle Routing problem](https://developers.google.com/optimization/routing/vrp)
+- [Public Transport Routing](https://research.google/blog/an-update-on-fast-transit-routing-with-transfer-patterns/)
