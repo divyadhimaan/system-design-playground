@@ -53,3 +53,20 @@
 
 For this design, we will use a hybrid of `Option 3` and `Option 4`.
 
+### More guidelines to consider
+- Rate limiter placement(server side vs middleware) is dependent on many factors, there is no absolute answer. Consider:
+  - Programming Language
+  - Cache Service
+  - Infrastructure
+  - Traffic Patterns
+- Identify which rate limiting algorithm to use.
+  - Token Bucket
+  - Leaky Bucket
+  - Fixed Window Counter
+  - Sliding Window Log
+  - Sliding Window Counter
+  - Hybrid Approaches
+- If already using microservice architecture, and api gateway is included, then placing rate limiter in api gateway is a good choice.
+- Building your own rate limiter is complex, consider using existing solutions like Envoy, NGINX, Kong, or cloud provider services.
+
+
