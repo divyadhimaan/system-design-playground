@@ -17,13 +17,13 @@
 - **Distributed Rate Limiting**: The rate limiter can be shared among multiple servers.
 - **Exception Handling**: The system should gracefully handle failures and exceptions.
 - **High Fault Tolerance**: The system should be resilient to failures and continue to operate under adverse conditions.
-
+---
 ## Step 2: Propose High Level Design
 
 - Using basic client-server architecture.
 - Next important question: Where to place the rate limiter?
 
-### Where to place the Rate Limiter?
+### Q1. Where to place the Rate Limiter?
 
 `Option 1`: Client Side Rate Limiting
 - Clients are responsible for limiting their own request rates.
@@ -53,7 +53,7 @@
 
 For this design, we will use a hybrid of `Option 3` and `Option 4`.
 
-### More guidelines to consider
+### Q2. More guidelines to consider
 - Rate limiter placement(server side vs middleware) is dependent on many factors, there is no absolute answer. Consider:
   - Programming Language
   - Cache Service
@@ -68,5 +68,9 @@ For this design, we will use a hybrid of `Option 3` and `Option 4`.
   - Hybrid Approaches
 - If already using microservice architecture, and api gateway is included, then placing rate limiter in api gateway is a good choice.
 - Building your own rate limiter is complex, consider using existing solutions like Envoy, NGINX, Kong, or cloud provider services.
+
+### Q3. What are available Rate Limiting Algorithms?
+
+#### 1. Token Bucket
 
 
