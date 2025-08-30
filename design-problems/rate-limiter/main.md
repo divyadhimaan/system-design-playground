@@ -13,6 +13,7 @@
       - [4. Sliding Window Log](#4-sliding-window-log)
       - [5. Sliding Window Counter](#5-sliding-window-counter)
       - [Summary - Algorithms](#summary---algorithms)
+    - [High Level Design](#design)
   - [Articles](#articles)
 
 # Rate Limiter
@@ -243,6 +244,29 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | Sliding Window Counter | Sliding Window Counter improves on Fixed Window by smoothing out burstiness at boundaries. It considers requests in the current and previous window, applying a weight based on elapsed time. It’s efficient (O(1)) and memory-light, making it a good balance between Fixed Window and Sliding Log. However, it’s still approximate and may not perfectly eliminate bursts. For more accuracy, Sliding Log is preferred; for higher throughput, Token Bucket is often used. |
 ---
 
+### High Level Design
+- At high level, We need a counter to keep track of how many requests are sent from the same user, IP Address, etc.
+- If counter exceeds a certain threshold, we can reject the request.
+
+#### Q: Where should the counter be stored?
+- `Database`: Not a good idea, slowness of disk access.
+- `In-Memory`: Fast, but not persistent. If server crashes, we lose all counters.
+- `Distributed Cache (Redis/Memcached)`: Fast, persistent, and can be shared across multiple servers.
+
+#### Q: Which cache to use?
+- `Redis`: Supports atomic operations, Lua scripting, and has built-in data structures.
+- In memory store that offers two commands: INCR and EXPIRE
+  - `INCR`: increments the value of a key by 1. If the key does not exist, it is set to 0 before performing the operation.
+  - `EXPIRE`: sets a timeout on a key. After the timeout has expired, the key
+
+#### Design
+![high-level-design](../../rateLimiterHLD/img.png)
+- The client sends a request to rate limiting middleware.
+- Rate limiting middleware fetches the counter from the corresponding bucket in Redis and
+checks if the limit is reached or not.
+  - If the limit is reached, the request is rejected.
+  - If the limit is not reached, the request is sent to API servers. Meanwhile, the system
+  increments the counter and saves it back to Redis.
 ## Articles
 
 #### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
