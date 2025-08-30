@@ -1,4 +1,4 @@
-- Table of Content
+# Rate Limiter: Table of Content
 
 - [Rate Limiter](#rate-limiter)
   - [Need for Rate Limiter](#need-for-rate-limiter)
