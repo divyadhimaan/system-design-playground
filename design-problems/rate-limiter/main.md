@@ -79,7 +79,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | **Advantage**         | - Allows bursts (better than leaky bucket).<br/>- Easy to implement.<br/>- O(1) check per request.<br/>- Widely used (APIs, CDNs, Cloud).                                                                                                                                                                                                                                                                |
 | **Disadvantage**      | - Needs precise timing for refill.<br/>- Requires distributed coordination in multi-server setup.<br/>- Difficult to tune parameters: B and R.                                                                                                                                                                                                                                                           |
 | **Use Cases**         | - API rate limiting (per user / per IP). <br> - Network bandwidth shaping (ISP data control). <br> - Distributed systems (fair usage of shared resources).                                                                                                                                                                                                                                               |
-| **Code**              | [TokenBucket code](./../../code/rate-limiter-algorithms/TokenBucket.java)                                                                                                                                                                                                                                                                                                                                |
+| **Code**              | [TokenBucket code](./../../code/rate-limiter-algorithms/TokenBucketLimiter.java)                                                                                                                                                                                                                                                                                                                                |
 
 ![token-bucket](./../../images/token-bucket1.png)
 
@@ -111,7 +111,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | **Disadvantages** | - No bursts allowed.<br/> - Burst of traffic will fill the bucket with old requests, and new requests are rejected <br> - Latency can increase (requests wait in queue) <br> - Extra requests wasted if bucket full |
 | **Use Cases**     | - Network routers & ISPs (bandwidth shaping) <br> - Video streaming/VoIP (steady flow required) <br> - Systems prioritizing fairness over bursts                                                                    |
 | **Analogy**       | Funnel with a small hole → pour water fast, but it drips out at constant rate. Overflowing water = dropped requests.                                                                                                |
-| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/LeakyBucket.java)                                                                                                                                          |
+| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/LeakyBucketLimiter.java)                                                                                                                                          |
 
 ![leaky bucket diagram](../../images/leakyBucket.png)
 
@@ -130,6 +130,17 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 
 ### Fixed Window Counter
 
+| **Aspect**        | **Details**                                                                                                                                                                                                 |
+|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Definition**    | Time is divided into fixed windows (e.g., 1 minute). <br/>A counter tracks the number of requests in the current window. <br/>Requests are allowed until the counter exceeds the threshold.                 |
+| **Parameters**    | - **Window Size (W):** Duration of each time window (e.g., 1 min) <br> - **Limit (L):** Max requests allowed per window                                                                                     |
+| **Working**       | 1. Track count of requests in the current window. <br> 2. If count ≤ limit → allow request and increment counter. <br> 3. If count > limit → reject request. <br> 4. Counter resets at start of new window. |
+| **Example**       | - W = 1 min, L = 5. <br> - At 12:00:00 → counter resets, allow 5 requests. <br> - At 12:00:30 → if 6th request arrives → rejected. <br> - At 12:01:00 → counter resets, requests allowed again.             |
+| **Advantages**    | - Simple to implement <br> - Low memory (just a counter) <br> - Easy to reason about                                                                                                                        |
+| **Disadvantages** | - Bursty at boundaries (e.g., 5 requests at 12:00:59 and 5 at 12:01:00 → 10 allowed in 2 seconds) <br> - Not smooth, can overload system briefly                                                            |
+| **Use Cases**     | - Simple API rate limits (small systems) <br> - When approximate fairness is acceptable <br> - Quick prototyping                                                                                            |
+| **Analogy**       | Toll gate allows up to **L cars per minute**. At minute reset, a new set of cars can immediately enter → causing sudden bursts.                                                                             |
+| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/FixedWindowLimiter.java)                                                                                                                       |
 
 ### Summary - Algorithms
 

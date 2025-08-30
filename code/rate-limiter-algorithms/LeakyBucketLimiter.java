@@ -1,13 +1,13 @@
 import java.util.LinkedList;
 import java.util.Queue;
 
-class LeakyBucket {
+class LeakyBucketLimiter {
     private final int capacity;
     private final int leakRatePerSec;
     private final Queue<Long> bucket = new LinkedList<>();
     private long lastLeakTime;
 
-    public LeakyBucket(int capacity, int leakRatePerSec) {
+    public LeakyBucketLimiter(int capacity, int leakRatePerSec) {
         this.capacity = capacity;
         this.leakRatePerSec = leakRatePerSec;
         this.lastLeakTime = System.nanoTime();

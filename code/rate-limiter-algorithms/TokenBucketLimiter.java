@@ -1,10 +1,10 @@
-class TokenBucket {
+class TokenBucketLimiter {
     private final int capacity;
     private final int refillRatePerSec;
     private int tokens;
     private long lastRefillTime;
 
-    public TokenBucket(int capacity, int refillRatePerSec) {
+    public TokenBucketLimiter(int capacity, int refillRatePerSec) {
         this.capacity = capacity;
         this.refillRatePerSec = refillRatePerSec;
         this.tokens = capacity;
