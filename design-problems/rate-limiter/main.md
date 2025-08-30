@@ -111,11 +111,29 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | **Analogy**       | Funnel with a small hole → pour water fast, but it drips out at constant rate. Overflowing water = dropped requests.                             |
 | **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/LeakyBucket.java)                                                                       |
 
+![leaky bucket diagram](../../images/leakyBucket.png)
+
+#### FAQs
+| Question # | Question                                | Answer                                                                                                          |
+|------------|-----------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| 1.         | Why is it called “Leaky Bucket”?        | Because it works like a bucket with a small hole at the bottom: requests flow in, but leak out at a fixed rate. |
+| 2.         | What problem does it solve?             | It smooths out bursty traffic by enforcing a constant processing rate, preventing sudden spikes.                |
+| 3.         | What happens when bucket is full?       | New incoming requests are dropped/rejected until space becomes available.                                       |
+| 4.         | Does it allow bursts?                   | No. All requests are processed at a strict constant rate (unlike Token Bucket, which allows bursts).            | 
+| 5.         | Time complexity per request?            | O(1) – simple queue operations (enqueue/dequeue).                                                               | 
+| 6.         | Where is it used in real-world systems? | - Routers and ISPs for bandwidth shaping <br> - Streaming services (VoIP, video) where steady flow is required. | 
+| 7.         | Does it waste requests?                 | Yes, if the bucket is full, incoming requests are dropped (no waiting allowed beyond capacity).                 |
+| 8.         | Is it suitable for distributed systems? | Not ideal for distributed request limiting (like APIs), but great for **traffic shaping in networks**.          | 
+---
+
 ### Summary - Algorithms
 
 | Algorithm    | Interview Answer                                                                                                                                                                                                                                                                                                                 |
 |--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Token Bucket | We use a token bucket algorithm where each client has a bucket with max capacity. Tokens are added at a fixed rate and each request consumes a token. At the API Gateway, we check the bucket (stored in Redis for distributed consistency). This allows us to control average request rate while still supporting short bursts. |
+| Leaky Bucket | Leaky Bucket ensures a strict constant rate (smooth flow, no bursts). Token Bucket allows bursts up to a limit, but enforces the average rate.                                                                                                                                                                                   |
+
+---
 
 ## Articles
 
