@@ -71,6 +71,8 @@ For this design, we will use a hybrid of `Option 3` and `Option 4`.
 
 ### Q3. What are available Rate Limiting Algorithms?
 
-#### 1. Token Bucket
+#### 1. Token Bucket Algorithm
+
+- Simple, Well understood, commonly used by internet companies. Both Amazon and Stripe use this algorithm.
 
 

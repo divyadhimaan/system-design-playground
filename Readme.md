@@ -57,7 +57,7 @@ A collection of materials referred to while learning:
 
 - System Design Course by Gaurav Sen
 - [System Design Primer](https://github.com/donnemartin/system-design-primer)
-- [System Desin Interview - Alex Xu (Part 1)](https://shorturl.at/4coTo)
+- [System Design Interview - Alex Xu (Part 1)](./resources/system-design-interview-alex-xu-part1.pdf)
 <!-- - [Grokking the System Design Interview](https://www.designgurus.io/course/system-design) -->
 
 ## Articles
