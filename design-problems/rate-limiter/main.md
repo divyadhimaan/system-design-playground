@@ -9,7 +9,8 @@
     - [Rate Limiting Algorithms](#rate-limiting-algorithms)
       - [1. Token Bucket Algorithm](#1-token-bucket-algorithm)
       - [2. Leaky Bucket Algorithm](#2-leaky-bucket-algorithm)
-      - [Fixed Window Counter](#fixed-window-counter)
+      - [3. Fixed Window Counter](#3-fixed-window-counter)
+      - [4. Sliding Window Log](#4-sliding-window-log)
       - [Summary - Algorithms](#summary---algorithms)
   - [Articles](#articles)
 
@@ -143,7 +144,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | 8.         | Is it suitable for distributed systems? | Not ideal for distributed request limiting (like APIs), but great for **traffic shaping in networks**.          | 
 ---
 
-### Fixed Window Counter
+### 3. Fixed Window Counter
 
 | **Aspect**        | **Details**                                                                                                                                                                                                                                                 |
 |-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -173,7 +174,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 
 ---
 
-### Sliding Window Log
+### 4. Sliding Window Log
 
 | **Aspect**        | **Details**                                                                                                                                                                                                                                                                      |
 |-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -206,12 +207,12 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 
 ### Summary - Algorithms
 
-| Algorithm            | Interview Answer                                                                                                                                                                                                                                                                                                                 |
-|----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Token Bucket         | We use a token bucket algorithm where each client has a bucket with max capacity. Tokens are added at a fixed rate and each request consumes a token. At the API Gateway, we check the bucket (stored in Redis for distributed consistency). This allows us to control average request rate while still supporting short bursts. |
-| Leaky Bucket         | Leaky Bucket ensures a strict constant rate (smooth flow, no bursts). Token Bucket allows bursts up to a limit, but enforces the average rate.                                                                                                                                                                                   |
-| Fixed Window Counter | Fixed Window Counter is easy to implement and works well for simple APIs, but it suffers from burstiness at window boundaries. If fairness and smoothing are critical, Token Bucket or Sliding Window would be better choices.                                                                                                   |
-|                      |                                                                                                                                                                                                                                                                                                                                  |
+| Algorithm            | Interview Answer                                                                                                                                                                                                                                                                                                                                                                                  |
+|----------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Token Bucket         | We use a token bucket algorithm where each client has a bucket with max capacity. Tokens are added at a fixed rate and each request consumes a token. At the API Gateway, we check the bucket (stored in Redis for distributed consistency). This allows us to control average request rate while still supporting short bursts.                                                                  |
+| Leaky Bucket         | Leaky Bucket ensures a strict constant rate (smooth flow, no bursts). Token Bucket allows bursts up to a limit, but enforces the average rate.                                                                                                                                                                                                                                                    |
+| Fixed Window Counter | Fixed Window Counter is easy to implement and works well for simple APIs, but it suffers from burstiness at window boundaries. If fairness and smoothing are critical, Token Bucket or Sliding Window would be better choices.                                                                                                                                                                    |
+| Sliding Window log   | The Sliding Window Log algorithm stores timestamps of each request and removes outdated ones to enforce rate limits in a moving window. It provides high accuracy and prevents burstiness at boundaries, unlike Fixed Window. However, it requires more memory and can have higher time complexity. It’s well-suited for strict APIs like payments and login systems where fairness is critical.  |
 ---
 
 ## Articles
