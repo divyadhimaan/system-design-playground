@@ -260,7 +260,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
   - `EXPIRE`: sets a timeout on a key. After the timeout has expired, the key
 
 #### Design
-![high-level-design](../../rateLimiterHLD/img.png)
+![high-level-design](../../images/rateLimiterHLD.png)
 - The client sends a request to rate limiting middleware.
 - Rate limiting middleware fetches the counter from the corresponding bucket in Redis and
 checks if the limit is reached or not.
