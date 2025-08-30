@@ -206,8 +206,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 
 ---
 
-### Sliding Window Counter
-
+### 5. Sliding Window Counter
 | **Aspect**        | **Details**                                                                                                                                                                                                                                                                           |
 |-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | **Definition**    | An improvement over Fixed Window Counter. <br/>Instead of counting requests only in the current fixed interval, it uses **two windows (current + previous)** and calculates requests proportionally (weighted) to the elapsed time in the current window.                             |
