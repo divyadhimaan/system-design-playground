@@ -99,17 +99,19 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 
 ### 2. Leaky Bucket Algorithm
 
-| **Aspect**        | **Details**                                                                                                                                      |
-|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Definition**    | Rate-limiting algorithm where requests enter a bucket (queue) and leave at a constant leak rate. If bucket overflows → requests are dropped.     |
-| **Parameters**    | - **Bucket Capacity (B):** Max requests the bucket (queue) can hold <br> - **Leak Rate (R):** Requests processed per second                      |
-| **Working**       | 1. Requests arrive → added to bucket. <br> 2. Bucket drains at fixed rate `R`. <br> 3. If bucket exceeds capacity → extra requests dropped.      |
-| **Example**       | - B = 10, R = 2/sec. <br> - 12 requests come instantly. <br> - First 10 stored, 2 dropped. <br> - Requests then exit at steady rate (2/sec).     |
-| **Advantages**    | - Smooth constant traffic flow <br> - Simple to implement <br> - Ensures fairness                                                                |
-| **Disadvantages** | - No bursts allowed <br> - Latency can increase (requests wait in queue) <br> - Extra requests wasted if bucket full                             |
-| **Use Cases**     | - Network routers & ISPs (bandwidth shaping) <br> - Video streaming/VoIP (steady flow required) <br> - Systems prioritizing fairness over bursts |
-| **Analogy**       | Funnel with a small hole → pour water fast, but it drips out at constant rate. Overflowing water = dropped requests.                             |
-| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/LeakyBucket.java)                                                                       |
+[Shopify](#shopifys-rate-limiting-strategy) Uses Leaky Bucket for Rate Limiting.
+
+| **Aspect**        | **Details**                                                                                                                                                                                                         |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Definition**    | Rate-limiting algorithm where requests enter a bucket (queue) and leave at a constant leak rate. If bucket overflows → requests are dropped.                                                                        |
+| **Parameters**    | - **Bucket Capacity (B):** Max requests the bucket (queue) can hold <br> - **Leak Rate (R):** Requests processed per second                                                                                         |
+| **Working**       | 1. Requests arrive → added to bucket. <br> 2. Bucket drains at fixed rate `R`. <br> 3. If bucket exceeds capacity → extra requests dropped.                                                                         |
+| **Example**       | - B = 10, R = 2/sec. <br> - 12 requests come instantly. <br> - First 10 stored, 2 dropped. <br> - Requests then exit at steady rate (2/sec).                                                                        |
+| **Advantages**    | - Smooth constant traffic flow <br> - Simple to implement <br> - Ensures fairness                                                                                                                                   |
+| **Disadvantages** | - No bursts allowed.<br/> - Burst of traffic will fill the bucket with old requests, and new requests are rejected <br> - Latency can increase (requests wait in queue) <br> - Extra requests wasted if bucket full |
+| **Use Cases**     | - Network routers & ISPs (bandwidth shaping) <br> - Video streaming/VoIP (steady flow required) <br> - Systems prioritizing fairness over bursts                                                                    |
+| **Analogy**       | Funnel with a small hole → pour water fast, but it drips out at constant rate. Overflowing water = dropped requests.                                                                                                |
+| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/LeakyBucket.java)                                                                                                                                          |
 
 ![leaky bucket diagram](../../images/leakyBucket.png)
 
@@ -126,6 +128,9 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | 8.         | Is it suitable for distributed systems? | Not ideal for distributed request limiting (like APIs), but great for **traffic shaping in networks**.          | 
 ---
 
+### Fixed Window Counter
+
+
 ### Summary - Algorithms
 
 | Algorithm    | Interview Answer                                                                                                                                                                                                                                                                                                                 |
@@ -138,5 +143,5 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 ## Articles
 
 ### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
-
 ### [Stripe's Rate Limiting Strategy](https://stripe.com/blog/rate-limiters)
+### [Shopify's Rate Limiting Strategy](https://shopify.dev/docs/api/usage/limits)
