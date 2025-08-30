@@ -30,7 +30,7 @@
 
 ### Q1. Where to place the Rate Limiter?
 
-| Type                                                     | Pros                                                                                                                                                                                                                 | Cons                                                                  | Use Cases                                                |                                                               | 
+| Type                                                     | Pros                                                                                                                                                                                                                 | Cons                                                                  | Use Cases                                                | Diagrams                                                      | 
 |----------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------|----------------------------------------------------------|---------------------------------------------------------------|
 | **Client Side Rate Limiting**                            | - Clients are responsible for limiting their own request rates.<br/>- Unreliable as clients can be malicious or misconfigured.                                                                                       | No control over client behavior.                                      | Use only for well-behaved clients, not security.         |                                                               | 
 | **Server Side Rate Limiting**                            | - Rate Limiting logic implemented inside microservices.<br/> - Fine-grained (per-user, per-API, per-plan).                                                                                                           | Backend servers already received the request → some wasted resources. | Useful when rate limits depend on domain-specific rules. | ![img.png](./../../images/rate-limiter-server.png)            |
@@ -60,8 +60,15 @@ For this design, we will use a hybrid of `Rate Limiter Middleware` and `Distribu
 
 ### Q3. What are available Rate Limiting Algorithms?
 
-#### 1. Token Bucket Algorithm
-
+#### Token Bucket Algorithm
 - Simple, Well understood, commonly used by internet companies. Both Amazon and Stripe use this algorithm.
+
+`Algorithm`
+- Bucket with a fixed capacity that holds tokens.
+- Each incoming request consumes a token.
+- Tokens are added to the bucket at a fixed rate.
+- If the bucket has no tokens → request is rejected/throttled. |
+
+![token-bucket](./../../images/token-bucket1.png)
 
 
