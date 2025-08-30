@@ -37,12 +37,15 @@
 - Backend servers already received the request → some wasted resources.
 - Useful when rate limits depend on domain-specific rules.
 
+![img.png](./../../images/rate-limiter-server.png)
+
 `Option 3`: Rate Limiter Middleware (API Gateway/ Load Balancer)
 - Rate limiter sits before traffic enters backend.
 - Protects backend servers from overload.
 - Central enforcement → consistent across services.
 - Limited flexibility (may not know fine-grained app-level logic).
 - Most common placement in real-world systems.
+
 ![middleware.png](./../../images/rate-limiter-middleware.png)
 
 `Option 4`: Distributed Shared Store (Redis / Memcached)
