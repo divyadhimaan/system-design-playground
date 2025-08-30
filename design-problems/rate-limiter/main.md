@@ -64,60 +64,24 @@ For this design, we will use a hybrid of `Rate Limiter Middleware` and `Distribu
 
 ### 1. Token Bucket Algorithm
 
-Simple, Well understood, commonly used by internet companies (e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#stripes-rate-limiting-strategy)).
+Simple, Well understood, commonly used by internet companies (
+e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#stripes-rate-limiting-strategy)).
 
-| **Aspect**            | **Details**                                                                                     |
-|-----------------------|-------------------------------------------------------------------------------------------------|
-| **Definition**        | Bucket with fixed capacity that holds tokens.                                                   |
-| **How Requests Work** | Each incoming request consumes a token.                                                         |
-| **Refill Mechanism**  | Tokens are added to the bucket at a fixed rate.                                                 |
-| **When Bucket Empty** | If no tokens → request is rejected/throttled.                                                   |
-| **Parameters**        | - **Bucket size (B)**: max tokens in bucket <br> - **Refill rate (R)**: tokens added per second |
-| Code                  | [TokenBucket code ](./../../code/rate-limiter-algorithms/TokenBucket.java)                      |
+| **Aspect**            | **Details**                                                                                                                                                                                                                                                                                                                                                                                              |
+|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Definition**        | Bucket with fixed capacity that holds tokens.                                                                                                                                                                                                                                                                                                                                                            |
+| **How Requests Work** | Each incoming request consumes a token.                                                                                                                                                                                                                                                                                                                                                                  |
+| **Refill Mechanism**  | Tokens are added to the bucket at a fixed rate.                                                                                                                                                                                                                                                                                                                                                          |
+| **When Bucket Empty** | If no tokens → request is rejected/throttled.                                                                                                                                                                                                                                                                                                                                                            |
+| **Parameters**        | - **Bucket size (B)**: max tokens in bucket <br> - **Refill rate (R)**: tokens added per second                                                                                                                                                                                                                                                                                                          |
+| **Working**           | **Symbols:** <br> - **B**: bucket capacity (max tokens) <br> - **R**: token refill rate (tokens/sec) <br> - **T**: current tokens in bucket <br><br> **Steps:** <br> 1. Initially, `T = B` (bucket full). <br> 2. On each request: <br>   • If `T > 0` → consume 1 token, request allowed. <br>   • If `T = 0` → request rejected/throttled. <br> 3. Tokens refill at rate `R` until `T = B` (capacity). |
+| **Example**           | - B = 10, R = 5/sec. <br> - At t=0, 10 requests arrive → all allowed (T=10→0). <br> - At t=1, bucket refilled with 5 tokens (T=5). <br> - At t=1, 20 requests arrive instantly → 5 allowed (T=5→0), 15 rejected.                                                                                                                                                                                         |
+| **Advantage**         | - Allows bursts (better than leaky bucket).<br/>- Easy to implement.<br/>- O(1) check per request.<br/>- Widely used (APIs, CDNs, Cloud).                                                                                                                                                                                                                                                                |
+| **Disadvantage**      | - Needs precise timing for refill.<br/>- Requires distributed coordination in multi-server setup.<br/>- Difficult to tune parameters: B and R.                                                                                                                                                                                                                                                           |
+| **Use Cases**         | - API rate limiting (per user / per IP). <br> - Network bandwidth shaping (ISP data control). <br> - Distributed systems (fair usage of shared resources).                                                                                                                                                                                                                                               |
+| **Code**              | [TokenBucket code](./../../code/rate-limiter-algorithms/TokenBucket.java)                                                                                                                                                                                                                                                                                                                                |
 
 ![token-bucket](./../../images/token-bucket1.png)
-
-#### Working
-
-| **Symbol** | **Meaning**                            |
-|------------|----------------------------------------|
-| B          | Bucket capacity (max tokens).          |
-| R          | Token refill rate (tokens per second). |
-| T          | Current tokens in bucket.              |
-
-- Initially, the bucket is full: `T = B`.
-- Each request checks if `T > 0`:
-    - If yes → consume 1 token, request allowed.
-    - If no → reject/throttle request.
-- Tokens refill gradually at rate `R`.
-- The bucket never exceeds capacity `B`.
-
-#### Example
-
-| **Time** | **Action**                    | **Tokens Left (T)** | **Result**             |
-|----------|-------------------------------|---------------------|------------------------|
-| t = 0    | 10 requests arrive            | 10 → 0              | All 10 allowed         |
-| t = 1    | Bucket refilled with 5 tokens | 5                   | 5 allowed              |
-| t = 1    | 20 requests arrive instantly  | 5 → 0               | 5 allowed, 15 rejected |
-
-#### Advantages
-
-- Allows bursts (better than leaky bucket).
-- Easy to implement.
-- O(1) check per request.
-- Widely used (APIs, CDNs, Cloud).
-
-#### Disadvantages
-
-- Needs precise timing for refill.
-- Requires distributed coordination in multi server setup.
-- Difficult to set tune parameters: B and R.
-
-#### Use Cases
-
-- API rate limiting (per user / per IP).
-- Network bandwidth shaping (ISP data control).
-- Distributed systems (fair usage of shared resources).
 
 #### FAQs
 
@@ -135,6 +99,17 @@ Simple, Well understood, commonly used by internet companies (e.g., [Amazon](#ho
 
 ### 2. Leaky Bucket Algorithm
 
+| **Aspect**        | **Details**                                                                                                                                      |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Definition**    | Rate-limiting algorithm where requests enter a bucket (queue) and leave at a constant leak rate. If bucket overflows → requests are dropped.     |
+| **Parameters**    | - **Bucket Capacity (B):** Max requests the bucket (queue) can hold <br> - **Leak Rate (R):** Requests processed per second                      |
+| **Working**       | 1. Requests arrive → added to bucket. <br> 2. Bucket drains at fixed rate `R`. <br> 3. If bucket exceeds capacity → extra requests dropped.      |
+| **Example**       | - B = 10, R = 2/sec. <br> - 12 requests come instantly. <br> - First 10 stored, 2 dropped. <br> - Requests then exit at steady rate (2/sec).     |
+| **Advantages**    | - Smooth constant traffic flow <br> - Simple to implement <br> - Ensures fairness                                                                |
+| **Disadvantages** | - No bursts allowed <br> - Latency can increase (requests wait in queue) <br> - Extra requests wasted if bucket full                             |
+| **Use Cases**     | - Network routers & ISPs (bandwidth shaping) <br> - Video streaming/VoIP (steady flow required) <br> - Systems prioritizing fairness over bursts |
+| **Analogy**       | Funnel with a small hole → pour water fast, but it drips out at constant rate. Overflowing water = dropped requests.                             |
+| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/LeakyBucket.java)                                                                       |
 
 ### Summary - Algorithms
 
@@ -142,8 +117,8 @@ Simple, Well understood, commonly used by internet companies (e.g., [Amazon](#ho
 |--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Token Bucket | We use a token bucket algorithm where each client has a bucket with max capacity. Tokens are added at a fixed rate and each request consumes a token. At the API Gateway, we check the bucket (stored in Redis for distributed consistency). This allows us to control average request rate while still supporting short bursts. |
 
-
 ## Articles
 
 ### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
+
 ### [Stripe's Rate Limiting Strategy](https://stripe.com/blog/rate-limiters)
