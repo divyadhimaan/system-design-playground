@@ -14,6 +14,7 @@
       - [5. Sliding Window Counter](#5-sliding-window-counter)
       - [Summary - Algorithms](#summary---algorithms)
     - [High Level Design](#design)
+  - [Step 3: Design Deep Dive](#step-3-design-deep-dive)
   - [Articles](#articles)
 
 # Rate Limiter
@@ -267,6 +268,16 @@ checks if the limit is reached or not.
   - If the limit is reached, the request is rejected.
   - If the limit is not reached, the request is sent to API servers. Meanwhile, the system
   increments the counter and saves it back to Redis.
+
+---
+## Step 3: Design Deep Dive
+
+The [High Level Design](#design) does not answer the following questions:
+1. How are rate limiting rules created? Where are the rules stored?
+2. How to handle requests that are rejected due to rate limiting?
+
+### 1. Rate Limiting Rules
+
 ## Articles
 
 #### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
