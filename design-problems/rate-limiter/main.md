@@ -158,6 +158,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/FixedWindowLimiter.java)                                                                                                                                                                           |
 
 ```W = 1 second, L = 3 requests/second```
+
 ![fixed-window-counter](../../images/rateLimitingAlgos/fixedWindowCounter.png)
 
 #### FAQs
@@ -169,6 +170,37 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | 4.         | How to fix burstiness?                       | Use Sliding Window Counter/Log or Token Bucket instead.                                                                                             | 
 | 5.         | Time complexity per request?                 | O(1) - just incrementing a counter and checking limit.                                                                                              |
 | 6.         | Is it suitable for distributed systems?      | Yes, but requires synchronization (e.g., Redis) to maintain consistent counters across servers.                                                     |
+
+---
+
+### Sliding Window Log
+
+| **Aspect**        | **Details**                                                                                                                                                                                                                                                                      |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Definition**    | Instead of resetting counters at fixed intervals, we log **timestamps of each request** in a sliding time window. <br/>A request is allowed if the number of logged requests in the last `W` duration ≤ limit `L`.                                                               |
+| **Parameters**    | - **Window Size (W):** Duration of sliding window (e.g., 1 min) <br> - **Limit (L):** Max requests allowed in last `W`                                                                                                                                                           |
+| **Working**       | 1. Maintain a log (queue/list) of timestamps for each request. <br> 2. When a new request comes: <br>    a. Remove timestamps older than `now - W`. <br>    b. If log size < `L`, accept request and add timestamp. <br>    c. Else, reject request. But still add the timestamp |
+| **Example**       | W = 1 min, L = 2. <br> - Requests at 1:00:01, 1:00:30 → allowed (2). <br> - Request at 1:00:50 → rejected (3th within 1 min). <br> - At 1:01:40 → older timestamps (1:00:01, 1:00:30) is out of window → new request allowed.  (Image added below )                              |
+| **Advantages**    | - Smooths out requests over time (no boundary burst issue). <br> - Accurate rate limiting since it tracks exact timestamps. <br> - Prevents burstiness better than Fixed Window.                                                                                                 |
+| **Disadvantages** | - Higher memory (stores timestamps for each request). <br> - O(n) per request in worst case (pruning old timestamps). <br> - More complex than Fixed Window Counter.                                                                                                             |
+| **Use Cases**     | - APIs requiring strict rate limits (payments, authentication). <br> - When fairness and accuracy are critical.                                                                                                                                                                  |
+| **Analogy**       | A **movie theatre** allows only 100 people in any given 1-hour window. <br/>Security checks last hour’s log → only if less than 100 entered, you can go in.                                                                                                                      |
+| **Code**          | [SlidingWindowLog code](./../../code/rate-limiter-algorithms/SlidingWindowLogLimiter.java)                                                                                                                                                                                       |
+
+```W = 1 min, L = 2.```
+
+![sliding-window-log](../../images/rateLimitingAlgos/slidingWindowLog.png)
+
+#### FAQs
+| Question # | Question                                      | Answer                                                                                                                         |
+|------------|-----------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| 1.         | Why is it called "sliding window log"?        | Because instead of resetting at fixed intervals, the window "slides" with time by pruning old requests outside the window.     |
+| 2.         | How does it differ from Fixed Window Counter? | - Fixed Window = bursty at edges. <br/> - Sliding Window Log = smooth, accurate because logs slide with real time.             |
+| 3.         | Memory requirement?                           | O(N), where N = number of requests in last `W`. Each request’s timestamp must be stored until it falls outside the window.     |
+| 4.         | Time complexity per request?                  | Worst-case O(N) (removing old timestamps), but often amortized O(1).                                                           |
+| 5.         | Do requests wait or fail immediately?         | Requests exceeding limit are rejected immediately (no queue built-in).                                                         |
+| 6.         | Can it work in distributed systems?           | Yes, but timestamps must be stored centrally (e.g., Redis/Zookeeper) for global consistency.                                   |
+| 7.         | When to use over Token/Leaky Bucket?          | Use when **precise request tracking** is needed (e.g., banking, payments). Token/Leaky bucket allow controlled bursts instead. |
 
 ---
 
@@ -184,6 +216,6 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 
 ## Articles
 
-### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
-### [Stripe's Rate Limiting Strategy](https://stripe.com/blog/rate-limiters)
-### [Shopify's Rate Limiting Strategy](https://shopify.dev/docs/api/usage/limits)
+#### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
+#### [Stripe's Rate Limiting Strategy](https://stripe.com/blog/rate-limiters)
+#### [Shopify's Rate Limiting Strategy](https://shopify.dev/docs/api/usage/limits)
