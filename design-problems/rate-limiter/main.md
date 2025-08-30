@@ -1,3 +1,18 @@
+- Table of Content
+
+- [Rate Limiter](#rate-limiter)
+  - [Need for Rate Limiter](#need-for-rate-limiter)
+  - [Step 1: Design Scope](#step-1-design-scope)
+  - [Step 2: Propose High Level Design](#step-2-propose-high-level-design)
+    - [Q1. Where to place the Rate Limiter?](#q1-where-to-place-the-rate-limiter)
+    - [Q2. More guidelines to consider](#q2-more-guidelines-to-consider)
+    - [Rate Limiting Algorithms](#rate-limiting-algorithms)
+      - [1. Token Bucket Algorithm](#1-token-bucket-algorithm)
+      - [2. Leaky Bucket Algorithm](#2-leaky-bucket-algorithm)
+      - [Fixed Window Counter](#fixed-window-counter)
+      - [Summary - Algorithms](#summary---algorithms)
+  - [Articles](#articles)
+
 # Rate Limiter
 
 - A rate limiter is a system that controls the rate at which requests are processed to ensure fair usage and prevent
@@ -81,7 +96,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | **Use Cases**         | - API rate limiting (per user / per IP). <br> - Network bandwidth shaping (ISP data control). <br> - Distributed systems (fair usage of shared resources).                                                                                                                                                                                                                                               |
 | **Code**              | [TokenBucket code](./../../code/rate-limiter-algorithms/TokenBucketLimiter.java)                                                                                                                                                                                                                                                                                                                                |
 
-![token-bucket](./../../images/token-bucket1.png)
+![token-bucket](../../images/rateLimitingAlgos/tokenBucket.png)
 
 #### FAQs
 
@@ -113,7 +128,7 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | **Analogy**       | Funnel with a small hole → pour water fast, but it drips out at constant rate. Overflowing water = dropped requests.                                                                                                |
 | **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/LeakyBucketLimiter.java)                                                                                                                                          |
 
-![leaky bucket diagram](../../images/leakyBucket.png)
+![leaky bucket diagram](../../images/rateLimitingAlgos/leakyBucket.png)
 
 #### FAQs
 | Question # | Question                                | Answer                                                                                                          |
@@ -141,6 +156,21 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 | **Use Cases**     | - Simple API rate limits (small systems) <br> - When approximate fairness is acceptable <br> - Quick prototyping                                                                                                                                            |
 | **Analogy**       | Toll gate allows up to **L cars per minute**. At minute reset, a new set of cars can immediately enter → causing sudden bursts.                                                                                                                             |
 | **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/FixedWindowLimiter.java)                                                                                                                                                                           |
+
+```W = 1 second, L = 3 requests/second```
+![fixed-window-counter](../../images/rateLimitingAlgos/fixedWindowCounter.png)
+
+#### FAQs
+| Question # | Question                                     | Answer                                                                                                                                              |
+|------------|----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1.         | Why is it called "fixed window"?             | Because time is divided into non-overlapping fixed intervals (e.g., every 1 minute).                                                                | 
+| 2.         | What problem can it cause?                   | Burstiness at window boundaries. Example: if limit=5/min, 5 requests at 12:00:59 + 5 at 12:01:00 = 10 requests in 2 seconds.                        | 
+| 3.         | How is it different from Leaky/Token bucket? | - Leaky Bucket: smooth flow, constant drain.<br/>- Token Bucket: allows bursts if tokens available.<br/>- Fixed Window: simple but bursty at edges. |
+| 4.         | How to fix burstiness?                       | Use Sliding Window Counter/Log or Token Bucket instead.                                                                                             | 
+| 5.         | Time complexity per request?                 | O(1) - just incrementing a counter and checking limit.                                                                                              |
+| 6.         | Is it suitable for distributed systems?      | Yes, but requires synchronization (e.g., Redis) to maintain consistent counters across servers.                                                     |
+
+---
 
 ### Summary - Algorithms
 
