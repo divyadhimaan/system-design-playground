@@ -111,9 +111,21 @@ Simple, Well understood, commonly used by internet companies (e.g., Amazon, Stri
 
 - Needs precise timing for refill.
 - Requires distributed coordination in multi server setup.
+- Difficult to set tune parameters: B and R.
 
 #### Use Cases
 
 - API rate limiting (per user / per IP).
 - Network bandwidth shaping (ISP data control).
 - Distributed systems (fair usage of shared resources).
+
+### FAQs
+#### Q1. How many buckets do we need?
+- Depends on granularity of rate limiting.
+- Usually per user, per API key, or per IP address.
+- If system allows a max of 10000 requests per second, and we want to limit each user to 100 requests per second, it makes sense to have a global bucket shared by all resources.
+### Summary
+
+| Algorithm    | Interview Answer                                                                                                                                                                                                                                                                                                                 |
+|--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Token Bucket | We use a token bucket algorithm where each client has a bucket with max capacity. Tokens are added at a fixed rate and each request consumes a token. At the API Gateway, we check the bucket (stored in Redis for distributed consistency). This allows us to control average request rate while still supporting short bursts. | 
