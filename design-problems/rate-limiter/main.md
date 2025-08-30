@@ -30,7 +30,7 @@
 - Unreliable as clients can be malicious or misconfigured.
 - No control over client behavior.
 - Use only for well-behaved clients, not security.
-
+---
 `Option 2`: Server Side Rate Limiting
 - Rate Limiting logic implemented inside microservices.
 - Fine-grained (per-user, per-API, per-plan).
@@ -38,7 +38,7 @@
 - Useful when rate limits depend on domain-specific rules.
 
   ![img.png](./../../images/rate-limiter-server.png)
-
+---
 `Option 3`: Rate Limiter Middleware (API Gateway/ Load Balancer)
 - Rate limiter sits before traffic enters backend.
 - Protects backend servers from overload.
@@ -47,7 +47,7 @@
 - Most common placement in real-world systems.
 
   ![middleware.png](./../../images/rate-limiter-middleware.png)
-
+---
 `Option 4`: Distributed Shared Store (Redis / Memcached)
 - Rate limiting counters/tokens stored in Redis or Memcached.
 - API Gateway / Service → queries Redis to check limit.
