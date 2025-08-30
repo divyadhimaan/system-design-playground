@@ -58,42 +58,45 @@ For this design, we will use a hybrid of `Rate Limiter Middleware` and `Distribu
 - Building your own rate limiter is complex, consider using existing solutions like Envoy, NGINX, Kong, or cloud
   provider services.
 
+---
+
 ### Rate Limiting Algorithms
 
-#### Token Bucket Algorithm
-- Simple, Well understood, commonly used by internet companies. Both Amazon and Stripe use this algorithm.
+### 1. Token Bucket Algorithm
 
-`Algorithm`
-- Bucket with a fixed capacity that holds tokens.
-- Each incoming request consumes a token.
-- Tokens are added to the bucket at a fixed rate.
-- If the bucket has no tokens → request is rejected/throttled. 
-- The token bucket algorithm takes two parameters:
-  - `Bucket size`: the maximum number of tokens allowed in the bucket 
-  - `Refill rate`: number of tokens put into the bucket every second
+Simple, Well understood, commonly used by internet companies (e.g., Amazon, Stripe).
 
-    ![token-bucket](./../../images/token-bucket1.png)
+| **Aspect**            | **Details**                                                                                     |
+|-----------------------|-------------------------------------------------------------------------------------------------|
+| **Definition**        | Bucket with fixed capacity that holds tokens.                                                   |
+| **How Requests Work** | Each incoming request consumes a token.                                                         |
+| **Refill Mechanism**  | Tokens are added to the bucket at a fixed rate.                                                 |
+| **When Bucket Empty** | If no tokens → request is rejected/throttled.                                                   |
+| **Parameters**        | - **Bucket size (B)**: max tokens in bucket <br> - **Refill rate (R)**: tokens added per second |
 
-`Working`
-- Let `B` = bucket capacity (max tokens).
-- `R` = token refill rate (tokens per second).
-- `T` = current tokens in bucket.
+![token-bucket](./../../images/token-bucket1.png)
+
+#### Working
+
+| **Symbol** | **Meaning**                            |
+|------------|----------------------------------------|
+| B          | Bucket capacity (max tokens).          |
+| R          | Token refill rate (tokens per second). |
+| T          | Current tokens in bucket.              |
 
 - Initially, the bucket is full: `T = B`.
 - Each request checks if `T > 0`:
-  - If yes → consume 1 token, request allowed.
-  - If no → reject/throttle request.
+    - If yes → consume 1 token, request allowed.
+    - If no → reject/throttle request.
 - Tokens refill gradually at rate `R`.
 - The bucket never exceeds capacity `B`.
 
-```
-//Example
-B = 10 tokens.
-R = 5 tokens/sec.
-T = 10 (initially full).
+---
 
-Requests arrive:
-At t=0: bucket = 10 → 10 requests pass.
-At t=1: bucket refilled to 5 → 5 more allowed.
-20 requests come instantly → 10 pass, 10 dropped.
-```
+### Example
+
+| **Time** | **Action**                    | **Tokens Left (T)** | **Result**             |
+|----------|-------------------------------|---------------------|------------------------|
+| t = 0    | 10 requests arrive            | 10 → 0              | All 10 allowed         |
+| t = 1    | Bucket refilled with 5 tokens | 5                   | 5 allowed              |
+| t = 1    | 20 requests arrive instantly  | 5 → 0               | 5 allowed, 15 rejected |
