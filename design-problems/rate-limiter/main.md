@@ -58,7 +58,7 @@ For this design, we will use a hybrid of `Rate Limiter Middleware` and `Distribu
 - Building your own rate limiter is complex, consider using existing solutions like Envoy, NGINX, Kong, or cloud
   provider services.
 
-### Q3. What are available Rate Limiting Algorithms?
+### Rate Limiting Algorithms
 
 #### Token Bucket Algorithm
 - Simple, Well understood, commonly used by internet companies. Both Amazon and Stripe use this algorithm.
@@ -67,8 +67,33 @@ For this design, we will use a hybrid of `Rate Limiter Middleware` and `Distribu
 - Bucket with a fixed capacity that holds tokens.
 - Each incoming request consumes a token.
 - Tokens are added to the bucket at a fixed rate.
-- If the bucket has no tokens → request is rejected/throttled. |
+- If the bucket has no tokens → request is rejected/throttled. 
+- The token bucket algorithm takes two parameters:
+  - `Bucket size`: the maximum number of tokens allowed in the bucket 
+  - `Refill rate`: number of tokens put into the bucket every second
 
-![token-bucket](./../../images/token-bucket1.png)
+    ![token-bucket](./../../images/token-bucket1.png)
 
+`Working`
+- Let `B` = bucket capacity (max tokens).
+- `R` = token refill rate (tokens per second).
+- `T` = current tokens in bucket.
 
+- Initially, the bucket is full: `T = B`.
+- Each request checks if `T > 0`:
+  - If yes → consume 1 token, request allowed.
+  - If no → reject/throttle request.
+- Tokens refill gradually at rate `R`.
+- The bucket never exceeds capacity `B`.
+
+```
+//Example
+B = 10 tokens.
+R = 5 tokens/sec.
+T = 10 (initially full).
+
+Requests arrive:
+At t=0: bucket = 10 → 10 requests pass.
+At t=1: bucket refilled to 5 → 5 more allowed.
+20 requests come instantly → 10 pass, 10 dropped.
+```
