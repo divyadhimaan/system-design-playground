@@ -130,17 +130,17 @@ e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#s
 
 ### Fixed Window Counter
 
-| **Aspect**        | **Details**                                                                                                                                                                                                 |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Definition**    | Time is divided into fixed windows (e.g., 1 minute). <br/>A counter tracks the number of requests in the current window. <br/>Requests are allowed until the counter exceeds the threshold.                 |
-| **Parameters**    | - **Window Size (W):** Duration of each time window (e.g., 1 min) <br> - **Limit (L):** Max requests allowed per window                                                                                     |
-| **Working**       | 1. Track count of requests in the current window. <br> 2. If count ≤ limit → allow request and increment counter. <br> 3. If count > limit → reject request. <br> 4. Counter resets at start of new window. |
-| **Example**       | - W = 1 min, L = 5. <br> - At 12:00:00 → counter resets, allow 5 requests. <br> - At 12:00:30 → if 6th request arrives → rejected. <br> - At 12:01:00 → counter resets, requests allowed again.             |
-| **Advantages**    | - Simple to implement <br> - Low memory (just a counter) <br> - Easy to reason about                                                                                                                        |
-| **Disadvantages** | - Bursty at boundaries (e.g., 5 requests at 12:00:59 and 5 at 12:01:00 → 10 allowed in 2 seconds) <br> - Not smooth, can overload system briefly                                                            |
-| **Use Cases**     | - Simple API rate limits (small systems) <br> - When approximate fairness is acceptable <br> - Quick prototyping                                                                                            |
-| **Analogy**       | Toll gate allows up to **L cars per minute**. At minute reset, a new set of cars can immediately enter → causing sudden bursts.                                                                             |
-| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/FixedWindowLimiter.java)                                                                                                                       |
+| **Aspect**        | **Details**                                                                                                                                                                                                                                                 |
+|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Definition**    | Time is divided into fixed windows (e.g., 1 minute). <br/>A counter tracks the number of requests in the current window. <br/>Requests are allowed until the counter exceeds the threshold.                                                                 |
+| **Parameters**    | - **Window Size (W):** Duration of each time window (e.g., 1 min) <br> - **Limit (L):** Max requests allowed per window                                                                                                                                     |
+| **Working**       | 1. Track count of requests in the current window. <br> 2. If count ≤ limit → allow request and increment counter. <br> 3. If count > limit → reject request. <br> 4. Counter resets at start of new window.                                                 |
+| **Example**       | - W = 1 min, L = 5. <br> - At 12:00:00 → counter resets, allow 5 requests. <br> - At 12:00:30 → if 6th request arrives → rejected. <br> - At 12:01:00 → counter resets, requests allowed again.                                                             |
+| **Advantages**    | - Simple to implement <br> - Low memory (just a counter) <br> - Easy to reason about                                                                                                                                                                        |
+| **Disadvantages** | - Bursty at boundaries (e.g., 5 requests at 12:00:59 and 5 at 12:01:00 → 10 allowed in 2 seconds) <br> - Not smooth, can overload system briefly and allows spikes at window edges. <br/> - There is no queue or retry mechanism built into this algorithm. |
+| **Use Cases**     | - Simple API rate limits (small systems) <br> - When approximate fairness is acceptable <br> - Quick prototyping                                                                                                                                            |
+| **Analogy**       | Toll gate allows up to **L cars per minute**. At minute reset, a new set of cars can immediately enter → causing sudden bursts.                                                                                                                             |
+| **Code**          | [LeakyBucket code ](./../../code/rate-limiter-algorithms/FixedWindowLimiter.java)                                                                                                                                                                           |
 
 ### Summary - Algorithms
 
