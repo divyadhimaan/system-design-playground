@@ -64,7 +64,7 @@ For this design, we will use a hybrid of `Rate Limiter Middleware` and `Distribu
 
 ### 1. Token Bucket Algorithm
 
-Simple, Well understood, commonly used by internet companies (e.g., Amazon, Stripe).
+Simple, Well understood, commonly used by internet companies (e.g., [Amazon](#how-amazon-used-token-bucket-for-api-rate-limiting), [Stripe](#stripes-rate-limiting-strategy)).
 
 | **Aspect**            | **Details**                                                                                     |
 |-----------------------|-------------------------------------------------------------------------------------------------|
@@ -140,4 +140,10 @@ Simple, Well understood, commonly used by internet companies (e.g., Amazon, Stri
 
 | Algorithm    | Interview Answer                                                                                                                                                                                                                                                                                                                 |
 |--------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Token Bucket | We use a token bucket algorithm where each client has a bucket with max capacity. Tokens are added at a fixed rate and each request consumes a token. At the API Gateway, we check the bucket (stored in Redis for distributed consistency). This allows us to control average request rate while still supporting short bursts. | 
+| Token Bucket | We use a token bucket algorithm where each client has a bucket with max capacity. Tokens are added at a fixed rate and each request consumes a token. At the API Gateway, we check the bucket (stored in Redis for distributed consistency). This allows us to control average request rate while still supporting short bursts. |
+
+
+## Articles
+
+### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
+### [Stripe's Rate Limiting Strategy](https://stripe.com/blog/rate-limiters)
