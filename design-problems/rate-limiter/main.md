@@ -73,6 +73,7 @@ Simple, Well understood, commonly used by internet companies (e.g., Amazon, Stri
 | **Refill Mechanism**  | Tokens are added to the bucket at a fixed rate.                                                 |
 | **When Bucket Empty** | If no tokens → request is rejected/throttled.                                                   |
 | **Parameters**        | - **Bucket size (B)**: max tokens in bucket <br> - **Refill rate (R)**: tokens added per second |
+| Code                  | [TokenBucket code ](./../../code/rate-limiter-algorithms/TokenBucket.java)                      |
 
 ![token-bucket](./../../images/token-bucket1.png)
 
@@ -91,12 +92,28 @@ Simple, Well understood, commonly used by internet companies (e.g., Amazon, Stri
 - Tokens refill gradually at rate `R`.
 - The bucket never exceeds capacity `B`.
 
----
-
-### Example
+#### Example
 
 | **Time** | **Action**                    | **Tokens Left (T)** | **Result**             |
 |----------|-------------------------------|---------------------|------------------------|
 | t = 0    | 10 requests arrive            | 10 → 0              | All 10 allowed         |
 | t = 1    | Bucket refilled with 5 tokens | 5                   | 5 allowed              |
 | t = 1    | 20 requests arrive instantly  | 5 → 0               | 5 allowed, 15 rejected |
+
+#### Advantages
+
+- Allows bursts (better than leaky bucket).
+- Easy to implement.
+- O(1) check per request.
+- Widely used (APIs, CDNs, Cloud).
+
+#### Disadvantages
+
+- Needs precise timing for refill.
+- Requires distributed coordination in multi server setup.
+
+#### Use Cases
+
+- API rate limiting (per user / per IP).
+- Network bandwidth shaping (ISP data control).
+- Distributed systems (fair usage of shared resources).
