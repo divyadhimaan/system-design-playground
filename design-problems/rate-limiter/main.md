@@ -277,6 +277,43 @@ The [High Level Design](#design) does not answer the following questions:
 2. How to handle requests that are rejected due to rate limiting?
 
 ### 1. Rate Limiting Rules
+- Rate limiting rules can be created by the system administrator or automatically generated based on usage patterns.
+- Rules can be stored in a database or configuration file.
+- Rules can be cached in memory for fast access.
+- Example: 
+  1. The system is configured to allow a maximum of 5 marketing messages
+    per day.
+   ```yaml
+    domain: messaging
+    descriptors:
+    - key: message_type
+      Value: marketing
+      rate_limit:
+      unit: day
+      requests_per_unit: 5
+    ```
+  2.This rule shows that clients are not allowed to login more than 5 times in 1 minute.
+    ```yaml
+    domain: auth
+    descriptors:
+    - key: auth_type
+      Value: login
+      rate_limit:
+      unit: minute
+      requests_per_unit: 5
+    ```
+
+### 2. Exceeding Rate limit
+- When a request is rejected due to rate limiting, the system can return either of two: `429 Too Many Requests` / `503 Service Unavailable`.
+- Depending on use-case we may enqueue the request for later processing or drop it.
+- The response can include a `Retry-After` header indicating when the client can retry the request.
+- Rate limiter headers can be used to inform clients about their current rate limit status:
+  - `X-Ratelimit-Remaining`: The remaining number of allowed requests within the window.
+  - `X-Ratelimit-Limit`: It indicates how many calls the client can make per time window.
+  - `X-Ratelimit-Retry-After`: The number of seconds to wait until you can make a request again
+  without being throttled.
+- When a user has sent too many requests, a 429 too many requests error and X-Ratelimit-
+  Retry-After header are returned to the client.
 
 
 ## Articles
