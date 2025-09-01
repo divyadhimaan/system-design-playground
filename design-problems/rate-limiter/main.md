@@ -15,6 +15,14 @@
       - [Summary - Algorithms](#summary---algorithms)
     - [High Level Design](#design)
   - [Step 3: Design Deep Dive](#step-3-design-deep-dive)
+    - [Rate Limiting Rules](#1-rate-limiting-rules)
+    - [Handling Rate Limited Requests](#2-exceeding-rate-limit)
+  - [Distributed Rate Limiting](#rate-limiter-in-distributed-system)
+    - [Race Conditions](#1-race-condition)
+    - [Synchronization](#2-synchronization)
+  - [Performance](#performance)
+  - [Monitoring](#monitoring)
+  - [Follow Ups](#follow-ups)
   - [Articles](#articles)
 
 # Rate Limiter
@@ -443,7 +451,7 @@ timestamp from Redis cache. Based on the response, the rate limiter decides:
   located far away from the data center.
 - Synchronize data with an eventual consistency model.
 
-## Monitoring & Alerting
+## Monitoring
 - After the rate limiter is put in place, it is important to gather analytics data to check whether
   the rate limiter is effective. Primarily, we want to make sure:
   - The rate limiting algorithm is effective.
