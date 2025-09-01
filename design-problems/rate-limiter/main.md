@@ -329,6 +329,141 @@ timestamp from Redis cache. Based on the response, the rate limiter decides:
 
 ![rate-limiter-design](../../diagrams/rateLimiter.png)
 
+## Rate Limiter in Distributed System
+- Rate limiter should support multiple servers and concurrent threads.
+- There are 2 challenges:
+  - Race conditions: Multiple servers may try to update the same counter simultaneously.
+  - Synchronization: Counters must be consistent across all servers.
+
+### 1. Race Condition:
+- For the rate limiter to work
+  - It reads the counter from Redis
+  - checks if the limit exceeds the threshold
+  - if not, increments the counter
+  - saves it back to Redis
+- Race condition can happen in a highly concurrent environment.
+
+```pgsql
+         ┌──────────────┐                        ┌──────────────┐
+         │ Request A     │                        │ Request B     │
+         └──────┬───────┘                        └──────┬───────┘
+                │                                       │
+                ▼                                       ▼
+        ┌─────────────────┐                     ┌─────────────────┐
+        │ Read Counter=4  │ <───── Redis ─────> │ Read Counter=4  │
+        └─────────────────┘                     └─────────────────┘
+                │                                       │
+                ▼                                       ▼
+        ┌─────────────────┐                     ┌─────────────────┐
+        │ Check limit (5) │                     │ Check limit (5) │
+        │ → OK            │                     │ → OK            │
+        └─────────────────┘                     └─────────────────┘
+                │                                       │
+                ▼                                       ▼
+        ┌─────────────────┐                     ┌─────────────────┐
+        │ Increment=5     │                     │ Increment=5     │
+        └─────────────────┘                     └─────────────────┘
+                │                                       │
+                ▼                                       ▼
+             ┌────────────────────────── Redis ──────────────────────────┐
+             │ Counter saved as 5 (one update lost, should be 6, but 5) │
+             └──────────────────────────────────────────────────────────┘
+
+```
+- Explanation:
+  - Suppose limit = 5 requests per window. 
+  - Current counter in Redis = 4. 
+  - Two requests (A and B) arrive concurrently.
+  - Request A reads counter = 4. 
+  - Request B reads counter = 4 (before A writes back). 
+  - Both see "OK" (4 < 5). 
+  - Both increment their local counter → 5. 
+  - Both write back 5 to Redis. 
+  - Final counter = 5, but in reality 6 requests happened.
+
+#### Solution:
+- Locks are the most obvious solution, but they hurt performance and scalability.
+- Two strategies are used:
+  1. Use atomic Redis commands (INCR) or **Lua scripting** so that check + increment happen in a single step.
+  2. Use **sorted sets data structure in Redis** to store timestamps of requests. This allows efficient pruning of old requests and counting recent ones within a time window.
+
+> `Interview Answer`: This problem occurs due to non-atomic read-modify-write operations in a concurrent environment. The fix is to use atomic Redis commands (INCR) or Lua scripting so that check + increment happen in a single step.
+### 2. Synchronization:
+- To support millions of users, one rate limiter server might not be enough to handle the traffic.
+- When multiple rate limiter servers are used, synchronization is required.
+
+#### Problem:
+
+- Scenario: Multiple Rate Limiter Servers
+  - Suppose we allow 5 requests per minute per user. 
+  - We deploy 3 rate limiter servers behind a load balancer. 
+  - User requests are distributed randomly across these servers.
+```pgsql
+                     ┌────────────────────┐
+                     │   Load Balancer    │
+                     └───────┬────────────┘
+         ┌───────────────────┼───────────────────┐
+         ▼                   ▼                   ▼
+ ┌───────────────┐   ┌───────────────┐   ┌───────────────┐
+ │ RateLimiter S1│   │ RateLimiter S2│   │ RateLimiter S3│
+ │ Counter=2     │   │ Counter=2     │   │ Counter=2     │
+ └───────┬───────┘   └───────┬───────┘   └───────┬───────┘
+         │                   │                   │
+         ▼                   ▼                   ▼
+   User A Req#1         User A Req#2         User A Req#3
+
+```
+- What happens without synchronization:
+  - User A sends 3 requests in quick succession.
+  - Request #1 goes to Server S1, reads counter=2, allows it (2 < 5), increments to 3.
+  - Request #2 goes to Server S2, reads counter=2 (no knowledge of S1's update), allows it, increments to 3.
+  - Request #3 goes to Server S3, reads counter=2, allows it, increments to 3.
+  - All 3 requests are allowed, but total should be limited to 5. 
+  - If User A sends more requests, they will also be allowed until each server's local counter hits 5, leading to a total of up to 15 requests in the same minute.
+
+#### Solution:
+- One possible solution is to use sticky sessions at the load balancer so that all requests from the same user go to the same rate limiter server. This ensures that each user's requests are consistently counted by one server. [NOT SCALABLE]
+- A better solution is to use a **centralized store (like Redis)** for counters. All rate limiter servers read and write counters to Redis. This ensures consistency across servers, but adds some latency due
+
+>  Still centralized Redis can become a bottleneck. Following can be opted to reduce the problem:
+> - we can shard counters by user ID
+>   - `BENEFIT` Parallelizes load across multiple Redis nodes.
+>   - `TRADEOFF` Requires consistent hashing strategy.
+> - use local caches with short TTLs to reduce load on Redis
+>   - `BENEFIT` Redis load reduced drastically.
+>   - `TRADEOFF` Short-term inconsistency (user may get a few extra requests if multiple servers prefetch).
+> - Send multiple Redis commands in a batch without waiting for response of each 
+>   - `BENEFIT` Fewer network trips → lower latency.
+>   - `TRADEOFF` Slight delay in responses (microseconds).
+
+![distributed-rate-limiter](../../images/distributed-rate-limiter.png)
+
+## Performance
+- Multi-data center setup is crucial for a rate limiter because latency is high for users
+  located far away from the data center.
+- Synchronize data with an eventual consistency model.
+
+## Monitoring & Alerting
+- After the rate limiter is put in place, it is important to gather analytics data to check whether
+  the rate limiter is effective. Primarily, we want to make sure:
+  - The rate limiting algorithm is effective.
+  - The rate limiting rules are effective.
+
+## Follow Ups
+| **Category**            | **Type**                                 | **Explanation**                                                             | **Pros**                                                 | **Cons / Trade-offs**                                        |
+|-------------------------|------------------------------------------|-----------------------------------------------------------------------------|----------------------------------------------------------|--------------------------------------------------------------|
+| **Limit Strictness**    | **Hard Limit**                           | Requests exceeding the limit are rejected immediately (e.g., HTTP 429).     | Simple to implement <br> Strong protection against abuse | Harsh on clients <br> Might drop legitimate spikes           |
+|                         | **Soft Limit**                           | Requests exceeding the limit are queued/delayed instead of rejected.        | Better user experience <br> Smooths out bursts           | Needs queue management <br> Risk of latency build-up         |
+| **Rate Limiting Level** | **User-level**                           | Restricts requests per user account.                                        | Prevents single user abuse <br> Fair usage               | Needs user identification <br> Expensive for anonymous APIs  |
+|                         | **IP-level**                             | Restricts requests per IP address.                                          | Useful for public APIs <br> Easy to implement            | Breaks in NAT/shared IPs <br> Attackers can use multiple IPs |
+|                         | **Endpoint-level**                       | Different limits per API endpoint (e.g., `/login` stricter than `/search`). | Protects critical endpoints <br> Fine-grained control    | More configuration overhead                                  |
+| **Rate Limiting Layer** | **Application Layer (L7)**               | Implemented in application code/middleware.                                 | Granular (per user, endpoint, etc.) <br> Custom logic    | Adds app load <br> Harder to scale horizontally              |
+|                         | **Network Layer (L4)**                   | Implemented in load balancer / API gateway.                                 | Centralized <br> Works before hitting app                | Limited flexibility (mostly IP-based)                        |
+|                         | **Firewall Layer (L3)**                  | Implemented in firewall (IP-based blocking).                                | Very fast <br> Blocks DDoS early                         | Too coarse-grained <br> No user-level awareness              |
+| **Client Experience**   | **Error messages**                       | Provide clear `429 Too Many Requests` with human-readable text.             | Transparency for clients                                 | Without guidance, clients may retry blindly                  |
+|                         | **Retry-After header**                   | Tells client when to retry.                                                 | Helps clients back off <br> Reduces retries storm        | Needs accurate time sync                                     |
+|                         | **Rate Limit headers (`X-RateLimit-*`)** | Expose remaining quota, reset time, etc.                                    | Helps client self-throttle <br> Better API adoption      | Extra dev work to maintain consistency                       |
+
 ## Articles
 
 #### [How Amazon used Token Bucket for API Rate Limiting](https://aws.amazon.com/blogs/compute/amazon-api-gateway-helps-customers-throttle-api-calls-to-protect-backend-services/)
