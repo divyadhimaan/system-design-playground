@@ -66,3 +66,11 @@ In distributed systems, data/items must be distributed across multiple servers/n
 2. **Load Imbalance**: If servers are not evenly distributed on the ring, some servers may end up with significantly more keys than others, leading to load imbalance.
    - In below figure, `s2` has a much larger range of keys compared to `s1` or `s3`, leading to uneven load distribution.
    - ![load-imbalance](../../images/consitentHashing/load-imbalance.png)
+
+## Solutions for Enhanced Load Balancing
+
+### Virtual Nodes
+
+- Each physical server is assigned multiple positions on the ring → improves key distribution.
+- When a server is added/removed, only a fraction of its virtual nodes are affected, further reducing key remapping.
+- ![virtual-nodes](../../images/consitentHashing/virtual-nodes.png)
