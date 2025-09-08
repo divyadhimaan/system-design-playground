@@ -51,6 +51,8 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Uber - Cab Aggregator App](./design-problems/uber/main.md)
 - [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
 - [Whatsapp Calling](./design-problems/whatsapp-calling-app/main.md)
+- [Rate Limiter](./design-problems/rate-limiter/main.md)
+- [Consistent Hashing](./design-problems/consistent-hashing/main.md)
 
 ## Resources
 A collection of materials referred to while learning:
