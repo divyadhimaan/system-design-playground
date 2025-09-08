@@ -60,7 +60,7 @@ In distributed systems, data/items must be distributed across multiple servers/n
 ---
 
 ## Issues with Basic Consistent Hashing
-1. **Hot Spots**: Certain keys may be accessed more frequently than others, leading to hot spots on specific servers.
+1. **Hot Spots Key Problem**: Certain keys may be accessed more frequently than others, leading to hot spots on specific servers.
    - In below figure, when `s1` is removed, `s2`'s load increases significantly as it takes over all keys from `s1`.
    - ![hotspot-problem](../../images/consitentHashing/hotspot-problem.png)
 2. **Load Imbalance**: If servers are not evenly distributed on the ring, some servers may end up with significantly more keys than others, leading to load imbalance.
@@ -73,4 +73,57 @@ In distributed systems, data/items must be distributed across multiple servers/n
 
 - Each physical server is assigned multiple positions on the ring → improves key distribution.
 - When a server is added/removed, only a fraction of its virtual nodes are affected, further reducing key remapping.
+- The key storing server is determined in the same way as before, by moving clockwise to the next server node.
 - ![virtual-nodes](../../images/consitentHashing/virtual-nodes.png)
+
+### Benefits of Virtual Nodes
+- As the number of virtual nodes increases, the distribution of keys becomes more balanced.
+- This is because the standard deviation gets smaller with more virtual nodes, leading to
+  balanced data distribution. 
+- Standard deviation measures how data are spread out. 
+- The standard deviation will be smaller when we increase the
+  number of virtual nodes. 
+- However, more spaces are needed to store data about virtual nodes.
+- This is a tradeoff, and we can tune the number of virtual nodes to fit our system requirements.
+
+
+> `Weighting`: Allow different servers to have different capacity by assigning more virtual nodes, helps in better load distribution.
+
+
+## Finding affected keys to be remapped
+
+1. When a server is added:
+   - The affected range starts from the new server's position and goes anticlockwise until a server is found.
+   - All keys in this range need to be remapped to the new server.
+2. When a server is removed:
+   - The affected range starts from the removed server's position and goes anticlockwise until a server is found.
+   - All keys in this range need to be remapped to the next server clockwise.
+
+## Design Flow
+
+1. Client sends key-based request.
+2. Key hashed → find position on hash ring.
+3. Lookup algorithm finds nearest node clockwise. 
+4. Route request to that server.
+
+
+## For Consistent Hashing Implementation
+- Use gossip protocols/Zookeeper/etcd to keep node membership updated. 
+- **Replication**: Store key in multiple clockwise nodes for fault tolerance. 
+- **Scaling**: Adding/removing nodes causes minimal reshuffling.
+
+## Example Use Cases
+- Distributed Caches (Memcached, Redis Cluster). 
+- Distributed Databases (Cassandra, DynamoDB, Riak). 
+- Content Delivery Networks (CDNs) for cache routing. 
+- Sharded Key-Value Stores. 
+- Load Balancers with consistent request-to-server mapping.
+
+## Real World Examples
+- Amazon DynamoDB uses consistent hashing for data distribution and replication.[Reference](https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf)
+- Apache Cassandra uses consistent hashing to distribute data across nodes in a cluster.[Reference](https://www.cs.cornell.edu/Projects/ladis2009/papers/lakshman-ladis2009.pdf)
+- Maglev, Google's software load balancer, uses consistent hashing for request distribution.[Reference](https://static.googleusercontent.com/media/research.google.com/en//pubs/archive/44824.pdf)
+
+## Gist
+
+> Consistent hashing solves the problem of massive rehashing when nodes change by mapping both nodes and keys onto a hash ring. Only a small fraction of keys get remapped when nodes join/leave. Using virtual nodes ensures even distribution. It is widely used in distributed caches, databases, and CDNs.
