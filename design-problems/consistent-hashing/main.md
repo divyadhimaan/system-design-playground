@@ -56,3 +56,13 @@ In distributed systems, data/items must be distributed across multiple servers/n
 
 
   ![removing-server](../../images/consitentHashing/removing-server.png)
+
+---
+
+## Issues with Basic Consistent Hashing
+1. **Hot Spots**: Certain keys may be accessed more frequently than others, leading to hot spots on specific servers.
+   - In below figure, when `s1` is removed, `s2`'s load increases significantly as it takes over all keys from `s1`.
+   - ![hotspot-problem](../../images/consitentHashing/hotspot-problem.png)
+2. **Load Imbalance**: If servers are not evenly distributed on the ring, some servers may end up with significantly more keys than others, leading to load imbalance.
+   - In below figure, `s2` has a much larger range of keys compared to `s1` or `s3`, leading to uneven load distribution.
+   - ![load-imbalance](../../images/consitentHashing/load-imbalance.png)
