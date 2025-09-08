@@ -26,11 +26,33 @@ In distributed systems, data/items must be distributed across multiple servers/n
 
 
 ### Key Idea about the technique
-- Represent the hash space as a **hash ring** (0 to 2³² – 1).
-  ![hash-rings](../../images/consitentHashing/hash-ring.png)
-- **Hash servers**: Using hash function `f`, we amp servers based on server IP or name onto the ring. Below image shows 4 servers mapped on hash ring.
-  ![hash-servers](../../images/consitentHashing/hash-servers.png)
-- **Hash Keys**: Both keys and nodes (servers) are placed on the ring using same hash function.
-  ![hash-keys](../../images/consitentHashing/hash-keys.png)
-- Each key is assigned to the next node (server) clockwise on the ring.
-  ![finding-servers](../../images/consitentHashing/hash-finding.png)
+
+| Step                                                                                                                                                 | Depiction                                                          | 
+|------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------------------|
+| **Hash Ring**: Represent the hash space as a **hash ring** (0 to 2³² – 1).                                                                           | ![hash-rings](../../images/consitentHashing/hash-ring.png)         | 
+| **Hash servers**: Using hash function `f`, we amp servers based on server IP or name onto the ring. Below image shows 4 servers mapped on hash ring. | ![hash-servers](../../images/consitentHashing/hash-servers.png)    | 
+| **Hash Keys**: Both keys and nodes (servers) are placed on the ring using same hash function.                                                        | ![hash-keys](../../images/consitentHashing/hash-keys.png)          |
+| Each key is assigned to the next node (server) clockwise on the ring.                                                                                | ![finding-servers](../../images/consitentHashing/hash-finding.png) | 
+
+--- 
+## Handling Node Changes
+
+### 1. Adding a Node (server)
+
+- Adding a new server involves:
+  - Hashing the new server to find its position on the ring.
+  - The new server takes over responsibility for keys that fall between it and its predecessor on the ring.
+- Only the keys that map to the new server need to be moved, minimizing disruption.
+- In below figure, after a new `server 4` is added, only `key0` needs to be remapped.
+
+
+  ![adding-server](../../images/consitentHashing/adding-server.png)
+
+### 2. Removing a Node (server)
+
+- When a server is removed, its keys are reassigned to the next server clockwise on the ring.
+- Again, only the keys that were assigned to the removed server need to be moved.
+- In below figure, after `server 1` is removed, only `key1` needs to be remapped.
+
+
+  ![removing-server](../../images/consitentHashing/removing-server.png)
