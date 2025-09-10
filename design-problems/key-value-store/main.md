@@ -57,3 +57,7 @@
 - For example:
   - A banking application would prefer `CP` to ensure data consistency.
   - A social media application would prefer `AP` to ensure availability.
+
+### System Components and Techniques
+
+
