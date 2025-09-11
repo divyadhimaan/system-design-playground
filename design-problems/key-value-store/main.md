@@ -85,4 +85,25 @@
 - This way, if one server goes down, the data can still be accessed from another server
 - With virtual nodes, the first `N` distinct servers in a clockwise direction are chosen for replication.
 - Nodes in same data center often fail at same time due to power/network issues. To handle this, replicas can be placed in different data centers and data centers are connected through high speed networks.
+- For further reading refer [Data replication and Migration in Distributed Systems](./../../concepts/data-replication-and-migration.md).
 
+#### 3. Consistency Model
+- In a distributed key-value store, we can choose between strong consistency and eventual consistency based on the use case.
+- **Strong Consistency**: Ensures that all clients see the most recent write. This can be achieved using techniques like quorum-based replication, where a write is considered successful only when a majority of replicas acknowledge the write.
+- **Eventual Consistency**: Ensures that all replicas will eventually converge to the same value, but there may be a delay before all replicas are updated. This can be achieved using techniques like asynchronous replication, where writes are propagated to replicas in the background.
+- The choice between strong and eventual consistency depends on the specific requirements of the application.
+- Consider
+  ```
+    N -> The number of replicas
+    W -> The number of replicas that must acknowledge a write for it to be considered successful
+    R -> The number of replicas that must be read to ensure the most recent write is read
+  ```
+- To achieve strong consistency, we can set `W + R > N`. This ensures that there is at least one replica that has acknowledged the write and is read during a read operation.
+- To achieve eventual consistency, we can set `W + R <= N`. This allows for faster writes and reads, but there may be a delay before all replicas are updated.
+- if R = 1 and W = N, The system is optimized for fast read.
+- if W = 1 and R = N, The system is optimized for fast write.
+- For further reading refer [Consistency Models in Distributed Systems](./../../concepts/consistency.md).
+    
+
+- Out of 3 consistency models (Strong, Eventual, Causal), key-value stores typically use Eventual consistency models.
+- From concurrent writes, eventual consistency allows inconsistent values to enter the system and forces client to read the values to reconcile them.
