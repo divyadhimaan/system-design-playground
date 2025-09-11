@@ -1,3 +1,30 @@
+# Key Value Store: Table of Contents
+
+- [Key Value Store](#key-value-store)
+  - [Step 1: Requirements and Design Scope](#step-1-requirements-and-design-scope)
+  - [Step 2: Proposing High Level Design](#step-2-proposing-high-level-design)
+    - [Designing a Single server Key-Value Store](#designing-a-single-server-key-value-store)
+    - [Designing a Distributed Key-Value Store](#designing-a-distributed-key-value-store)
+      - [CAP Theorem](#cap-theorem)
+        - [Choosing between CP and AP](#choosing-between-cp-and-ap)
+      - [System Components and Techniques](#system-components-and-techniques)
+        - [1. Data Partitioning](#1-data-partitioning)
+        - [2. Data Replication](#2-data-replication)
+        - [3. Consistency Model](#3-consistency-model)
+        - [4. Inconsistency Resolution](#4-inconsistency-resolution)
+        - [5. Handling Failures](#5-handling-failures)
+          - [A. Failure Detection](#a-failure-detection)
+          - [B. Handling Temporary Failures](#b-handling-temporary-failures)
+          - [C. Handling Permanent Failures](#c-handling-permanent-failures)
+          - [D. Handling data center outages](#d-handling-data-center-outages)
+  - [Step 3: Detailed Design](#step-3-detailed-design)
+    - [Architecture Diagram](#architecture-diagram)
+    - [Write Path](#write-path)
+    - [Read Path](#read-path)
+
+
+
+
 # Key Value Store
 
 - A **key-value store** is a type of _non-relational_ database that uses a simple key-value pair to store data. 
@@ -193,5 +220,50 @@
 
 ## Step 3: Detailed Design
 
+### Architecture Diagram
+- Clients communicate with the key-value store through simple APIs: get(key) and put(key,
+value).
+- A coordinator is a node that acts as a proxy between the client and the key-value store.
+- Nodes are distributed on a ring using consistent hashing.
+- The system is completely decentralized so adding and moving nodes can be automatic.
+- Data is replicated at multiple nodes.
+- There is no single point of failure as every node has the same set of responsibilities.
+![architecture-diagram](../../images/keyValueStore/arch-diagram.png)
 
-![architecture-diagram](../../images/keyValueStore/keyValue-3.png)
+- Since the system is decentralized, any node can act as a coordinator.
+- Each node has same set of responsibilities.
+![Node-responsibilities](../../images/keyValueStore/node-responisibilities.png)
+
+### Consistent Hashing Flow
+- Hash the Key 
+  - Compute a hash of the key → hash(key). 
+  - Example: hash("user123") → 856. 
+- Map Nodes to a Ring 
+  - All nodes are placed on a circular hash ring using a hash function. 
+  - Example: Node A → 100, Node B → 500, Node C → 900. 
+- Locate the Key’s Node 
+  - Move clockwise on the ring to find the first node ≥ key’s hash. 
+  - If hash(key)=856 → closest node clockwise is Node C (900). 
+- Replication (Optional)
+  - Store copies of the key on the next N nodes clockwise for fault tolerance. 
+- Node Joins/Leaves 
+  - If a new node joins, only nearby keys need to be redistributed. 
+  - Minimizes data movement compared to simple modulo hashing.
+
+### Write Path
+
+1. Client sends a `put(key, value)` request to any node (coordinator).
+2. Coordinator uses consistent hashing to find the responsible node(s).
+3. The write request is persisted on a commit log file.
+   > Note: A commit log is an append-only file that records every change made to the database. It ensures durability by allowing recovery of data in case of a crash.
+4. Data is saved in the memory cache.
+5. When the memory cache is full or reaches a predefined threshold, data is flushed to
+   SSTable on disk. 
+   > Note: A [sorted-string table (SSTable)](https://www.igvita.com/2012/02/06/sstable-and-log-structured-storage-leveldb/) is a sorted list of <key, value>
+      pairs. 
+
+![write-path](../../images/keyValueStore/write-path.png)
+
+
+### Read Path
+
