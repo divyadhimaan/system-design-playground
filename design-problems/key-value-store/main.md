@@ -137,8 +137,8 @@
    - It requires atleast two independent failure detectors to avoid false positives. 
    - An all-to-all multicast heartbeat mechanism can be used where each node sends heartbeat messages to all other nodes at regular intervals. 
    - If a node does not receive a heartbeat from another node within a certain timeout period, it can mark that node as failed.
-   ![img.png](../../images/keyValue-1.png)
----
+   ![heartbeat mechanism](../../images/keyValueStore/keyValue-1.png)
+
 2. **Gossip Protocol**:
   - Each node maintains a node membership list, which contains member IDs and heartbeat
     counters. 
@@ -155,4 +155,43 @@
     - Node s0 sends heartbeats that include s2’s info to a set of random nodes. Once other
       nodes confirm that s2’s heartbeat counter has not been updated for a long time, node s2 is
       marked down, and this information is propagated to other nodes.
-      ![img.png](../../images/keyValue-2.png)
+      ![gossip protocol](../../images/keyValueStore/keyValue-2.png)
+
+##### B. Handling Temporary Failures
+- After failure detection, we need to handle temporary failures to ensure high availability.
+- In strict quorum approach, read and write operations are blocked if the required number of replicas are not available.
+- In "sloppy quorum" approach, read and write operations can proceed as long as a subset of replicas are available. (system chooses first W healthy servers for writes and first R healthy servers for reads)
+- Techniques:
+  - **Hinted Handoff**: When a node is temporarily unavailable, writes intended for that node are stored on a different node (the "hint"). Once the original node comes back online, the hints are forwarded to it.
+  - **Read Repair**: During read operations, if a node detects that it has stale data compared to other replicas, it can update its data to the latest version.
+
+
+##### C. Handling Permanent Failures
+- In case of permanent failures, we need to ensure that data is not lost and the system remains available.
+- Techniques:
+- **Anti-Entropy**: 
+  - A background process that periodically compares data between replicas and synchronizes any differences.
+  - A merkle tree can be used to efficiently identify differences between replicas.
+  > A `hash tree` or `Merkle tree` is a tree in which every non-leaf
+  node is labeled with the hash of the labels or values (in case of leaves) of its child nodes.
+  Hash trees allow efficient and secure verification of the contents of large data structures
+
+- Use of Merkle Tree:
+  - Replica comparison:
+    - If two replicas have same root hash, data is identical. 
+    - If root hashes differ, check children recursively until differences are found. 
+    - Only mismatched branches need syncing.
+
+  - Proof of data integrity:
+    - A Merkle proof allows you to verify a single block belongs to the dataset without downloading all data.
+
+##### D. Handling data center outages
+- To handle data center outages, replicas can be placed in different data centers.
+- Data centers are connected through high speed networks to ensure low latency access to replicas.
+- In case of a data center outage, clients can still access replicas in other data centers.
+
+
+## Step 3: Detailed Design
+
+
+![architecture-diagram](../../images/keyValueStore/keyValue-3.png)
