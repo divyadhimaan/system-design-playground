@@ -77,6 +77,7 @@
       - Automatic Scaling: Minimizes data movement during scaling operations.
       - Heterogeneity: the number of virtual nodes for a server is proportional to its capacity. For example, a server with double the capacity can have double the virtual nodes, allowing it to handle more keys.
     - Cons: More complex to implement.
+- For further reading refer [Consistent Hashing](./../consistent-hashing/main.md).
 
 
 #### 2. Data Replication
@@ -107,3 +108,51 @@
 
 - Out of 3 consistency models (Strong, Eventual, Causal), key-value stores typically use Eventual consistency models.
 - From concurrent writes, eventual consistency allows inconsistent values to enter the system and forces client to read the values to reconcile them.
+
+#### 4. Inconsistency Resolution
+
+- In eventually consistent systems, replicas may hold conflicting versions of the same data due to:
+  - Concurrent writes 
+  - Network partitions 
+  - Delayed replication 
+- To resolve, systems track versions of each object instead of overwriting blindly.
+
+- Techniques for versioning:
+  
+  | Technique                                       | Description                                               | Working                                                                          | Pros                                                           | Cons                                                                                                        | Real-world Analogy                                                                          |
+  |-------------------------------------------------|-----------------------------------------------------------|----------------------------------------------------------------------------------|----------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|
+  | **Simple Version Numbers**                      | Each update increments a version counter.                 | Replicas compare counters; higher counter overwrites lower.                      | Simple to implement.                                           | Cannot capture concurrent writes properly (overwrites valid updates).                                       | Book editions: higher edition replaces the previous one, but parallel drafts are lost.      |
+  | **Timestamps (LWW)**                            | Each version is tagged with a timestamp.                  | Latest timestamp chosen as the correct value.                                    | Easy and efficient.                                            | Requires synchronized clocks; may lose valid updates.                                                       | “Last modified time” in a file system – the newest timestamp wins.                          |
+  | **Vector Clocks**                               | Each version tagged with a list of (node, counter) pairs. | Tracks causal history; detects whether versions are concurrent or one dominates. | Can detect concurrent updates and preserve causality.          | Complex to implement; more storage overhead.(set threshold for length, discard old pairs if limit exceeded) | Google Docs edit history: can detect parallel edits and keep both until merged.             |
+  | **Conflict-free Replicated Data Types (CRDTs)** | Special data structures designed for automatic merging.   | CRDTs define merge rules ensuring eventual consistency without conflicts.        | Automatically resolves conflicts; strong eventual consistency. | Limited to specific data types (counters, sets, maps).                                                      | Shared shopping cart: items from different users are merged automatically without conflict. |
+
+---
+
+---
+#### 5. Handling Failures
+- In a distributed key-value store, we need to handle various types of failures to ensure high availability and fault tolerance.
+
+##### A. Failure Detection
+1. **All-to-All heartbeat Mechanism**: 
+   - It requires atleast two independent failure detectors to avoid false positives. 
+   - An all-to-all multicast heartbeat mechanism can be used where each node sends heartbeat messages to all other nodes at regular intervals. 
+   - If a node does not receive a heartbeat from another node within a certain timeout period, it can mark that node as failed.
+   ![img.png](../../images/keyValue-1.png)
+---
+2. **Gossip Protocol**:
+  - Each node maintains a node membership list, which contains member IDs and heartbeat
+    counters. 
+  - Each node periodically increments its heartbeat counter.
+  - Each node periodically sends heartbeats to a set of random nodes, which in turn
+    propagate to another set of nodes.
+  - Once nodes receive heartbeats, membership list is updated to the latest info.
+  - If the heartbeat has not increased for more than predefined periods, the member is
+    considered as offline.
+  - For example
+    - Node s0 maintains a node membership list shown on the left side.
+    - Node s0 notices that node s2’s (member ID = 2) heartbeat counter has not increased for a
+      long time.
+    - Node s0 sends heartbeats that include s2’s info to a set of random nodes. Once other
+      nodes confirm that s2’s heartbeat counter has not been updated for a long time, node s2 is
+      marked down, and this information is propagated to other nodes.
+      ![img.png](../../images/keyValue-2.png)
