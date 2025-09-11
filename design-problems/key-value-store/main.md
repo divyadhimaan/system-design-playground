@@ -21,6 +21,7 @@
     - [Architecture Diagram](#architecture-diagram)
     - [Write Path](#write-path)
     - [Read Path](#read-path)
+  - [Summary](#summary)
 
 
 
@@ -267,3 +268,27 @@ value).
 
 ### Read Path
 
+1. After a read request is directed to specific node, it first checks its memory cache.
+   ![img.png](../../images/keyValueStore/readPath1.png)
+2. If the key is not found in memory, system checks the bloom filter.
+3. The bloom filter is used to figure out which SSTable files might contain the key.
+   > Note: A [bloom filter](https://en.wikipedia.org/wiki/Bloom_filter) is a space-efficient probabilistic data structure used to test whether an element is a member of a set. It can yield false positives but not false negatives.
+4. If the bloom filter indicates that the key might be in an SSTable, the system checks the SSTable index to find the exact location of the key.
+5. Finally, the system retrieves the value from the SSTable on disk.
+
+    ![img_1.png](../../images/keyValueStore/readPath2.png)
+
+## Summary
+
+| Goal/Problems                | Technique                                               |
+|-------------------------------|--------------------------------------------------------|
+| Ability to store big data     | Use consistent hashing to spread the load across servers |
+| High availability reads       | Data replication, Multi-data center setup              |
+| Highly available writes       | Versioning and conflict resolution with vector clocks  |
+| Dataset partition             | Consistent Hashing                                     |
+| Incremental scalability       | Consistent Hashing                                     |
+| Heterogeneity                 | Consistent Hashing                                     |
+| Tunable consistency           | Quorum consensus                                       |
+| Handling temporary failures   | Sloppy quorum and hinted handoff                       |
+| Handling permanent failures   | Merkle tree                                            |
+| Handling data center outage   | Cross-data center replication                          |
