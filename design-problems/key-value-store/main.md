@@ -60,4 +60,29 @@
 
 ### System Components and Techniques
 
+#### 1. Data Partitioning
+- For large applications, data is partitioned across multiple servers to distribute load and improve performance.
+- Challenges with partitioning:
+  - How to distribute data across multiple servers evenly?
+  - How to minimize data movement when nodes are added or removed?
+- Techniques for data partitioning:
+  - **Range-based Partitioning**: Data is partitioned based on key ranges. For example, keys starting with 'A' to 'M' are stored in server 1, and keys starting with 'N' to 'Z' are stored in server 2.
+    - Pros: Simple to implement and understand.
+    - Cons: Can lead to hot spots if certain key ranges are accessed more frequently.
+  - **Hash-based Modulo Partitioning**: A hash function is applied to the key to determine which server will store the data. For example, `hash(key) % number_of_servers` can be used to determine the server.
+    - Pros: Distributes data evenly across servers.
+    - Cons: When a server is added or removed, a large portion of data needs to be moved.
+  - **Consistent Hashing**: A more advanced technique that minimizes data movement when servers are added or removed. Servers and keys are mapped to a circular hash space, and each key is assigned to the next server in a clockwise direction.
+    - Pros: 
+      - Automatic Scaling: Minimizes data movement during scaling operations.
+      - Heterogeneity: the number of virtual nodes for a server is proportional to its capacity. For example, a server with double the capacity can have double the virtual nodes, allowing it to handle more keys.
+    - Cons: More complex to implement.
+
+
+#### 2. Data Replication
+- To ensure high availability and fault tolerance, data is replicated across multiple servers.
+- In consistent hashing, each key can be replicated to the next `N` (configurable) servers in a clockwise direction on the hash ring.
+- This way, if one server goes down, the data can still be accessed from another server
+- With virtual nodes, the first `N` distinct servers in a clockwise direction are chosen for replication.
+- Nodes in same data center often fail at same time due to power/network issues. To handle this, replicas can be placed in different data centers and data centers are connected through high speed networks.
 
