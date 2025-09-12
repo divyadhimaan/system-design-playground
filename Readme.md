@@ -170,3 +170,9 @@ Homebrew is a package manager for macOS (and Linux) that simplifies the installa
 - Example: Used in VoIP softphones and enterprise telephony systems.
 
 ---
+
+### NTP (Network Time Protocol)
+- Protocol for synchronizing clocks of computer systems over packet-switched, variable-latency data networks.
+- Uses a hierarchical system of time sources, with primary servers connected to highly accurate reference clocks.
+- Ensures accurate timekeeping for applications like logging, authentication, and scheduling.
+- Example: Synchronizing server times in data centers.
