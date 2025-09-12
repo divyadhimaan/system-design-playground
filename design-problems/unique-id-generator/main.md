@@ -29,6 +29,9 @@ A service or algorithm that generates globally unique identifiers across distrib
 > 
 > A. The ID increments by timestamp, not by 1. IDs should be ordered by date.
 
+> Q. What is the length of the ID? Is there a maximum length?
+> 
+> A. 64 bits, i.e., IDs should fit within a 64-bit integer. Keeping it storage friendly.
 
 > Q. Do IDs only contain numbers, or can they include letters/symbols?
 > 
