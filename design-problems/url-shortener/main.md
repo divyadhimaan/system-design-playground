@@ -118,3 +118,8 @@ click the alias, it redirects you to the original URL.
   - Each _hashValue_ can be mapped back to _longURL_
 
 ## Step 3: Design Deep Dive
+
+### Data Model
+
+- Until now everything is stores in Hash tables.
+- Good starting point. But, not feasible for real world systems as memory resources are limited and expensive.
