@@ -1,3 +1,18 @@
+# Unique ID Generator - Table of Contents
+- [Unique ID generator](#unique-id-generator)
+  - [Problem Statement](#problem-statement)
+    - [Step 1: Understand Requirements and Design Scope](#step-1-understand-requirements-and-design-scope)
+      - [Requirements](#requirements)
+    - [Step 2: High-Level Design](#step-2-high-level-design)
+      - [Twitter Snowflake Design](#twitter-snowflake-design)
+    - [Follow Ups](#follow-ups)
+      - [1. **Clock Synchronization**](#1-clock-synchronization)
+      - [2. **Section Length Tuning**](#2-section-length-tuning)
+      - [3. Handling Machine Failures](#3-handling-machine-failures)
+      - [4. High availability](#4-high-availability)
+      - [5. Choosing ID structure depending on requirements (uniqueness only vs time-ordering).](#5-choosing-id-structure-depending-on-requirements-uniqueness-only-vs-time-ordering)
+        - [References/Articles](#referencesarticles)        
+
 # Unique ID generator
 
 A service or algorithm that generates globally unique identifiers across distributed systems.
