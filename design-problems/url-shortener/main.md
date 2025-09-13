@@ -1,3 +1,8 @@
+# URL Shortener: Table of Content
+
+- [URL Shortener](#url-shortener)
+  - [Ste]
+
 # URL Shortener
 
 A URL shortener is a service that takes a long URL and converts it into a shorter, more manageable URL. This is often used for sharing links on social media, in emails, or in text messages where space is limited.
@@ -43,7 +48,7 @@ click the alias, it redirects you to the original URL.
   - Each character takes 1 byte. 
   - Each URL mapping takes 200 bytes (100 bytes for long URL + 100 bytes for short URL). 
   - Total storage over 10 years = 365 billion * 200 bytes * 10 years = 730 TB.
-
+---
 ## Step 2: High-Level Design
 
 - In HLD for URL shortener, we will focus on the following components:
@@ -116,10 +121,100 @@ click the alias, it redirects you to the original URL.
 - The hash function must abide:
   - Each _longURL_ must be hashed to one _hashValue_
   - Each _hashValue_ can be mapped back to _longURL_
-
+---
 ## Step 3: Design Deep Dive
 
 ### Data Model
 
 - Until now everything is stores in Hash tables.
 - Good starting point. But, not feasible for real world systems as memory resources are limited and expensive.
+
+- A better option is to store `<shortURL, longURL>` mapping in a relational database.
+- Simplified version of table contains _id_, _shortURL_, _longURL_.
+
+    ![relational-data-model](../../images/urlShortener/deep-dive-1.png)
+---
+### Hash Function
+- The hashValue consists of characters from [0-9, a-z, A-Z] -> 10 + 26 + 26 = 62 characters
+- To figure out the length of hashValue, find smallest `n`, such that 62<sup>n</sup> >= 365 billion (system must support 365 billion records. refer [estimations](#estimations))
+- with `n=7`, 62<sup>7</sup> ~ 3.5 trillion.
+- so the length of hashValue is 7.
+- Options for hash function include:
+  - Hash + collision resolution
+  - Counter + base62 encoding
+
+#### Hash + Collision resolution
+- To shorten the long URL, we nee dto implement a hash function that hashes a long URL to 7-character string.
+- Following are the available hash functions:
+  
+  | Aspect                            | CRC32                                                  | MD5                                                                                      | SHA-1                                                       |
+  |-----------------------------------|--------------------------------------------------------|------------------------------------------------------------------------------------------|-------------------------------------------------------------|
+  | **Output Size**                   | 32-bit (4 bytes)                                       | 128-bit (16 bytes)                                                                       | 160-bit (20 bytes)                                          |
+  | **Hash Length (Hex)**             | 8 hex chars                                            | 32 hex chars                                                                             | 40 hex chars                                                |
+  | **Security**                      | Weak (not secure, easily reversible collisions)        | Broken (collision attacks possible)                                                      | Broken (collision attacks possible)                         |
+  | **Speed**                         | Very Fast                                              | Fast                                                                                     | Slower than MD5, but still fast                             |
+  | **Collision Probability**         | High (only 2³² space, \~4B values)                     | Lower than CRC32 but collisions still possible                                           | Lower than MD5 but still possible                           |
+  | **Suitability for URL Shortener** | Not ideal (too small hash space → collisions at scale) | Better (can truncate safely to 7 chars with acceptable collision risk for smaller scale) | Even better (more entropy, can truncate to 7 chars safely)  |
+  | **Use Case Fit**                  | Small-scale, low concurrency                           | Medium-scale apps (shortener with millions of URLs)                                      | Large-scale apps (billions of URLs, higher uniqueness need) |
+
+
+- None of them have a character size of 7.
+- MD5 or SHA-1, when truncated, provide much larger entropy → better uniqueness for URL shortener.
+- How to make it shorter?
+  - Collect first 7 characters -> Leads to collisions
+- how to handle collision?
+  - We can recursively append a new predefined string until no more collision is discovered. Check the diagram below
+  - ![collision-resolution](../../images/urlShortener/collision-resolution.png)
+- This method can eliminate collision. 
+- Problem? 
+  - Database queries are expensive.
+- Solution:
+  - [Bloom Filters](#bloom-filters) can improve performance. A bloom filter is a probabilistic data structure used to test whether an element is a member of a set.
+  - Can return:
+    - Definitely not present 
+    - Possibly present (with some false positive probability)
+  - Uses bit array + multiple hash functions.
+
+#### Base62 conversion
+- Base conversion helps you convert the same number between its different number representation systems.
+- Base62 is used here as there are 62 possible characters for _hashValue_.
+- How this works?
+  - Representation
+    - Digits: 0–9 (10)
+    - Uppercase letters: A–Z (26)
+    - Lowercase letters: a–z (26)
+  - Converts numeric values → short alphanumeric strings.
+- Example: ID = 11157
+- ![base62](../../images/urlShortener/base62.png)
+- Thus, shortURL is https://tinyurl.com/2TX
+
+#### Hash + collision resolution vs base62
+| Aspect                  | Hash + Collision Resolution                                          | Base62 Conversion                                                               |
+|-------------------------|----------------------------------------------------------------------|---------------------------------------------------------------------------------|
+| **Short URL length**    | Fixed short URL length.                                              | Short URL length is not fixed, grows with the ID.                               |
+| **Unique ID generator** | Does not need a unique ID generator.                                 | Depends on a unique ID generator.                                               |
+| **Collision handling**  | Collision is possible and must be resolved.                          | Collision is impossible because ID is unique.                                   |
+| **Predictability**      | Impossible to figure out the next short URL (does not depend on ID). | Easy to figure out next short URL if ID increments by 1 → **security concern**. |
+| **Use case**            | Best for: Public-facing shorteners (e.g., bit.ly, tinyurl).          | Best for: Enterprise/internal tools, low-security use cases.                    |
+
+---
+### URL Shortening: Deep Dive
+
+- URL Shortening logic should be logically simple and functional.
+- Base 62 conversion used.
+- Flow
+  1. longURL is the input.
+  2. The system checks if the longURL is in the database.
+  3. If it is, it means the longURL was converted to shortURL before. In this case, fetch the
+     shortURL from the database and return it to the client.
+  4. If not, the longURL is new. A new unique ID (primary key) is generated by the unique
+     ID generator.
+  5. Convert the ID to shortURL with base 62 conversion.
+  6. Create a new database row with the ID, shortURL, and longURL.
+
+![url-shortener-digram](../../images/urlShortener/url-shortener-diagram.png)
+
+- Unique ID generator -> generate globally unique IDs ( Design from Distributed System perse)
+## Reference
+
+#### [Bloom Filters](https://en.wikipedia.org/wiki/Bloom_filter)
