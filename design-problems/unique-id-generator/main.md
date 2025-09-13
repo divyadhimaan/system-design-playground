@@ -97,7 +97,8 @@ We have multiple options to design a unique ID generator.
 - Timestamp is the part that makes IDs sortable by time.
 - Sequence Number allows multiple IDs to be generated within the same millisecond. In theory a machine can generate up to 4096 IDs per millisecond. If the sequence number exceeds 4095 within the same millisecond, the generator must wait until the next millisecond to continue generating IDs.
 
-## Follow Ups
+## Follow-Ups
+
 ### 1. **Clock Synchronization**: 
    - In our design, we assume ID generation servers have the same clock. 
    - This assumption might not be true when a server is running on multiple cores. 

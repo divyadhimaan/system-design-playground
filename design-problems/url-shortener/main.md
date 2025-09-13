@@ -212,9 +212,36 @@ click the alias, it redirects you to the original URL.
   5. Convert the ID to shortURL with base 62 conversion.
   6. Create a new database row with the ID, shortURL, and longURL.
 
-![url-shortener-digram](../../images/urlShortener/url-shortener-diagram.png)
+![url-shortener-diagram](../../images/urlShortener/url-shortener-diagram.png)
 
-- Unique ID generator -> generate globally unique IDs ( Design from Distributed System perse)
+- [Unique ID generator](./../unique-id-generator/main.md) -> generate globally unique IDs (Design from Distributed System perse)
+
+---
+
+### URL Redirecting: Deep Dive
+- As there are more reads than writes, url mapping is stored in cache to improve performance.
+- Load balancer is added to handle request.
+- Flow:
+  1. A user clicks a short URL link: https://tinyurl.com/zn9edcu
+  2. The load balancer forwards the request to web servers.
+  3. If a shortURL is already in the cache, return the longURL directly.
+  4. If a shortURL is not in the cache, fetch the longURL from the database. If it is not in the
+     database, it is likely a user entered an invalid shortURL.
+  5. The longURL is returned to the user.
+![url-redirect-diagram](../../images/urlShortener/url-redirect-diagram.png)
+
+## Follow-Ups
+
+1. [Rate Limiter](./../rate-limiter/main.md): A potential security problem we could face is that malicious users send an
+   overwhelmingly large number of URL shortening requests. Rate limiter helps to filter out
+   requests based on IP address or other filtering rules. 
+2. Web server scaling: Since web tier is stateless, it is easy to scale by adding or removing web servers.
+3. Database Scaling: Database replication and sharding are common techniques.
+4. Availability: Use CSN to store mappings close to users globally.
+5. Analytics: Data is increasingly important for business success. Integrating an analytics
+   solution to the URL shortener could help to answer important questions like how many
+   people click on a link? When do they click the link? etc.
+
 ## Reference
 
 #### [Bloom Filters](https://en.wikipedia.org/wiki/Bloom_filter)
