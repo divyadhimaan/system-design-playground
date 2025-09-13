@@ -72,14 +72,14 @@ click the alias, it redirects you to the original URL.
 - When a user clicks on a shortened URL, the service needs to redirect them to the original long URL.
 - Once a server receives a tinyurl request, it changes the short URL to long URL with 301/302 redirect.
 
-![api-side-url-redirecting](../../images/urlShortener/url-redirecting-1.png)
+    ![api-side-url-redirecting](../../images/urlShortener/url-redirecting-1.png)
 
 #### Detailed communication flow for URL redirecting
 
 1. User clicks on a shortened URL (e.g., `https://tinyurl.com/abc123`).
 2. Servers receive the request and redirect back with 301/302 and the original long URL.
 
-![detailed-communication](../../images/urlShortener/url-redirecting-2.png)
+    ![detailed-communication](../../images/urlShortener/url-redirecting-2.png)
 
 #### 301 vs 302 Redirect
 
@@ -108,3 +108,13 @@ click the alias, it redirects you to the original URL.
 
 ### URL Shortening
 
+- Let us assume short URL: `www.tinyurl.com/{hashValue}`
+- We must find a hash function _fx_ that maps a long URL to _hashValue_\
+
+    ![hash-function](../../images/urlShortener/url-shortening-1.png)
+
+- The hash function must abide:
+  - Each _longURL_ must be hashed to one _hashValue_
+  - Each _hashValue_ can be mapped back to _longURL_
+
+## Step 3: Design Deep Dive
