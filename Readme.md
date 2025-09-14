@@ -176,3 +176,37 @@ Homebrew is a package manager for macOS (and Linux) that simplifies the installa
 - Uses a hierarchical system of time sources, with primary servers connected to highly accurate reference clocks.
 - Ensures accurate timekeeping for applications like logging, authentication, and scheduling.
 - Example: Synchronizing server times in data centers.
+---
+### Redis Lua Scripts
+- Lua = lightweight, high-performance, embeddable scripting language. 
+- Designed to be fast, portable, and simple.
+- Often used in:
+  - Game engines (e.g., Roblox, World of Warcraft mods). 
+  - Embedded systems. 
+  - Databases (e.g., Redis) for scripting logic.
+- In System Design, Redis supports Lua scripting to run custom logic atomically inside Redis.
+- Instead of multiple round-trips (client ↔ Redis), you can:
+  - Upload Lua script.
+  - Execute on server in one step.
+- Why Lua Scripts:
+  - Ensures atomicity: script executes as a single operation.
+  - Reduce network overhead: One call instead of multiple client-server requests.
+- Example:
+  - Say you want to check if a key exists, and if not, set it.
+  - Without Lua:
+    - Client does GET key. 
+    - If not exists → does SET key value. 
+    - Problem: race condition (another client may set in between).
+  - With Lua:
+  ```lua
+  if redis.call("EXISTS", KEYS[1]) == 0 then
+  return redis.call("SET", KEYS[1], ARGV[1])
+  else
+  return nil
+  end
+  ```
+  - Call from client
+  ```bash
+  EVAL "if redis.call('EXISTS', KEYS[1]) == 0 then return redis.call('SET', KEYS[1], ARGV[1]) else return nil end" 1 myKey myValue
+  ```
+---
