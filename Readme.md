@@ -55,6 +55,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Consistent Hashing](./design-problems/consistent-hashing/main.md)
 - [Key Value Store](./design-problems/key-value-store/main.md)
 - [Unique ID generator](./design-problems/unique-id-generator/main.md)
+- [Web Crawler](./design-problems/web-crawler/main.md)
 
 ## Resources
 A collection of materials referred to while learning:
