@@ -90,4 +90,16 @@ storage is needed to store five-year content.
 - The HTML downloader downloads web pages from the internet.
 
 #### DNS resolver
+- To download a web page, URL must be translated to IP address.
+- HTML downloader calls the DNS resolver to get the corresponding to get the IP address.
 
+#### Content parser
+- After a web page is downloaded, it must be parsed and validated because malformed web pages could provoke problems and waste storage space.
+- Extracts text, links, and metadata.
+- Removes session IDs & duplicates.
+
+#### Content Seen?
+- “Content Seen?” data structure is used to eliminate data redundancy and shorten processing time.
+- To compare two HTML documents, we can compare them character by character. 
+- However, this method is slow and time-consuming, especially when billions of web pages are involved. 
+- An efficient way to accomplish this task is to compare the hash values of the two web pages
