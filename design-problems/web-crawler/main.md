@@ -68,3 +68,26 @@
 - 1-billion-page x 500k = 500 TB storage per month. 
 • Assuming data are stored for five years, 500 TB * 12 months * 5 years = 30 PB. A 30 PB
 storage is needed to store five-year content.
+
+## Step 2: High Level Design
+
+### Components
+
+#### Seed URLs
+- Starting point for crawl process.
+- A set of initial web addresses (URLs) to begin crawling.
+- Example
+  - To crawl all web pages from university's website, intuitive way to select seed URLs is to use the university's domain name.
+- General strategy is to divide the entire URL space into smaller ones.
+- Seed URL selection is an open-ended question.
+- `Analogy`: Think of seed URLs as the roots of the crawling tree, from which the crawler explores the rest of the web.
+
+#### URL Frontier
+- The component that stores URLs to be download is called the URL frontier.
+- Like a FIFO queue.
+
+#### HTML downloader / Fetcher
+- The HTML downloader downloads web pages from the internet.
+
+#### DNS resolver
+
