@@ -104,4 +104,5 @@ storage is needed to store five-year content.
 - However, this method is slow and time-consuming, especially when billions of web pages are involved. 
 - An efficient way to accomplish this task is to compare the hash values of the two web pages
 
-#
+#### Content Storage
+- It is a storage
