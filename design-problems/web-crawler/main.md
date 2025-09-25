@@ -105,4 +105,8 @@ storage is needed to store five-year content.
 - An efficient way to accomplish this task is to compare the hash values of the two web pages
 
 #### Content Storage
-- It is a storage
+- It is a storage system for storing HTML content.
+- Choice of storage system depends on factors such as data type, data size, access frequency, life span, so on.
+- Both disk and memory are used.
+  - Most of tge content is store on disk because the data set is too big to fit in memory.
+  - Popular content is kept in memory to reduce latency.
