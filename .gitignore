@@ -2,6 +2,7 @@ January.code-workspace
 
 .idea
 
+*.class
 
-
-
+.DS_Store
+*.iml
