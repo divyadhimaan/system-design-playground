@@ -256,3 +256,65 @@ URL frontier design, and it contains two modules:
    - Some web servers respond slowly or may not respond at all. 
    - To avoid long wait time, a maximal wait time is specified. 
    - If a host does not respond within a predefined time, the crawler will stop the job and crawl some other pages.
+
+---
+
+### Robustness
+
+1. **Consistent Hashing**:
+   - When a crawl server goes down, its workload must be redistributed to other servers.
+   - Consistent hashing is used to minimize the amount of data that needs to be moved when servers are added or removed.
+2. **Save Crawl States and Data**:
+    - Periodically save the current state of the crawler (e.g., URL frontier, downloaded pages) to persistent storage.
+    - In case of a crash, the crawler can resume from the last saved state instead of starting from scratch.
+3. **Error Handling**:
+   - Implement robust error handling to manage issues such as network failures, timeouts, and malformed HTML.
+   - Retry failed requests a limited number of times before giving up.
+4. **Data validation**:
+    - Validate downloaded content to ensure it meets expected formats and standards.
+---
+
+### Extensibility
+- Design the crawler with modular components that can be easily extended or replaced.
+- The crawler can be extended by plugging in new modules.
+- PNG Downloader module is plugged-in to download PNG files.
+- Web Monitor module is added to monitor the web and prevent copyright and trademark infringements.
+---
+
+### Detect and Avoid Traps
+1. **Redundant Content**:
+   - Some websites may have multiple URLs pointing to the same content (e.g., session IDs, tracking parameters).
+   - Hashes or checksum can be used to identify and avoid downloading duplicate content.
+2. **Spider Traps**:
+   - Some websites may have infinite loops or dynamically generated pages that can trap crawlers.
+   - Implement depth limits and URL pattern checks to avoid getting stuck in such traps.
+3. **Data Noise**:
+    - Some web pages may contain a lot of irrelevant or low-quality content.
+    - Implement content quality checks to filter out noisy data.
+
+## Additional Considerations
+
+### Server-side rendering: 
+
+- Numerous websites use scripts like JavaScript, AJAX, etc. to generate links on the fly. 
+- If we download and parse web pages directly, we will not be able to retrieve dynamically generated links. 
+- To solve this problem, we perform server-side rendering (also called dynamic rendering) first before parsing a page.
+
+### Filter out unwanted pages: 
+
+- With finite storage capacity and crawl resources, an anti-spam component is beneficial in filtering out low quality and spam pages.
+
+### Database replication and sharding: 
+
+- Techniques like replication and sharding are used to improve the data layer availability, scalability, and reliability.
+
+### Horizontal scaling: 
+
+- For large scale crawl, hundreds or even thousands of servers are needed to perform download tasks. The key is to keep servers stateless.
+
+### Availability, consistency, and reliability: 
+- These concepts are at the core of any large system’s success. 
+
+### Analytics: 
+
+- Collecting and analyzing data are important parts of any system because data is key ingredient for fine-tuning.
