@@ -152,3 +152,26 @@ downloading.
 #### URL Storage [URL Database]
 - A database to store URLs that have been crawled or are scheduled to be crawled.
 - Helps in managing and tracking the crawling process.
+
+
+## Step 2: Design Deep Dive
+
+### DFS vs BFS Crawling
+- Think of web as a directed graph where web pages are nodes and hyperlinks are edges.
+- Two common strategies for traversing this graph are Depth-First Search (DFS) and Breadth-First Search (BFS).
+- **DFS Crawling**: Explores as far down a branch as possible before backtracking. 
+  - Pros: Uses less memory, can quickly reach deep pages.
+  - Cons: May get stuck in deep sections, less polite to servers.
+- **BFS Crawling**: Explores all neighbors at the present depth before moving on to nodes at the next depth level.
+  - Pros: More polite, better coverage of the web.
+  - Cons: Uses more memory, slower to reach deep pages.
+- For web crawling, BFS is generally preferred due to its politeness and better coverage.
+
+#### Problems with BFS
+- Most links from the same web page are linked back to the same host. All
+  the links in wikipedia.com are internal links, making the crawler busy processing URLs
+  from the same host (wikipedia.com). When the crawler tries to download web pages in
+  parallel, Wikipedia servers will be flooded with requests. This is considered as “impolite” .
+- Standard BFS does not take the priority of a URL into consideration. The web is large
+  and not every page has the same level of quality and importance. Therefore, we may want
+  to prioritize URLs according to their page ranks, web traffic, update frequency, etc.
