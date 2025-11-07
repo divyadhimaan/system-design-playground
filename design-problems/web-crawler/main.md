@@ -153,9 +153,10 @@ downloading.
 - A database to store URLs that have been crawled or are scheduled to be crawled.
 - Helps in managing and tracking the crawling process.
 
-
+---
 ## Step 2: Design Deep Dive
 
+---
 ### DFS vs BFS Crawling
 - Think of web as a directed graph where web pages are nodes and hyperlinks are edges.
 - Two common strategies for traversing this graph are Depth-First Search (DFS) and Breadth-First Search (BFS).
@@ -168,10 +169,90 @@ downloading.
 - For web crawling, BFS is generally preferred due to its politeness and better coverage.
 
 #### Problems with BFS
-- Most links from the same web page are linked back to the same host. All
+- `Impolite requests`: Most links from the same web page are linked back to the same host. All
   the links in wikipedia.com are internal links, making the crawler busy processing URLs
   from the same host (wikipedia.com). When the crawler tries to download web pages in
   parallel, Wikipedia servers will be flooded with requests. This is considered as “impolite” .
-- Standard BFS does not take the priority of a URL into consideration. The web is large
+- `Prioritization missed`: Standard BFS does not take the priority of a URL into consideration. The web is large
   and not every page has the same level of quality and importance. Therefore, we may want
   to prioritize URLs according to their page ranks, web traffic, update frequency, etc.
+
+---
+
+### URL Frontier
+- To solve the problems with BFS, we can modify the URL frontier to be a priority queue of queues.
+- It can ensure politeness, support URL prioritization and freshness.
+
+#### 1. Politeness
+- Web crawler should not bombard a web server with requests in a short time interval.
+- Sending too many requests is considered impolite or may even be treated as DOS attack.
+- The politeness constraint is implemented by maintain a mapping from website hostnames to download (worker) threads.
+- Each downloader thread has a separate FIFO queue and only downloads URLs obtained from that queue. 
+![img.png](../../diagrams/web-crawler-2.png)
+- `Queue Router`: It ensures that each queue (b1, b2, … bn) only contains URLs from the same host.
+- `Mapping Table`: It maintains a mapping from hostnames to downloader threads.
+- `FIFO Queues`: Each downloader thread has a separate FIFO queue for URLs from the same host.
+- `Queue Selector`: It selects the next queue for a downloader thread to fetch URLs from.
+- `Worker Threads`: Each downloader thread processes URLs from its assigned queue.
+
+#### 2. Prioritization
+- Each URL is assigned a priority score based on factors such as page rank, update frequency, and relevance to seed URLs.
+- **Prioritizer** is the component that handles URL prioritization.
+![img.png](../../diagrams/web-crawler-3.png)
+- `Prioritizer`: Takes URLs as inputs and assigns priority scores based on predefined criteria.
+  - Queues: Each queue has an assigned priority. Queues with high priority are selected with higher probability.
+- `Queue Selector`: Selects the next queue for a downloader thread to fetch URLs from, based on queue priorities.
+
+
+#### URL Frontier Design
+
+URL frontier design, and it contains two modules:
+• Front queues: manage prioritization
+• Back queues: manage politeness
+
+![img.png](../../diagrams/web-crawler-4.png)
+
+#### Freshness
+- Web pages are constantly being added, deleted, and edited. 
+- A web crawler must periodically recrawl downloaded pages to keep our data set fresh. 
+- Recrawling all the URLs is time-consuming and resource intensive. 
+- Few strategies to optimize freshness are listed as follows:
+  - Recrawl based on web pages’ update history.
+  - Prioritize URLs and recrawl important pages first and more frequently.
+
+#### Storage for URL Frontier
+- Hybrid Approach
+- **In-Memory Storage**: For high-priority URLs that need to be crawled frequently.
+- **Disk-Based Storage**: For low-priority URLs that can be crawled less frequently.
+- To reduce the cost of reading from the disk and writing to the disk, we
+  maintain buffers in memory for enqueue/dequeue operations. Data in the buffer is
+  periodically written to the disk.
+
+---
+
+### HTML Downloader
+- The HTML downloader is responsible for fetching web pages from the internet using HTTP protocol.
+
+#### Robots Exclusion Protocol - Robots.txt
+- A standard used by websites to communicate with web crawlers and other web robots.
+- It specifies which parts of the website should not be accessed or crawled by automated agents.
+- Located at the root of a website (e.g., `www.example.com/robots.txt`).
+- Before attempting to crawl a web site, a crawler should check its corresponding robots.txt first and follow its rules.
+- To avoid repeat downloads of robots.txt file, we cache the results of the file. 
+- The file is downloaded and saved to cache periodically.
+
+#### Performance Optimization
+1. **Distributed Crawl**:
+   - To achieve high performance, we can distribute the crawling task to multiple machines.
+   - URL space is partitioned into smaller subspaces, and each machine is responsible for crawling a specific subspace.
+2. **Cache DNS Resolver**:
+   - Once a request to DNS is carried out by a crawler thread, other threads are blocked until the first request is completed.
+   - DNS resolution can be time-consuming. To reduce latency, we can cache the results of DNS lookups.
+   - Our DNS cache keeps the domain name to IP address mapping and is updated periodically by cron jobs.
+3. **Locality**:
+    - Distribute crawl servers geographically. 
+    - When crawl servers are closer to website hosts, crawlers experience faster download time. 
+4. **Short Timeout**:
+   - Some web servers respond slowly or may not respond at all. 
+   - To avoid long wait time, a maximal wait time is specified. 
+   - If a host does not respond within a predefined time, the crawler will stop the job and crawl some other pages.
