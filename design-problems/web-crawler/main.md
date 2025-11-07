@@ -2,7 +2,7 @@
 
 - A web crawler is a system that crawls the internet, discovers new pages, and indexes data for later use (e.g., by a search engine).
 - Crawler Use cases
-  - **Search Engine Indexing**: A crawler collects web pages to create local index for search engines.
+  - **Search Engine Indexing**: A crawler collects web pages to create local index for search engines. A process by which search engines (like Google, Bing, or DuckDuckGo) collect, analyze, and store information from web pages so they can quickly return relevant results when you perform a search.
   - **Web archiving**: Process of collecting information from web to preserve data for future use.
   - **Web mining**: It helps to discover useful knowledge from the internet. For example, financial firms use crawlers to download shareholder meetings and annual reports to learn.
   - **Web monitoring**: Crawlers help to monitor copyrights and trademark infringements over the internet.
@@ -24,7 +24,7 @@
   ```
 - But the design goes beyond the simple algorithm and is highly dependent on the scale.
 
-> Q. What is the main purpose of tge crawler? Search engine indexing, data mining or something else?
+> Q. What is the main purpose of tte crawler? Search engine indexing, data mining or something else?
 > 
 > A. Search Engine Indexing
 
@@ -40,7 +40,7 @@
 > 
 > A. Yes
 
-> Q. Do we need to store HTML pages crawled from wev?
+> Q. Do we need to store HTML pages crawled from web?
 > 
 > A. Yes, up to 5 years.
 
@@ -71,9 +71,31 @@ storage is needed to store five-year content.
 
 ## Step 2: High Level Design
 
+
+![web-crawler-1.png](../../diagrams/web-crawler-1.png)
+
+
+1. Add seed URLs to the URL Frontier
+2. HTML Downloader fetches a list of URLs from URL Frontier.
+3. HTML Downloader gets IP addresses of URLs from DNS resolver and starts
+downloading.
+4. Content Parser parses HTML pages and checks if pages are malformed.
+5. After content is parsed and validated, it is passed to the “Content Seen?” component.
+6. “Content Seen” component checks if a HTML page is already in the storage. 
+   1. If it is in the storage, this means the same content in a different URL has already been
+   processed. In this case, the HTML page is discarded.
+   2. If it is not in the storage, the system has not processed the same content before. The
+   content is passed to Link Extractor.
+7. Link extractor extracts links from HTML pages.
+8. Extracted links are passed to the URL filter.
+9. After links are filtered, they are passed to the “URL Seen?” component.
+10. “URL Seen” component checks if a URL is already in the storage, if yes, it is
+   processed before, and nothing needs to be done.
+11. If a URL has not been processed before, it is added to the URL Frontier.
+
 ### Components
 
-#### Seed URLs
+#### Seed URLs [Starting Points]
 - Starting point for crawl process.
 - A set of initial web addresses (URLs) to begin crawling.
 - Example
@@ -82,31 +104,51 @@ storage is needed to store five-year content.
 - Seed URL selection is an open-ended question.
 - `Analogy`: Think of seed URLs as the roots of the crawling tree, from which the crawler explores the rest of the web.
 
-#### URL Frontier
-- The component that stores URLs to be download is called the URL frontier.
+#### URL Frontier [URL Queue]
+- The component that stores URLs to be downloaded is called the URL frontier.
 - Like a FIFO queue.
 
-#### HTML downloader / Fetcher
+#### HTML downloader / Fetcher [Web Client]
 - The HTML downloader downloads web pages from the internet.
 
-#### DNS resolver
+#### DNS resolver [Domain Name System Resolver]
 - To download a web page, URL must be translated to IP address.
 - HTML downloader calls the DNS resolver to get the corresponding to get the IP address.
 
-#### Content parser
+#### Content parser [Parser & Validator]
 - After a web page is downloaded, it must be parsed and validated because malformed web pages could provoke problems and waste storage space.
 - Extracts text, links, and metadata.
 - Removes session IDs & duplicates.
 
-#### Content Seen?
+#### Content Seen? [Duplicate Detector]
 - “Content Seen?” data structure is used to eliminate data redundancy and shorten processing time.
 - To compare two HTML documents, we can compare them character by character. 
 - However, this method is slow and time-consuming, especially when billions of web pages are involved. 
 - An efficient way to accomplish this task is to compare the hash values of the two web pages
 
-#### Content Storage
+#### Content Storage [HTML Storage]
 - It is a storage system for storing HTML content.
 - Choice of storage system depends on factors such as data type, data size, access frequency, life span, so on.
 - Both disk and memory are used.
   - Most of tge content is store on disk because the data set is too big to fit in memory.
   - Popular content is kept in memory to reduce latency.
+
+#### URL Extractor
+- Extracts new URLs from downloaded web pages.
+- New URLs are added to the URL frontier for future crawling.
+
+#### URL Filter [URL Validator]
+- Not all URLs are worth crawling.
+- excludes certain content types, file extensions, error links and URLs in
+  “blacklisted” sites.
+- URL filter decides whether a URL should be crawled or not based on predefined rules.
+- For example, URLs pointing to images, videos, or other non-HTML content can be filtered out.
+
+#### URL Seen? [URL Deduplicator]
+- To avoid downloading the same URL multiple times, a “URL Seen?” data structure is used to keep track of URLs that have already been crawled.
+- Before adding a new URL to the URL frontier, the URL deduplicator checks if the URL has been seen before.
+- This is typically implemented using a hash set or a Bloom filter for efficient membership testing.
+
+#### URL Storage [URL Database]
+- A database to store URLs that have been crawled or are scheduled to be crawled.
+- Helps in managing and tracking the crawling process.
