@@ -49,10 +49,14 @@
   - **Device**: The iOS device that receives and displays the notification.
 ![iOS](../../images/notification-system/ios-structure.png)
 
+---
+
 #### Android Push Notification
 - Similar notification flow as iOS
 - Instead of APNs, there's `Firebase Cloud Messaging (FCM)` as the intermediary service.
 ![android](../../images/notification-system/android.png)
+
+---
 
 #### SMS Message
 - SMS uses services like:
@@ -66,5 +70,21 @@
     - At its core, it runs on AWS, uses API gateways for authentication and routing, and message brokers for reliable delivery.
     - maintains direct SMPP and SIP connections with carriers worldwide for low-latency communication
 - Most of them are commercial services that provide APIs to send SMS messages.
-![img.png](../../images/notification-system/sms.png)
-![img_1.png](img_1.png)
+![sms](../../images/notification-system/sms.png)
+
+---
+
+#### Email
+- Companies can set up their own email service.
+- But mostly use commercial email services like:
+  - `Sendgrid`: 
+    - cloud-based, distributed email delivery system designed for high scalability and reliability.
+    - It uses microservices hosted on AWS, with API gateways handling authentication and rate limiting.
+    - Emails are queued and processed through message brokers (like Kafka or RabbitMQ), then routed to global SMTP relays for delivery.
+  - `Mailchimp`:
+    - cloud-based, microservices-oriented marketing automation platform built for scalability and personalization.
+    - It runs primarily on AWS, using API gateways and RESTful services to manage campaigns, users, and analytics.
+    - Mailchimp uses message queues for async processing (email scheduling, tracking),
+![email](../../images/notification-system/email.png)
+
+---
