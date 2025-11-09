@@ -110,3 +110,47 @@
 ---
 
 ### Notification Sending/Receiving Flow
+
+- Following is the initial design:
+
+  ![high-level-flow](../../images/notification-system/high-level-flow.png)
+
+1. `Service 1 to N`: 
+   - Different services that trigger notifications (e.g., order service, chat service).
+   - It can be a micro-service, a cron job or a distributed task.
+   - Example: Order service sends order confirmation notification.
+2. `Notification System`:
+   - Receives notification requests from various services.
+   - Currently, only 1 notification server is used.
+   - provides APIs for services and build payloads for third party services.
+3. `Third Party Services`:
+   - APNs, FCM, Twilio, Sendgrid, etc.
+   - Responsible for delivering notifications to end-users.
+   - Considerations:
+     - Extensibility: flexible system with easy plugging and unplugging third party services.
+     - Availability: Some services may not be available in certain regions. Ex: FCM is not available in China, alternatives: Jpush
+4. `Users`:
+   - End-users who receive notifications on their devices.
+
+---
+#### Problems with Initial Design
+
+1. Single Point of Failure: 
+   - Single notification server can become a bottleneck and thus a SPOF.
+2. Scalability Issues:
+   - As the number of notifications grows, a single server may struggle to handle the load. 
+   - Challenging to scale DBs, caches and different notification processing components independently.
+3. Performance Bottlenecks:
+   - Processing and sending notifications is resource-intensive.
+   - A single server may lead to delays in notification delivery.
+
+---
+
+### Improved Design
+
+- Improvements:
+  1. Database and Cache Moved out of Notification server.
+  2. Multiple Notification Servers added with automatic horizontal scaling.
+  3. Introduced message queues for async processing.
+
+![improved-high-level-flow](../../images/notification-system/improved-high-level-flow.png)
