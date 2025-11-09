@@ -154,3 +154,38 @@
   3. Introduced message queues for async processing.
 
 ![improved-high-level-flow](../../images/notification-system/improved-high-level-flow.png)
+
+1. `Service 1 to N`: (unchanged)
+2. `Notification Servers`:
+   - Provides APIs for services to send notification requests.
+   - APIs are only accessible internally or by verified clients to prevent spam.
+   - Basic validation of verify emails, phone numbers, device tokens.
+   - Queries DB/Cache for contact info.
+   - Adds notification requests to message queues for parallel processing.
+3. `Cache`:
+    - Stores user info, device info and notification templates for quick access.
+4. `Database`:
+    - Stores user contact info, notification logs, templates, etc.
+5. `Message Queues`:
+   - Decouples notification request submission from processing.
+   - Serves as a buffer to handle spikes in notification requests.
+   - Each notification type is assigned to a distinct queue, outage in one third party service won't affect others.
+6. `Workers`:
+   - List of servers that pull notification events from message queues.
+   - Send notifications via appropriate third party services.
+   - Can be scaled independently based on load.
+7. `Third Party Services`: (unchanged)
+8. `Users`: (unchanged)
+
+### Flow
+
+1. A service calls APIs provided by notification servers to send notifications.
+2. Notification servers fetch metadata such as user info, device token, and notification setting from the cache or database.
+3. A notification event is sent to the corresponding queue for processing. For instance, an iOS push notification event is sent to the iOS PN queue.
+4. Workers pull notification events from message queues.
+5. Workers send notifications to third party services.
+6. Third-party services send notifications to user devices.
+
+---
+
+## Step 3: Detailed Design Considerations
