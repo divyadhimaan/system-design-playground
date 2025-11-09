@@ -1,5 +1,7 @@
 # Design a Notification System
 
+- [Introduction](#introduction)
+
 ## Introduction
 
 > A notification system is responsible for sending notifications to users through various channels such as email, SMS, and push notifications.
@@ -229,3 +231,48 @@
 
 ### Additional Components
 
+#### 1. Notification Template
+
+- Predefined templates for different notification types.
+- Stored in DB for easy management and updates.
+- Introduced to avoid building every notification from scratch.
+- Benefits:
+  - Consistent Format
+  - Reducing margin error
+  - saving time
+
+#### 2. Notification Setting
+
+- Websites and apps give users fine-grained control over notification settings.
+- This info is stored in notification setting table (DB)
+- Before any notification is sent, first the table is checked if the user has opted-in or not.
+
+#### 3. Rate Limiting
+
+- avoid overwhelming user with too many notifications
+- limit the number of notifications a user can receive
+
+#### 4. Retry mechanism
+
+- In case of third party service failure in sending notification, notification should be added to queue for retrying.
+- if problem persists, report 
+
+#### 5. Security in push notifications
+
+- In iOS or android, appKey and appSecret are used to secure push notification APIs.
+- Only authenticated or verified clients are allowed to send notifications.
+
+#### 6. Monitoring
+
+- Total number of queued notifications is an important metrics.
+- if number is large, processing is slow -> increase workers.
+
+#### 7. Event tracking
+
+- Metrics like open rate, click rate and engagement are important.
+- Event stages should be added for tracking.
+---
+
+### Updated Design
+
+![final-design](../../images/notification-system/final-design.png)
