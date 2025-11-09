@@ -197,7 +197,7 @@
 - Notification events can be delayed or reordered, but never lost.
 - Notification system should persist notification data in a database and implement a retry mechanism for failed notifications.
 
-![reliability](../../images/notification-system/reliability.png)
+    ![reliability](../../images/notification-system/reliability.png)
 
 > Will recipient receive duplicate notifications?
 
