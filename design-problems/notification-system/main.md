@@ -189,3 +189,43 @@
 ---
 
 ## Step 3: Detailed Design Considerations
+
+### Reliability
+
+> How to prevent data loss?
+
+- Notification events can be delayed or reordered, but never lost.
+- Notification system should persist notification data in a database and implement a retry mechanism for failed notifications.
+
+![reliability](../../images/notification-system/reliability.png)
+
+> Will recipient receive duplicate notifications?
+
+- Yes, duplicate notifications may be sent due to distributed nature of the system.
+- To mitigate this, dedupe mechanism can be implemented on the client side using unique notification IDs.
+- Dedupe mechanism:
+  - When notification arrives, we check if it is seen before by checking notification ID against a local cache.
+    - If seen before, discard it. 
+    - Otherwise, display it and store the ID in cache
+    
+<details> <summary>Why Exactly-Once Delivery is Impossible</summary>
+
+- [Resource](https://bravenewgeek.com/you-cannot-have-exactly-once-delivery/)
+- Why Exactly-Once Delivery is Impossible:
+    - Exactly-once delivery is impossible in a distributed system.
+    - Any system where components communicate over a network (browser ↔ server, server ↔ DB, server ↔ message queue) is distributed and thus cannot guarantee perfect delivery.
+- Analogy:
+    - Sending a letter → asking for confirmation call → no response.
+    - Either the letter got lost or the receiver ignored it.
+    - Sending multiple copies doesn’t guarantee success either.
+- Why It’s Impossible:
+    - Network failures, dropped messages, lost acknowledgments, or crashed nodes.
+    - You can’t distinguish between a slow and a failed system.
+    - FLP impossibility and Two Generals Problem prove that reliable coordination can’t be fully guaranteed in asynchronous distributed systems.
+</details>
+
+
+---
+
+### Additional Components
+
