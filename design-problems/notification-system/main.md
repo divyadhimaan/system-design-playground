@@ -1,5 +1,7 @@
 # Design a Notification System
 
+## Introduction
+
 > A notification system is responsible for sending notifications to users through various channels such as email, SMS, and push notifications.
 
 ## Step 1: Understand the Requirements
@@ -91,4 +93,20 @@
 
 > Summary: Provider -> Third Party Service -> Device/Recipient
 
-###
+### Contact Info Gathering Flow
+
+- To send notifications, we need to gather contact info from users.
+- Contact info includes:
+  - Email address
+  - Phone number
+  - Device tokens for push notifications
+- This info can be collected during user registration or profile update.
+- Store this info securely in a database.
+
+![contact-info](../../images/notification-system/contact-info.png)
+
+> Note: Email addresses and phone numbers should be verified to ensure they are valid.
+
+---
+
+### Notification Sending/Receiving Flow
