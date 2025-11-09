@@ -1,5 +1,41 @@
 # Design a web crawler
 
+- [Introduction](#introduction)
+- [Problem Statement](#problem-statement)
+- [Step 1: Understanding the problem and Design scope](#step-1-understanding-the-problem-and-design-scope)
+  - [Characteristics for a good crawler](#characteristics-for-a-good-crawler)
+  - [Estimations](#estimations)
+- [Step 2: High Level Design](#step-2-high-level-design)
+  - [Components](#components)
+    - [Seed URLs [Starting Points]](#seed-urls-starting-points)
+    - [URL Frontier [URL Queue]](#url-frontier-url-queue)
+    - [HTML downloader / Fetcher [Web Client]](#html-downloader--fetcher-web-client)
+    - [DNS resolver [Domain Name System Resolver]](#dns-resolver-domain-name-system-resolver)
+    - [Content parser [Parser & Validator]](#content-parser-parser--validator)
+    - [Content Seen? [Duplicate Detector]](#content-seen-duplicate-detector)
+    - [Content Storage [HTML Storage]](#content-storage-html-storage)
+    - [URL Extractor](#url-extractor)
+    - [URL Filter [URL Validator]](#url-filter-url-validator)
+    - [URL Seen? [URL Deduplicator]](#url-seen-url-deduplicator)
+    - [URL Storage [URL Database]](#url-storage-url-database)
+- [Step 3: Design Deep Dive](#step-3-design-deep-dive)
+  - [DFS vs BFS Crawling](#dfs-vs-bfs-crawling)
+    - [Problems with BFS](#problems-with-bfs)
+  - [URL Frontier](#url-frontier)
+    - [1. Politeness](#1-politeness)
+    - [2. Prioritization](#2-prioritization)
+    - [Freshness](#freshness)
+    - [Storage for URL Frontier](#storage-for-url-frontier)
+  - [HTML Downloader](#html-downloader)
+    - [Robots Exclusion Protocol - Robots.txt](#robots-exclusion-protocol---robotstxt)
+    - [Performance Optimization](#performance-optimization)
+  - [Robustness](#robustness)
+  - [Extensibility](#extensibility)
+  - [Detect and Avoid Traps](#detect-and-avoid-traps)
+- [Additional Considerations](#additional-considerations)
+
+## Introduction
+
 - A web crawler is a system that crawls the internet, discovers new pages, and indexes data for later use (e.g., by a search engine).
 - Crawler Use cases
   - **Search Engine Indexing**: A crawler collects web pages to create local index for search engines. A process by which search engines (like Google, Bing, or DuckDuckGo) collect, analyze, and store information from web pages so they can quickly return relevant results when you perform a search.
@@ -154,7 +190,7 @@ downloading.
 - Helps in managing and tracking the crawling process.
 
 ---
-## Step 2: Design Deep Dive
+## Step 3: Design Deep Dive
 
 ---
 ### DFS vs BFS Crawling

@@ -88,3 +88,7 @@
 ![email](../../images/notification-system/email.png)
 
 ---
+
+> Summary: Provider -> Third Party Service -> Device/Recipient
+
+###
