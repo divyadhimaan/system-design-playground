@@ -80,3 +80,17 @@ To retrieve feed, HTTP GET request is used.
 ---
 
 ## Step 3: Design Deep Dive
+
+Two components have been modified
+- Web servers
+- Fanout service
+
+![final-design](../../images/newsFeed/final-design.png)
+
+### Web Servers
+- Authentication: Only users signed in with valid auth_token are allowed to make posts
+- Rate Limiting: System limits the number of posts a user can make within a certain period, to prevent spam and abusive content.
+
+### Fanout Service
+
+- 
