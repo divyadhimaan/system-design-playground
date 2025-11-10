@@ -1,7 +1,5 @@
 # Design a Notification System
 
-- [Introduction](#introduction)
-
 ## Introduction
 
 > A notification system is responsible for sending notifications to users through various channels such as email, SMS, and push notifications.
@@ -29,7 +27,7 @@
 > A. 10 million mobile push notifications, 1 million SMS msgs, and 5 million emails.
 
 
-## Step 1: High Level Design
+## Step 2: High Level Design
 
 - Our notification system will support following notification types:
   - iOS Push Notification
