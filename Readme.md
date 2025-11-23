@@ -58,6 +58,9 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Design a Web Crawler](./design-problems/web-crawler/main.md)
 - [Design a Notification System](./design-problems/notification-system/main.md)
 
+## Interview Related Resources
+- [Database Selection](./concepts/interview-specific/database-selection.md)
+
 ## Resources
 A collection of materials referred to while learning:
 
