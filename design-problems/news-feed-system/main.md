@@ -93,4 +93,8 @@ Two components have been modified
 
 ### Fanout Service
 
-- 
+- Fanout: Process of delivering a post to all of the user's friends' news feeds.
+- Models
+  - Fanout on Write (push model): When a user makes a post, the system immediately pushes the post to all of the user's friends' news feeds. This approach ensures that when friends access their news feeds, the posts are already available, resulting in faster retrieval times.
+  - Fanout on Read (pull model): When a user accesses their news feed, the system retrieves the latest posts from the user's friends in real-time. This approach reduces the storage requirements since posts are not pre-populated in friends' feeds, but it may lead to slower retrieval times as posts need to be fetched on-the-fly.
+- Hybrid Approach: A combination of both fanout on write and fanout on read can be used. For example, popular users' posts can be pushed to friends' feeds (fanout on write), while less active users' posts can be fetched in real-time when friends access their feeds (fanout on read). This approach balances storage efficiency and retrieval speed.
