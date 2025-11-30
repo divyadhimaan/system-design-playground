@@ -95,6 +95,28 @@ Two components have been modified
 
 - Fanout: Process of delivering a post to all of the user's friends' news feeds.
 - Models
-  - Fanout on Write (push model): When a user makes a post, the system immediately pushes the post to all of the user's friends' news feeds. This approach ensures that when friends access their news feeds, the posts are already available, resulting in faster retrieval times.
-  - Fanout on Read (pull model): When a user accesses their news feed, the system retrieves the latest posts from the user's friends in real-time. This approach reduces the storage requirements since posts are not pre-populated in friends' feeds, but it may lead to slower retrieval times as posts need to be fetched on-the-fly.
-- Hybrid Approach: A combination of both fanout on write and fanout on read can be used. For example, popular users' posts can be pushed to friends' feeds (fanout on write), while less active users' posts can be fetched in real-time when friends access their feeds (fanout on read). This approach balances storage efficiency and retrieval speed.
+  - Fanout on Write (push model)
+  - Fanout on Read (pull model)
+
+#### Fanout on Write
+- news feed is pre-computed during write operation.
+- new post is pushed to all friends' cache as soon as user makes a post.
+- Pros:
+  - **Fast read performance**: since news feed is pre-computed, users can retrieve their feed quickly.
+  - **Reduced latency**: users experience minimal delay when accessing their news feed.
+- Cons:
+  - **High write amplification**: when a user with many friends makes a post, the system needs to update multiple caches, leading to increased write operations. -> hotkey problem.
+  - **Storage overhead**: storing pre-computed news feeds for all users can consume significant storage space. Also, irrelevant for inactive users.
+
+#### Fanout on Read
+- news feed is computed during read operation.
+- when user requests their news feed, system fetches posts from friends in real-time and aggregates them. On-demand model
+- Pros:
+  - For inactive users or those who rarely log in, no storage is wasted on pre-computed feeds.
+  - Data is not pushed to friends, so no hotkey problem.
+- Cons:
+  - Increased latency: users may experience delays when accessing their news feed, especially if they have many friends with numerous posts.
+  - Higher read load: fetching and aggregating posts from multiple friends can put a strain on the system during peak times.
+
+
+#### Hybrid Approach
