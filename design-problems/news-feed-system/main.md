@@ -151,3 +151,24 @@ Two components have been modified
 5. Store <post_id, user_id > in news feed cache.
 
 ### NewsFeed Retrieval Deep Dive
+
+![feed-retrieval](../../images/newsFeed/feed-retrieval.png)
+
+1. A user sends a request to retrieve her news feed. The request looks like this: `/v1/me/feed`
+2. The load balancer redistributes requests to web servers.
+3. Web servers call the news feed service to fetch news feeds.
+4. News feed service gets a list post IDs from the news feed cache.
+5. A user’s news feed is more than just a list of feed IDs. It contains username, profile
+   picture, post content, post image, etc. Thus, the news feed service fetches the complete
+   user and post objects from caches (user cache and post cache) to construct the fully
+   hydrated news feed.
+6. The fully hydrated news feed is returned in JSON format back to the client for
+   rendering.
+
+### Cache Architecture
+- `News Feed`: It stores IDs of news feeds.
+- `Content`: It stores every post data. Popular content is stored in hot cache.
+- `Social Graph`: It stores user relationship data.
+- `Action`: It stores info about whether a user liked a post, replied a post, or took other
+actions on a post.
+- `Counters`: It stores counters for like, reply, follower, following, etc.
