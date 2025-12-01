@@ -85,20 +85,22 @@ Two components have been modified
 - Web servers
 - Fanout service
 
+### Feed Publishing Deep Dive
+
 ![final-design](../../images/newsFeed/final-design.png)
 
-### Web Servers
+#### Web Servers
 - Authentication: Only users signed in with valid auth_token are allowed to make posts
 - Rate Limiting: System limits the number of posts a user can make within a certain period, to prevent spam and abusive content.
 
-### Fanout Service
+#### Fanout Service
 
 - Fanout: Process of delivering a post to all of the user's friends' news feeds.
 - Models
   - Fanout on Write (push model)
   - Fanout on Read (pull model)
 
-#### Fanout on Write
+##### Fanout on Write
 - news feed is pre-computed during write operation.
 - new post is pushed to all friends' cache as soon as user makes a post.
 - Pros:
@@ -107,10 +109,11 @@ Two components have been modified
 - Cons:
   - **High write amplification**: when a user with many friends makes a post, the system needs to update multiple caches, leading to increased write operations. -> _hotkey problem_.
   - **Storage overhead**: storing pre-computed news feeds for all users can consume significant storage space. Also, irrelevant for inactive users.
-> Hotkey: A key that gets disproportionately high traffic(writes/reads) compared to other keys in the system.
+> `Hotkey`: A key that gets disproportionately high traffic(writes/reads) compared to other keys in the system.
+> 
 > For example, a celebrity user with millions of followers posting frequently can create a hotkey situation, overwhelming the system with write operations to update all followers' feeds.
 
-#### Fanout on Read
+##### Fanout on Read
 - news feed is computed during read operation.
 - when user requests their news feed, system fetches posts from friends in real-time and aggregates them. On-demand model
 - Pros:
@@ -121,9 +124,30 @@ Two components have been modified
   - Higher read load: fetching and aggregating posts from multiple friends can put a strain on the system during peak times.
 
 
-#### Hybrid Approach
+##### Hybrid Approach
 
 - Combine both fanout on write and fanout on read.
 - For regular users with a manageable number of friends, use fanout on write to ensure fast read performance.
 - For celebrity users with a massive following, use fanout on read to avoid hotkey issues (with consistent hashing).
 - This approach balances the benefits of both models while mitigating their respective drawbacks.
+
+### Fanout Service Closer Look
+![fanout service](../../images/newsFeed/fanout-service.png)
+
+1. Fetch friend IDs from the graph database. Graph databases are suited for managing
+   friend relationship and friend recommendations.
+2. Get friends info from the user cache. The system then filters out friends based on user
+   settings. For example, if you mute someone, her posts will not show up on your news feed
+   even though you are still friends. Another reason why posts may not show is that a user
+   could selectively share information with specific friends or hide it from other people.
+3. Send friends list and new post ID to the message queue.
+4. Fanout workers fetch data from the message queue and store news feed data in the news
+   feed cache. You can think of the news feed cache as a <post_id, user_id> mapping table.
+   The memory consumption can become very large if we store the entire user
+   and post objects in the cache. Thus, only IDs are stored. To keep the memory size small,
+   we set a configurable limit. The chance of a user scrolling through thousands of posts in
+   news feed is slim. Most users are only interested in the latest content, so the cache miss
+   rate is low.
+5. Store <post_id, user_id > in news feed cache.
+
+### NewsFeed Retrieval Deep Dive
