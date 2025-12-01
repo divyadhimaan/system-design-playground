@@ -105,8 +105,10 @@ Two components have been modified
   - **Fast read performance**: since news feed is pre-computed, users can retrieve their feed quickly.
   - **Reduced latency**: users experience minimal delay when accessing their news feed.
 - Cons:
-  - **High write amplification**: when a user with many friends makes a post, the system needs to update multiple caches, leading to increased write operations. -> hotkey problem.
+  - **High write amplification**: when a user with many friends makes a post, the system needs to update multiple caches, leading to increased write operations. -> _hotkey problem_.
   - **Storage overhead**: storing pre-computed news feeds for all users can consume significant storage space. Also, irrelevant for inactive users.
+> Hotkey: A key that gets disproportionately high traffic(writes/reads) compared to other keys in the system.
+> For example, a celebrity user with millions of followers posting frequently can create a hotkey situation, overwhelming the system with write operations to update all followers' feeds.
 
 #### Fanout on Read
 - news feed is computed during read operation.
@@ -120,3 +122,8 @@ Two components have been modified
 
 
 #### Hybrid Approach
+
+- Combine both fanout on write and fanout on read.
+- For regular users with a manageable number of friends, use fanout on write to ensure fast read performance.
+- For celebrity users with a massive following, use fanout on read to avoid hotkey issues (with consistent hashing).
+- This approach balances the benefits of both models while mitigating their respective drawbacks.
