@@ -232,6 +232,11 @@ click the alias, it redirects you to the original URL.
 10. Use this hash for:
     - idempotency checks
     - duplication prevention
+- Benefits
+  - Idempotency: Same canonical URL → same short key.
+  - Storage Optimization: Avoid storing thousands of duplicate entries.
+  - Performance: Hash lookups become reliable and consistent.
+  - Security: Prevents malicious fragment tricks and unnecessary noise.
 
 - [Unique ID generator](./../unique-id-generator/main.md) -> generate globally unique IDs (Design from Distributed System perse)
 
