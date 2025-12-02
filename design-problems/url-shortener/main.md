@@ -266,6 +266,10 @@ click the alias, it redirects you to the original URL.
 5. Analytics: Data is increasingly important for business success. Integrating an analytics
    solution to the URL shortener could help to answer important questions like how many
    people click on a link? When do they click the link? etc.
+6. How to handle custom aliases?
+   - Allow users to specify their own custom short URLs.
+   - Validate that the custom alias is unique and does not conflict with existing short URLs.
+   - Update the database schema to accommodate custom aliases.
 
 ## Reference
 
