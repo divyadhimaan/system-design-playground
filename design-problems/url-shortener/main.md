@@ -212,7 +212,8 @@ click the alias, it redirects you to the original URL.
 
 ![url-shortener-diagram](../../images/urlShortener/url-shortener-diagram.png)
 
-#### Canonicalization:
+#### Canonicalization: 
+- converting different textual representations of the same webpage into one consistent, normalized form
 - Before storing longURL in the database, it is important to canonicalize it to ensure that
   different representations of the same URL are treated as identical.
 - For example, the following URLs should be considered the same:
