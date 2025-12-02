@@ -53,6 +53,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Whatsapp Calling](./design-problems/whatsapp-calling-app/main.md)
 - [Design a Rate Limiter](./design-problems/rate-limiter/main.md)
 - [Design a Consistent Hashing](./design-problems/consistent-hashing/main.md)
+- [Design a URL shortener](./design-problems/url-shortener/main.md)
 - [Design a Key Value Store](./design-problems/key-value-store/main.md)
 - [Design an Unique ID generator](./design-problems/unique-id-generator/main.md)
 - [Design a Web Crawler](./design-problems/web-crawler/main.md)
