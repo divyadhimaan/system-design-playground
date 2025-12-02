@@ -212,6 +212,27 @@ click the alias, it redirects you to the original URL.
 
 ![url-shortener-diagram](../../images/urlShortener/url-shortener-diagram.png)
 
+#### Canonicalization:
+- Before storing longURL in the database, it is important to canonicalize it to ensure that
+  different representations of the same URL are treated as identical.
+- For example, the following URLs should be considered the same:
+  - `http://example.com`
+  - `http://www.example.com`
+  - `https://example.com/`
+- Canonicalization steps may include:
+1. Parse the input URL 
+2. Lowercase the scheme and host 
+3. Remove default ports 
+4. Normalize the path (remove trailing slash, resolve dots)
+5. Remove fragments 
+6. Remove tracking parameters (optional but common)
+7. Sort query parameters (optional)
+8. Reconstruct the cleaned URL 
+9. Compute SHA-256 hash of the canonical URL 
+10. Use this hash for:
+    - idempotency checks
+    - duplication prevention
+
 - [Unique ID generator](./../unique-id-generator/main.md) -> generate globally unique IDs (Design from Distributed System perse)
 
 ---
