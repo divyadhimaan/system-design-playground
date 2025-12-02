@@ -1,7 +1,5 @@
 # URL Shortener: Table of Content
 
-- [URL Shortener](#url-shortener)
-  - [Ste]
 
 # URL Shortener
 
