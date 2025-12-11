@@ -29,6 +29,7 @@ This repository contains notes, diagrams, and code snippets created while learni
     - [SIP (Session Initiation Protocol)](#sip-session-initiation-protocol)
 
 ## Concepts
+- [Scalability: Basics](./concepts/scalability.md)
 - [Databases](./concepts/databases.md)
 - [Consistency in Distributed Systems](./concepts/consistency.md)
 - [Caches](./concepts/caching.md)
