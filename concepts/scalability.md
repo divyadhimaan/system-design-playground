@@ -91,3 +91,23 @@
 ### Queueing Systems
 - Decouple components and allow asynchronous request processing.
 - Smooth out traffic spikes and prevent backend overload.
+
+---
+
+## Challenges and Trade-offs in Scalability
+
+### Cost vs. Scalability
+- Scaling often requires additional resources, which increases infrastructure cost.
+- A balance must be found between improved performance/availability and the financial impact of scaling.
+
+### Complexity
+- As systems scale, architectural and operational complexity increases.
+- This added complexity makes maintenance, debugging, and updates more difficult and costly.
+
+### Latency vs. Throughput
+- Lowering latency may reduce maximum throughput, while optimizing for [throughput](./../Readme.md#throughput) can increase [latency](./../Readme.md#latency).
+- System design must prioritize the metric that aligns best with business requirements.
+
+### Data Partitioning Trade-offs
+- Partitioning improves scalability by distributing data across nodes.
+- Trade-offs include selecting the right partition key, balancing shard sizes, ensuring data locality, and minimizing cross-shard communication.

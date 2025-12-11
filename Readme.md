@@ -91,6 +91,15 @@ This is a personal learning repo, but feel free to open issues or PRs if you spo
 ---
 
 ## Glossary
+
+### Latency
+Latency refers to the time it takes for a request to travel from its point of origin to its destination and receive a response. 
+It combines a number of delays - Response times, transmission, and processing time.
+
+### Throughput
+The rate at which a system, process, or network can move data or carry out operations in a particular period of time is referred to as throughput. Bits per second (bps), bytes per second, transactions per second, etc. are common units of measurement. 
+It is computed by dividing the total number of operations or objects executed by the time taken.
+
 ### CAP Theorem (Brewer's Theorem)
 In a distributed computer system, you can only support two of the following guarantees:
 
