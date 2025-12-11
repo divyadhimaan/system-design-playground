@@ -120,6 +120,18 @@ Networks aren't reliable, so you'll need to support partition tolerance. A distr
 - Writes might take some time to propagate when the partition is resolved.
 - social media feeds prefer AP.
 
+#### Choosing between CP and AP
+- Example
+  - If there are 3 servers (n1, n2, n3) and a client wants to write a key-value pair (k1, v1). Lets say k1 is written to n3, but not propagated yet to n1 and n2.
+  - Now, if n3 goes down and a client wants to read k1.
+    - In `CP` system, the client will not get a response because it cannot guarantee consistency. It will wait until n3 is back up.
+    - In `AP` system, the client will get a response from n1 or n2, but it may not be the most recent value of k1.
+- For a key-value store, we can choose either `CP` or `AP` based on the use case.
+- Choosing between AP and CP depends on the specific requirements of the application.
+- For example:
+  - A banking application would prefer `CP` to ensure data consistency.
+  - A social media application would prefer `AP` to ensure availability.
+
 ### ACID Properties
 ACID is a set of properties that ensure reliable, consistent, and safe transactions in a database system.
 
