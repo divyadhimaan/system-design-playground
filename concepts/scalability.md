@@ -55,3 +55,39 @@
 ### System Architecture
 - Architectural structure influences scaling capability.
 - Modular, loosely coupled systems that support horizontal and vertical scaling scale more efficiently.
+
+---
+
+## Components That Improve Scalability
+
+### Load Balancer
+- Distributes incoming traffic across multiple servers.
+- Prevents overload on a single server and improves performance and availability.
+
+### Caching
+- Stores frequently accessed data to avoid repeated backend calls.
+- Reduces latency and significantly decreases load on backend systems.
+
+### Database Replication
+- Copies data from one database to another in real time.
+- Enhances read performance and improves availability by maintaining multiple data copies.
+
+### Database Sharding
+- Splits a database into smaller partitions (shards), each holding a subset of data.
+- Distributes load across multiple database instances and improves scalability.
+
+### Microservices Architecture
+- Breaks a monolithic application into independent, smaller services.
+- Allows each service to scale independently based on its specific workload.
+
+### Data Partitioning
+- Divides data into smaller logical segments (e.g., by region, user ID).
+- Distributes storage and processing load across multiple systems.
+
+### Content Delivery Networks (CDNs)
+- Cache and serve content from geographically closer edge servers.
+- Reduce latency and enhance performance for end users.
+
+### Queueing Systems
+- Decouple components and allow asynchronous request processing.
+- Smooth out traffic spikes and prevent backend overload.
