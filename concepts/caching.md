@@ -190,6 +190,7 @@ The application is responsible for reading and writing from storage. The cache d
 | **Use Case**            | Strong consistency needed        | High write performance, low consistency  | Write-once or infrequently read data   |
 
 
+![img.png](../images/caching-strategies.png)
 
 ### Example Use Cases
 
