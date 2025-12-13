@@ -66,208 +66,60 @@ The application is responsible for reading and writing from storage. The cache d
 - DB cache
 - Distributed cache 
 
+---
+
 ## Types of caches
-### Local Cache
-  - A local cache uses memory inside the service itself.
-  Since the data is present in the memory, it is much faster to get the data (because we don't need to make any network calls).
-  - The issue with a local cache is that it can cause a fanout. For example, we have three boxes and each one uses a local cache to store data. If we want to update the profile data of a user, we need to send requests to all the boxes. This is a fan out.
-  - To avoid fanouts we can shard the data and distribute load across the boxes using a load balancing algorithm (like consistent hashing). But what if one of the nodes fails? To avoid this we can replicate the data to multiple nodes. However, this can lead to data inconsistency.
-  So using a local cache reduces data consistency while increasing response time.
+### In-Memory Cache
+- In-memory caches store data in the main memory (RAM) for extremely fast access.
+- These caches are typically used for session management, storing frequently accessed objects, and as a front for databases.
+> Examples: Redis and Memcached.
 
-### Global Cache
-- Instead of each node having its data copy, we have a central data copy, which is a single node storing all the key-value pairs in its memory.
-- This improves the data consistency but reduces the response time (because we have to make network calls).
+### Distributed Cache
+- A distributed cache spans multiple servers and is designed to handle large-scale systems.
+- It ensures that cached data is available across different nodes in a distributed system.
+> Examples: Redis Cluster and Amazon ElastiCache.
 
-## Write Policy
+### Client-Side Cache
+- Client-side caching involves storing data on the client device, typically in the form of cookies, local storage, or application-specific caches.
 
-A write policy is triggered when there is a write operation in the cache. 
+- This is commonly used in web browsers to cache static assets like images, scripts, and stylesheets.
 
-A write request means some entry is added, updated or deleted in the cache. But because a cache is a source of truth each of the write requests will impact the entire system.
-### Cache Aside
-Cache-aside (also known as Lazy Loading) is a caching pattern commonly used in applications where the application code controls when to load data into the cache.
+### Database Cache
+- Database caching involves storing frequently queried database results in a cache.
+- This reduces the number of queries made to the database, improving performance and scalability.
 
-1. Read request comes in.
-2. Check if data is in the cache:
-  - If yes → return it 
-  - If no → fetch from the database, then:
-    - Store it in the cache 
-    - Return it to the user
-3. For writes/updates, you:
-   - Update the database
-   - Invalidate or update the cache
+### Content Delivery Network (CDN)
+- CDN is used to store copies of content on servers distributed across different geographical locations.
+- This reduces latency by serving content from a server closer to the user.
 
-### Write Back Policy (Write Behind)
+---
 
-If the key-value pair that is to be updated is present in the cache then it is updated. However, the key-value pair is not immediately updated in the database. 
+## Caching Strategies
 
-<p align="center">
-    <img src="../diagrams/write-back-policy.png" alt="write-back-policy">
-    <br/>
-    <i><a href="https://www.baeldung.com/cs/cache-write-policy">Write back Policy</a></i>
-</p>
-<details>
-<summary>Problem</summary>
-> **Problem**: As long as the cache is alive, users will get consistent data. However, if the cache is not alive, the data will be stale. (Not Persistent)
+- `Read-Through Cache`: The application first checks the cache for data. If it's not there (a cache miss), it retrieves the data from the database and updates the cache.
+- `Write-Through Cache`: Data is written to both the cache and the database simultaneously, ensuring consistency but potentially impacting write performance.
+- `Write-Back Cache`: Data is written to the cache first and later synchronized with the database, improving write performance but risking data loss.
+- `Cache-Aside (Lazy Loading)`: The application is responsible for reading and writing from both the cache and the database.
 
-To Avoid this problem, we use:
+### Read Through
 
-1.  <details>
-    <summary>Timeout based persistence</summary>
-    
-    ## Description
-    Cached data is written back to the main memory or database after a specific time interval (like TTL), regardless of whether the data was modified during that period.
-
-    ## Usage
-    - Useful in systems where data freshness is important but write operations can be delayed.
-    - Reduces write operations by batching them at regular intervals.
-    - Common in scenarios like session storage or analytics data caching where exact real-time sync is not critical.
-    </details>
-
-2. <details>
-    <summary>Event based write back</summary>
-
-    ## Description
-    Data is written back to the main memory/database when a specific event occurs, such as application shutdown, user logout, or cache size threshold being reached.
+- In the Read Through strategy, the cache acts as an intermediary between the application and the database.
+- When the application requests data, it first looks in the cache.
+- If data is available (cache hit), it’s returned to the application.
+- If the data is not available (cache miss), the cache itself is responsible for fetching the data from the database, storing it, and returning it to the application.
 
 
-    ## Usage
-    - Efficient for use-cases like temporary caching during user sessions, where persistence is needed only after a session ends.
-    - Reduces unnecessary writes during active use.
+### Comparison For Write Policies
 
-    </details>
-
-    
-3. <details>
-    <summary>Replacement Write Back</summary>
-    
-    ## Description
-    Cached data is written back to main memory only when the cache block is evicted/replaced, and only if it has been modified (marked dirty)
-
-
-    ## Usage
-    - Most commonly used in hardware-level CPU caches.
-    - Reduces write traffic to memory, as only evicted and modified blocks are written back.
-    - Efficient in systems with limited bandwidth or high memory write latency.
-    </details>
-
-
-</details>
-<details>
-<summary>Benefit</summary>
-- Eventual Consistency
-- Efficient
-</details>
-
-<details>
-
-<summary>Disadvantages</summary>
-  
--  Data Loss on Cache Failure
-
-    Since modified data is not immediately written to main memory, a cache crash or power failure can result in loss of unsaved changes.
-
-- Complexity in Data Coherency
-  
-    Maintaining consistency between the cache and main memory becomes more complex, especially in multi-core or distributed systems where multiple caches might hold different versions of the same data.
-
-    Look for other policies (Write-aside/ write-through)
-
-- Increased Latency on Eviction
-  
-    When a dirty block is evicted, the system must write it back to main memory, potentially delaying the fetch of new data.
-
-</details>
-
-
-### Write Through Policy
-
-In this policy, when there is a write request, we evict the key that is being updated, while simultaneously updating the database. The next time there is a read request, that is when the cache polls the database for the entry, persists the entry and sends the response to the user.
-
-
-- A write goes to the cache.
-- Simultaneously, the same data is written to the main memory.
-- This ensures data consistency between the cache and memory.
-
-<p align="center">
-    <img src="../diagrams/write-through-policy.png" alt="write-Through-policy">
-    <br/>
-    <i><a href="https://www.baeldung.com/cs/cache-write-policy">Write Through Policy</a></i>
-</p>
-
-
-<details>
-<summary>Problem</summary>
-
-> Problem: 
->   Intially: X = 10
->   Write Request: X = 20
->
-> A read request on X, but write is not updated yet. The read request returns X = 10 . So it can cause inconsistency.
-
-
-To avoid such problems, we can lock the data which is to be written and only unlock the data after the update operation is completed. 
-</details>
-
-<!-- BENEFITS OF WRITE THROUGH -->
-<details>
-<summary>Benefits</summary>
-
-- Read Efficient: Write-through is a slow overall operation due to the write operation, but subsequent reads of just written data are fast. Users are generally more tolerant of latency when updating data than reading data.
-   
-- Consistent: Data in the cache is not stale.
-  
-- Persistent: No risk of losing updates if the cache is lost (e.g., during a crash).
-</details>
-
-<!-- DISADVANTAGES OF WRITE THROUGH -->
-
-<details>
-<summary>Disadvantages</summary>
-
-- When a new node is created due to failure or scaling, the new node will not cache entries until the entry is updated in the database. Cache-aside in conjunction with write through can mitigate this issue.
-
-- Most data written might never be read, which can be minimized with a TTL.
-</details>
-
-
-### Write Around Policy
-
-Write-Around is a caching strategy where write operations bypass the cache and go directly to the main memory/storage. The cache is updated only on a read miss, not on write.
-
-> If we do not expect a read operation shortly after, the cache would become polluted with the entries we’re not using. To avoid cache pollution, we may bypass cache entry allocation in case of a cache miss:
-
-- Write → Goes only to memory/storage (not to cache).
-- Cache remains unchanged after a write.
-- On a read:
-  - If data is in cache → return it 
-  - If not (miss) → fetch from memory, store in cache, return it
-
-<p align="center">
-    <img src="../diagrams/write-around-policy.png" alt="write-around-policy">
-    <br/>
-    <i><a href="https://www.baeldung.com/cs/cache-write-policy">Write Around Policy</a></i>
-</p>
-
-<details>
-<summary>Benefits</summary>
-  - Reduces cache pollution (avoids caching rarely-read data)
-  - Keeps cache filled with frequently-read data
-  - Good for write-heavy systems
-  - Eventual Consistency
-  - High Persistence
-  </details>
-
-
-  ### Comparison For Write Policies
-| Feature                  | Write-Through                          | Write-Back                                | Write-Around                             |
-|--------------------------|----------------------------------------|--------------------------------------------|------------------------------------------|
-| **Write Location**       | Cache ✅ + Memory ✅                    | Cache ✅ only (Memory updated later)        | Memory ✅ only (Cache bypassed)           |
-| **Read After Write**     | Fast ✅ (data in cache)                | Fast ✅ (data in cache)                     | Slow ❌ (data not in cache yet)           |
-| **Write Latency**        | Slower ❌ (writes go to 2 places)      | Fast ✅ (writes hit cache only)             | Fast ✅                                   |
-| **Cache Pollution**      | Possible ❌ (caches all writes)        | Possible ❌                                 | Avoided ✅ (writes don't pollute cache)   |
-| **Data Consistency**     | High ✅ (always in sync)               | Lower ❌ (risk if cache lost before sync)   | High ✅ (memory is always up to date)     |
-| **Recovery Complexity**  | Low ✅                                 | High ❌ (needs dirty block tracking)        | Low ✅                                     |
-| **Use Case**             | Strong consistency needed             | High write performance, low consistency     | Write-once or infrequently read data     |
+| Feature                 | Write-Through                    | Write-Back                               | Write-Around                           |
+|-------------------------|----------------------------------|------------------------------------------|----------------------------------------|
+| **Write Location**      | Cache ✅ + Memory ✅               | Cache ✅ only (Memory updated later)      | Memory ✅ only (Cache bypassed)         |
+| **Read After Write**    | Fast ✅ (data in cache)           | Fast ✅ (data in cache)                   | Slow ❌ (data not in cache yet)         |
+| **Write Latency**       | Slower ❌ (writes go to 2 places) | Fast ✅ (writes hit cache only)           | Fast ✅                                 |
+| **Cache Pollution**     | Possible ❌ (caches all writes)   | Possible ❌                               | Avoided ✅ (writes don't pollute cache) |
+| **Data Consistency**    | High ✅ (always in sync)          | Lower ❌ (risk if cache lost before sync) | High ✅ (memory is always up to date)   |
+| **Recovery Complexity** | Low ✅                            | High ❌ (needs dirty block tracking)      | Low ✅                                  |
+| **Use Case**            | Strong consistency needed        | High write performance, low consistency  | Write-once or infrequently read data   |
 
 
 
@@ -280,17 +132,28 @@ Write-Around is a caching strategy where write operations bypass the cache and g
 | Logging, rarely read audit trails       | Write-Around               |
 
 
-## Replacement Policy
+## Cache Eviction Policies
 
 Cache replacement policies are strategies used to decide which data to remove from the cache when the cache is full and new data needs to be added.
 
  The goal is to maximize hit rate (how often requested data is found in cache).
 
  - Common Replacement Policies
-   - **LRU (Least Recently Used)** - Removes the least recently accessed item	- General purpose; works well in most cases
-   - **LFU (Least Frequently Used)** - Removes the item used least often - Good when some data is "hotter" than others
-   - **FIFO (First In, First Out)** - Removes the oldest inserted item
+   - **LRU (Least Recently Used)** - LRU evicts the least recently accessed data when the cache is full. It assumes that recently used data will likely be used again soon.
+   - **LFU (Least Frequently Used)** - LFU evicts data that has been accessed the least number of times, under the assumption that rarely accessed data is less likely to be needed.
+   - **FIFO (First In, First Out)** - FIFO evicts the oldest data in the cache first, regardless of how often or recently it has been accessed.
+   - **Time-to-Live (TTL)** - TTL is a time-based eviction policy where data is removed from the cache after a specified duration, regardless of usage.
    - **MRU (Most Recently Used)** - Removes the most recently used item
    - **ARC (Adaptive Replacement Cache)** - Balances between LRU and LFU - Smart choice when workload patterns vary
 
 Memcached used Segmented LRU (LRU+LFU).
+
+---
+## Challenges and Considerations
+
+1. **Cache Coherence**: Ensuring that data in the cache remains consistent with the source of truth (e.g., the database).
+2. **Cache Invalidation**: Determining when and how to update or remove stale data from the cache. 
+3. **Cold Start**: Handling scenarios when the cache is empty, such as after a system restart. 
+4. **Cache Eviction Policies**: Deciding which items to remove when the cache reaches capacity (e.g., Least Recently Used, Least Frequently Used). 
+5. **Cache Penetration**: Preventing malicious attempts to repeatedly query for non-existent data, potentially overwhelming the backend. 
+6. **Cache Stampede**: Managing situations where many concurrent requests attempt to rebuild the cache simultaneously.
