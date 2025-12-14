@@ -7,16 +7,19 @@
   - [What are drawbacks of caching?](#what-are-drawbacks-of-caching)
   - [Placement for Cache in a Distributed System](#placement-for-cache-in-a-distributed-system)
   - [Types of caches](#types-of-caches)
-    - [Local Cache](#local-cache)
-    - [Global Cache](#global-cache)
-  - [Write Policy](#write-policy)
-    - [Cache Aside](#cache-aside)
-    - [Write Back Policy (Write Behind)](#write-back-policy-write-behind)
-    - [Write Through Policy](#write-through-policy)
-    - [Write Around Policy](#write-around-policy)
-    - [Comparison For Write Policies](#comparison-for-write-policies)
-    - [Example Use Cases](#example-use-cases)
-  - [Replacement Policy](#replacement-policy)
+    - [In-Memory Cache](#in-memory-cache)
+    - [Distributed Cache](#distributed-cache)
+    - [Client-Side Cache](#client-side-cache)
+    - [Database Cache](#database-cache)
+    - [Content Delivery Network (CDN)](#content-delivery-network-cdn)
+  - [Caching Strategies](#caching-strategies)
+    - [Read Through](#read-through)
+    - [Cache Aside](#cache-aside-1)
+    - [Write Through](#write-through)
+    - [Write Around](#write-around)
+    - [Write Back](#write-back)
+  - [Cache Eviction Policies](#cache-eviction-policies)
+  - [Challenges and Considerations](#challenges-and-considerations)
 
 
 ## Introduction 
@@ -42,8 +45,6 @@ Two important things for caching are:
   - Avoid repeated communication
   - Reduce DB load
 </details>
-
-  
 
 ## How Caching works?
 The application is responsible for reading and writing from storage. The cache does not interact with storage directly. The application does the following:
