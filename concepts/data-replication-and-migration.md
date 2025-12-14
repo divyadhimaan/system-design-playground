@@ -69,27 +69,28 @@
 - CDC can transform data and has built-in libraries for connecting to various databases, simplifying data replication.
 
 ---
+
 ## Types of Replication
 
 ### 1. Asynchronous Replication
 - Primary node **does not wait** for replicas to acknowledge writes
 - Write is considered successful once committed on the primary
 
-**Flow**
+`Flow`
 - Client → Primary (write)
 - Primary → Replica (later, in background)
 
-**Pros**
+`Pros`
 - Low write latency
 - High throughput
 - Better performance under heavy load
 
-**Cons**
+`Cons`
 - **Replication lag**
 - Risk of **data loss** if primary fails before replicas sync
 - Temporary inconsistency
 
-**Use Cases**
+`Use Cases`
 - Social media feeds
 - Analytics systems
 - Non-critical data
@@ -100,22 +101,22 @@
 - Primary node **waits for replicas** to acknowledge writes
 - Write is successful only after replicas confirm
 
-**Flow**
+`Flow`
 - Client → Primary (write)
 - Primary → Replicas (ack required)
 - Client ← Success
 
-**Pros**
+`Pros`
 - Strong consistency
 - No data loss
 - All replicas are up-to-date
 
-**Cons**
+`Cons`
 - Higher write latency
 - Reduced availability if replicas are slow or down
 - Lower throughput
 
-**Use Cases**
+`Use Cases`
 - Financial systems
 - Banking transactions
 - Critical data systems
@@ -126,21 +127,21 @@
 - Hybrid approach between synchronous and asynchronous
 - Primary waits for **at least one replica** to acknowledge the write
 
-**Flow**
+`Flow`
 - Client → Primary (write)
 - Primary → Replicas
 - At least one ACK required → Client success
 
-**Pros**
+`Pros`
 - Better consistency than async
 - Lower latency than full sync
 - Reduced data loss risk
 
-**Cons**
+`Cons`
 - Still possible replication lag
 - More complex setup
 
-**Use Cases**
+`Use Cases`
 - E-commerce platforms
 - User data with moderate consistency needs
 
