@@ -69,11 +69,11 @@
 
 ## Types of Replication
 
-| Replication Type | Write Acknowledgement                  | Flow Summary                                   | Pros                                     | Cons                                             | Use Cases                                  |
-|------------------|----------------------------------------|------------------------------------------------|------------------------------------------|--------------------------------------------------|--------------------------------------------|
-| Asynchronous     | Primary does NOT wait for replicas     | Client → Primary → Replica (background)        | Low latency, high throughput, performant | Replication lag, data loss risk, inconsistency   | Social feeds, analytics, non-critical data |
-| Synchronous      | Primary waits for ALL replicas         | Client → Primary → Replicas → Client           | Strong consistency, no data loss         | High latency, lower availability, low throughput | Banking, finance, critical systems         |
-| Semi-Synchronous | Primary waits for at least ONE replica | Client → Primary → Replicas → (1 ACK) → Client | Balanced consistency & latency           | Some lag, complex setup                          | E-commerce, user profile data              |
+| Replication Type | Write Acknowledgement                  | Flow Summary                                   | Pros                                                     | Cons                                                             | Use Cases                                                  |
+|------------------|----------------------------------------|------------------------------------------------|----------------------------------------------------------|------------------------------------------------------------------|------------------------------------------------------------|
+| Asynchronous     | Primary does NOT wait for replicas     | Client → Primary → Replica (background)        | - Low latency, <br/>- high throughput, <br/>- performant | - Replication lag, <br/>- data loss risk, <br/>- inconsistency   | - Social feeds, <br/- >analytics, <br/>- non-critical data |
+| Synchronous      | Primary waits for ALL replicas         | Client → Primary → Replicas → Client           | - Strong consistency, <br/>- no data loss                | - High latency, <br/>- lower availability, <br/>- low throughput | - Banking, <br/>- finance, <br/>- critical systems         |
+| Semi-Synchronous | Primary waits for at least ONE replica | Client → Primary → Replicas → (1 ACK) → Client | - Balanced consistency, <br/>- latency                   | - Some lag, <br/>- complex setup                                 | - E-commerce, <br/>- user profile data                     |
 
 
 ### Quick Comparison
