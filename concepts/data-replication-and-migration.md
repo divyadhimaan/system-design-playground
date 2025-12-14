@@ -7,6 +7,12 @@
   - [How does Primary-Replica Architecture work?](#how-does-primary-replica-architecture-work)
     - [WAL - Write Ahead Log](#wal---write-ahead-log)
     - [CDC - Change Data Capture](#cdc---change-data-capture)
+  - [Types of Replication](#types-of-replication)
+    - [Asynchronous Replication](#1-asynchronous-replication)
+    - [Synchronous Replication](#2-synchronous-replication)
+    - [Semi-Synchronous Replication](#3-semi-synchronous-replication)
+    - [Quick Comparison](#quick-comparison)
+    - [Interview Tip](#interview-tip)
   - [Challenges](#challenges)
     - [Split brain Problem](#split-brain-problem)
     - [Write Amplification](#write-amplification)
@@ -17,25 +23,19 @@
 
 ## Database Replication
 
-Clients connect to a server that hosts a database.
-- The database is prone to failures due to various reasons (e.g., hardware issues, crashes).
-- To ensure availability and reliability, a replica (backup) of the original database is created.
+> Replication is the process of creating and maintaining multiple copies of the same data on different servers, known as replicas.
 
-- Write requests are sent only to the primary database to maintain data consistency and then copied over to replica as well.
-- Read requests can be handled by both the primary and the replica databases.
-- This replication strategy is especially beneficial for read-intensive applications, where write operations are relatively infrequent.
-- It helps in load balancing and improves read performance.
 
-### Pros
+## Why Replication is needed?
 
-- fault Tolerance
-- Improved read speed
-- Simple to implement
+| Goal                     | Description                              | Example                                 |
+|--------------------------|------------------------------------------|-----------------------------------------|
+| High Availability        | Keep service running when one node fails | Primary DB crashes → replica takes over |
+| Read Scalability         | Distribute read load                     | Multiple app servers query replicas     |
+| Disaster Recovery        | Maintain cross-region backups            | US → EU replication                     |
+| Fault Tolerance          | Survive hardware or network failures     | Leader crash → follower promotion       |
+| Geo Latency Optimization | Serve users from nearby replicas         | India users read from APAC replica      |
 
-### Cons
-
-- potential `consistency` issues if there are in-flight messages
-- slightly `slower write speeds` due to the added complexity
 
 
 ## How does Primary-Replica Architecture work?
@@ -43,6 +43,11 @@ Clients connect to a server that hosts a database.
  Initially, both databases are in the same state, and complex operations are copied onto both of them. 
  
  When a new write operation occurs on the primary, it is sent to the replica for synchronization.
+
+- Write requests are sent only to the primary database to maintain data consistency and then copied over to replica as well.
+- Read requests can be handled by both the primary and the replica databases.
+- This replication strategy is especially beneficial for read-intensive applications, where write operations are relatively infrequent.
+- It helps in load balancing and improves read performance.
 
 ### WAL - Write Ahead Log 
 
@@ -65,6 +70,101 @@ Clients connect to a server that hosts a database.
 - This is particularly useful when you have different types of databases, some optimized for writes and others for reads. 
   
 - CDC can transform data and has built-in libraries for connecting to various databases, simplifying data replication.
+
+---
+## Types of Replication
+
+### 1. Asynchronous Replication
+- Primary node **does not wait** for replicas to acknowledge writes
+- Write is considered successful once committed on the primary
+
+**Flow**
+- Client → Primary (write)
+- Primary → Replica (later, in background)
+
+**Pros**
+- Low write latency
+- High throughput
+- Better performance under heavy load
+
+**Cons**
+- **Replication lag**
+- Risk of **data loss** if primary fails before replicas sync
+- Temporary inconsistency
+
+**Use Cases**
+- Social media feeds
+- Analytics systems
+- Non-critical data
+
+---
+
+### 2. Synchronous Replication
+- Primary node **waits for replicas** to acknowledge writes
+- Write is successful only after replicas confirm
+
+**Flow**
+- Client → Primary (write)
+- Primary → Replicas (ack required)
+- Client ← Success
+
+**Pros**
+- Strong consistency
+- No data loss
+- All replicas are up-to-date
+
+**Cons**
+- Higher write latency
+- Reduced availability if replicas are slow or down
+- Lower throughput
+
+**Use Cases**
+- Financial systems
+- Banking transactions
+- Critical data systems
+
+---
+
+### 3. Semi-Synchronous Replication
+- Hybrid approach between synchronous and asynchronous
+- Primary waits for **at least one replica** to acknowledge the write
+
+**Flow**
+- Client → Primary (write)
+- Primary → Replicas
+- At least one ACK required → Client success
+
+**Pros**
+- Better consistency than async
+- Lower latency than full sync
+- Reduced data loss risk
+
+**Cons**
+- Still possible replication lag
+- More complex setup
+
+**Use Cases**
+- E-commerce platforms
+- User data with moderate consistency needs
+
+---
+
+### Quick Comparison
+
+| Type              | Latency | Consistency | Data Loss Risk | Availability |
+|-------------------|---------|-------------|----------------|--------------|
+| Asynchronous      | Low     | Weak        | High           | High         |
+| Synchronous       | High    | Strong      | None           | Lower        |
+| Semi-Synchronous  | Medium  | Medium      | Low            | Medium |
+
+---
+
+### Interview Tip
+- Choose **Async** for performance
+- Choose **Sync** for correctness
+- Choose **Semi-sync** for balanced systems
+
+---
 
 
 ## Challenges
