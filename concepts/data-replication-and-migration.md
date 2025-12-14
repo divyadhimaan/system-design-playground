@@ -1,30 +1,29 @@
 # Data Replication and Migration
 
-- [Data Replication and Migration](#data-replication-and-migration)
-  - [Database Replication](#database-replication)
-    - [Pros](#pros)
-    - [Cons](#cons)
-  - [How does Primary-Replica Architecture work?](#how-does-primary-replica-architecture-work)
-    - [WAL - Write Ahead Log](#wal---write-ahead-log)
-    - [CDC - Change Data Capture](#cdc---change-data-capture)
-  - [Types of Replication](#types-of-replication)
-    - [Asynchronous Replication](#1-asynchronous-replication)
-    - [Synchronous Replication](#2-synchronous-replication)
-    - [Semi-Synchronous Replication](#3-semi-synchronous-replication)
-    - [Quick Comparison](#quick-comparison)
-    - [Interview Tip](#interview-tip)
-  - [Challenges](#challenges)
-    - [Split brain Problem](#split-brain-problem)
-    - [Write Amplification](#write-amplification)
-  - [Database](#database)
-    - [Migration Approaches](#migration-approaches)
-      - [Naive](#naive)
-      - [Optimised](#optimised)
+- [Database Replication](#database-replication)
+- [Why Replication is needed?](#why-replication-is-needed)
+- [How does Primary-Replica Architecture work?](#how-does-primary-replica-architecture-work)
+  - [WAL - Write Ahead Log](#wal---write-ahead-log)
+  - [CDC - Change Data Capture](#cdc---change-data-capture)
+- [Types of Replication](#types-of-replication)
+  - [Asynchronous Replication](#1-asynchronous-replication)
+  - [Synchronous Replication](#2-synchronous-replication)
+  - [Semi-Synchronous Replication](#3-semi-synchronous-replication)
+  - [Quick Comparison](#quick-comparison)
+  - [Interview Tip](#interview-tip)
+- [Challenges](#challenges)
+  - [Split brain Problem](#split-brain-problem)
+  - [Write Amplification](#write-amplification)
+- [Database](#database)
+  - [Migration Approaches](#migration-approaches)
+    - [Naive](#naive)
+    - [Optimised](#optimised)
 
 ## Database Replication
 
 > Replication is the process of creating and maintaining multiple copies of the same data on different servers, known as replicas.
 
+---
 
 ## Why Replication is needed?
 
@@ -35,8 +34,6 @@
 | Disaster Recovery        | Maintain cross-region backups            | US → EU replication                     |
 | Fault Tolerance          | Survive hardware or network failures     | Leader crash → follower promotion       |
 | Geo Latency Optimization | Serve users from nearby replicas         | India users read from APAC replica      |
-
-
 
 ## How does Primary-Replica Architecture work?
 
