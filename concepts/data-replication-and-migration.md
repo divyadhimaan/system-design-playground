@@ -72,88 +72,20 @@
 
 ## Types of Replication
 
-### 1. Asynchronous Replication
-- Primary node **does not wait** for replicas to acknowledge writes
-- Write is considered successful once committed on the primary
+| Replication Type | Write Acknowledgement                  | Flow Summary                                   | Pros                                     | Cons                                             | Use Cases                                  |
+|------------------|----------------------------------------|------------------------------------------------|------------------------------------------|--------------------------------------------------|--------------------------------------------|
+| Asynchronous     | Primary does NOT wait for replicas     | Client → Primary → Replica (background)        | Low latency, high throughput, performant | Replication lag, data loss risk, inconsistency   | Social feeds, analytics, non-critical data |
+| Synchronous      | Primary waits for ALL replicas         | Client → Primary → Replicas → Client           | Strong consistency, no data loss         | High latency, lower availability, low throughput | Banking, finance, critical systems         |
+| Semi-Synchronous | Primary waits for at least ONE replica | Client → Primary → Replicas → (1 ACK) → Client | Balanced consistency & latency           | Some lag, complex setup                          | E-commerce, user profile data              |
 
-`Flow`
-- Client → Primary (write)
-- Primary → Replica (later, in background)
-
-`Pros`
-- Low write latency
-- High throughput
-- Better performance under heavy load
-
-`Cons`
-- **Replication lag**
-- Risk of **data loss** if primary fails before replicas sync
-- Temporary inconsistency
-
-`Use Cases`
-- Social media feeds
-- Analytics systems
-- Non-critical data
-
----
-
-### 2. Synchronous Replication
-- Primary node **waits for replicas** to acknowledge writes
-- Write is successful only after replicas confirm
-
-`Flow`
-- Client → Primary (write)
-- Primary → Replicas (ack required)
-- Client ← Success
-
-`Pros`
-- Strong consistency
-- No data loss
-- All replicas are up-to-date
-
-`Cons`
-- Higher write latency
-- Reduced availability if replicas are slow or down
-- Lower throughput
-
-`Use Cases`
-- Financial systems
-- Banking transactions
-- Critical data systems
-
----
-
-### 3. Semi-Synchronous Replication
-- Hybrid approach between synchronous and asynchronous
-- Primary waits for **at least one replica** to acknowledge the write
-
-`Flow`
-- Client → Primary (write)
-- Primary → Replicas
-- At least one ACK required → Client success
-
-`Pros`
-- Better consistency than async
-- Lower latency than full sync
-- Reduced data loss risk
-
-`Cons`
-- Still possible replication lag
-- More complex setup
-
-`Use Cases`
-- E-commerce platforms
-- User data with moderate consistency needs
-
----
 
 ### Quick Comparison
 
-| Type              | Latency | Consistency | Data Loss Risk | Availability |
-|-------------------|---------|-------------|----------------|--------------|
-| Asynchronous      | Low     | Weak        | High           | High         |
-| Synchronous       | High    | Strong      | None           | Lower        |
-| Semi-Synchronous  | Medium  | Medium      | Low            | Medium |
+| Type             | Latency | Consistency | Data Loss Risk | Availability |
+|------------------|---------|-------------|----------------|--------------|
+| Asynchronous     | Low     | Weak        | High           | High         |
+| Synchronous      | High    | Strong      | None           | Lower        |
+| Semi-Synchronous | Medium  | Medium      | Low            | Medium       |
 
 ---
 
