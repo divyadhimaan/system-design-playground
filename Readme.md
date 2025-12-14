@@ -12,19 +12,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [How to Use This Repo](#how-to-use-this-repo)
 - [Contributing](#contributing)
 - [Glossary](#glossary)
-  - [CAP Theorem (Brewer's Theorem)](#cap-theorem-brewers-theorem)
-    - [CP - consistency and partition tolerance](#cp---consistency-and-partition-tolerance)
-    - [AP - availability and partition tolerance](#ap---availability-and-partition-tolerance)
-  - [ACID Properties](#acid-properties)
-  - [Consistent Hashing](#consistent-hashing)
-  - [FFMPEG](#ffmpeg)
-  - [AVI](#avi)
-  - [Homebrew](#homebrew)
-  - [HLS](#hls)
-  - [DASH](#dash)
-  - [PSTN (Public Switched Telephone Network)](#pstn-public-switched-telephone-network)
-  - [VoIP (Voice over Internet Protocol)](#voip-voice-over-internet-protocol)
-  - [SIP (Session Initiation Protocol)](#sip-session-initiation-protocol)
+- [Key Differences](#key-differences)
 
 ## Concepts
 - [Scalability: Basics](./concepts/scalability.md)
@@ -91,6 +79,24 @@ This is a personal learning repo, but feel free to open issues or PRs if you spo
 
 ## Glossary
 
+- [Latency](#latency)
+- [Throughput](#throughput)
+- [CAP Theorem (Brewer's Theorem)](#cap-theorem-brewers-theorem)
+  - [CP - consistency and partition tolerance](#cp---consistency-and-partition-tolerance)
+  - [AP - availability and partition tolerance](#ap---availability-and-partition-tolerance)
+- [ACID Properties](#acid-properties)
+- [Consistent Hashing](#consistent-hashing)
+- [FFMPEG](#ffmpeg)
+- [AVI](#avi)
+- [Homebrew](#homebrew)
+- [HLS](#hls)
+- [DASH](#dash)
+- [PSTN (Public Switched Telephone Network)](#pstn-public-switched-telephone-network)
+- [VoIP (Voice over Internet Protocol)](#voip-voice-over-internet-protocol)
+- [SIP (Session Initiation Protocol)](#sip-session-initiation-protocol)
+- [NTP (Network Time Protocol)](#ntp-network-time-protocol)
+- [Redis Lua Scripts](#redis-lua-scripts)
+- 
 ### Latency
 Latency refers to the time it takes for a request to travel from its point of origin to its destination and receive a response. 
 It combines a number of delays - Response times, transmission, and processing time.
