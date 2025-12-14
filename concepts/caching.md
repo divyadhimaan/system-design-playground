@@ -227,3 +227,7 @@ Memcached used Segmented LRU (LRU+LFU).
 4. **Cache Eviction Policies**: Deciding which items to remove when the cache reaches capacity (e.g., Least Recently Used, Least Frequently Used). 
 5. **Cache Penetration**: Preventing malicious attempts to repeatedly query for non-existent data, potentially overwhelming the backend. 
 6. **Cache Stampede**: Managing situations where many concurrent requests attempt to rebuild the cache simultaneously.
+
+---
+
+[Back to Concepts](../Readme.md#concepts)

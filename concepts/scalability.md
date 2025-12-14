@@ -111,3 +111,8 @@
 ### Data Partitioning Trade-offs
 - Partitioning improves scalability by distributing data across nodes.
 - Trade-offs include selecting the right partition key, balancing shard sizes, ensuring data locality, and minimizing cross-shard communication.
+
+
+---
+
+[Back to Concepts](../Readme.md#concepts)
