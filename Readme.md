@@ -86,6 +86,7 @@ This is a personal learning repo, but feel free to open issues or PRs if you spo
   - [AP - availability and partition tolerance](#ap---availability-and-partition-tolerance)
 - [ACID Properties](#acid-properties)
 - [Consistent Hashing](#consistent-hashing)
+- [Sharding](#sharding)
 - [FFMPEG](#ffmpeg)
 - [AVI](#avi)
 - [Homebrew](#homebrew)
@@ -156,6 +157,24 @@ ACID is a set of properties that ensure reliable, consistent, and safe transacti
 Consistent Hashing maps servers to the key space and assigns requests(mapped to relevant buckets, called load) to the next clockwise server. Servers can then store relevant request data in them while allowing the system flexibility and scalability.
 
 ---
+
+### Sharding
+
+- Database sharding is a horizontal scaling technique used to split a large database into smaller, independent pieces called shards.
+- These shards are then distributed across multiple servers or nodes, each responsible for handling a specific subset of the data.
+
+- The sharding process involves several key components including:
+  - **Sharding Key**: The shard key is a unique identifier used to determine which shard a particular piece of data belongs to. It can be a single column or a combination of columns. 
+  - **Data Partitioning**: Partitioning involves splitting the data into shards based on the shard key. Each shard represents a portion of the total data set. Common strategies to partition database are range-based, hash-based, and directory-based sharding. 
+  - **Shard Mapping**: Creating a mapping of shard keys to shard locations. 
+  - **Shard Management**: The shard manager oversees the distribution of data across shards, ensuring data consistency and integrity. 
+  - **Query Routing**: The query router intercepts incoming queries and directs them to the appropriate shard(s) based on the shard key.
+- Sharding Strategies
+  - Hash-Based Sharding: Data is distributed using a hash function, which maps data to a specific shard.
+  - Range-Based Sharding: Data is distributed based on a range of values, such as dates or numbers.
+  - Geo-Based Sharding: Data is distributed based on geographic location, allowing for improved performance and reduced latency for users in different regions.
+  - Directory-Based Sharding: A lookup table is used to map data to specific shards.
+
 ### FFMPEG
 FFmpeg is a powerful, free, and open-source multimedia framework used for decoding, encoding, transcoding, and streaming audio and video files.
 
