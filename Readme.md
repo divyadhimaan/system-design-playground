@@ -97,7 +97,6 @@ This is a personal learning repo, but feel free to open issues or PRs if you spo
 - [SIP (Session Initiation Protocol)](#sip-session-initiation-protocol)
 - [NTP (Network Time Protocol)](#ntp-network-time-protocol)
 - [Redis Lua Scripts](#redis-lua-scripts)
-- 
 ### Latency
 Latency refers to the time it takes for a request to travel from its point of origin to its destination and receive a response. 
 It combines a number of delays - Response times, transmission, and processing time.
