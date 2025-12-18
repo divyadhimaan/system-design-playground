@@ -84,7 +84,7 @@ E.g. if the last seen of user X is 3sec and the threshold is 5sec then other use
 - Once the session service has the list of users it finds the gateway services that the users are connected to and then sends the message.
 > Note: We should also limit the number of users in a group. If there are a lot of users then it can cause a fanout. We can ask the client applications to pull new messages from our system but our messages won't be real-time in such case.
 - We do not want the gateway service to parse messages because we want to minimize the memory usage and maximize the TCP connections. So we will use a `message parser` to convert the unparsed to sensible message.
-- We have a mapping of groupID to userlD. This is one-many relationships. Group messaging service has multiple servers so there can be data redundancy. To reduce redundancy we use `consistent hashing`. We hash the groupID and send the request to the server according to the result.
+- We have a mapping of groupID to userID. This is one-many relationships. Group messaging service has multiple servers so there can be data redundancy. To reduce redundancy we use `consistent hashing`. We hash the groupID and send the request to the server according to the result.
 - We also need to use a `message queue` in case there are any failures while sending requests.
 - Once we give a request to the message queue it ensures that message will be sent. If we reach the maximum number of retries it tells the sender that it failed and we can notify the user.
 
