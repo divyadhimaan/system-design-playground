@@ -49,8 +49,6 @@
 - Push notifications for new messages
 
 
-
-
 ## One to One Chat
 
 - Whenever users want to send a message they send a request to our server. This request is received by the gateway service. Then the client applications maintain a TCP Connection with the gateway service to send messages.
