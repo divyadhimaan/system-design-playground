@@ -38,7 +38,7 @@
 > Interviewer: Forever.
 
 
-## Requirements
+### Requirements
 - One to One Chat with low delivery latency
 - Group Messaging (max of 100 people)
 - Sent + Delivered + Read Receipts
@@ -49,48 +49,128 @@
 - Push notifications for new messages
 
 
-## One to One Chat
+## Step 2: High Level Design
 
-- Whenever users want to send a message they send a request to our server. This request is received by the gateway service. Then the client applications maintain a TCP Connection with the gateway service to send messages.
-- Once the server sends the message to the recipient, our system must also notify the sender that the message has been delivered. So we also send a parallel response to the sender that the message has been delivered. 
-- (Note: To ensure that message will be delivered we store the message in the database and keep retrying till the recipient gets the message.) This takes care of `Sent receipts`.
-- When the recipient receives the message it sends a response (or acknowledgment) to our system.
-- This response is then routed to session service. It finds the sender from the mapping and sends the `Delivery receipts`.
-- The process to send the `Read receipts` is also the same. As soon as the user reads the message we perform the above process.
+- How clients and servers will communicate?
+  - Clients do not communicate directly. All communication is done via our chat servers.
+  - Functions supported
+    - Receive messages from other clients
+    - Find recipient and relay the message
+    - if recipient is not online, hold the message and deliver it when the recipient comes online.
+    - `SENDER --> CHAT SERVICE (store message / relay message) --> RECIPIENT`
+- When client starts a chat, it connects to chat service using a network protocol.
 
-### Components
+---
 
-- Gateway Service
-  - Multiple Servers
-  - Receives all requests from users
-  - Maintain TCP connection with users
-- Session Service
-  - Gateway service is also distributed. So if we want to send messages from one user to another we must know which user is connected to which gateway server. This is handled by session service.
-It maps each user (userlD) to the particular gateway server.
-- Database
-  - For storing messages
+---
+
+### Network Protocol
+- HTTP Protocol
+  - Client sends HTTP request to server to send a message.
+  - Server responds with HTTP response.
+  - Keep alive allows persistent connections and reduces TCP handshake overhead.
+  - Problem: HTTP is stateless and unidirectional. Server cannot send messages to clients unless clients poll the server.
+
+#### How to handle receiver side communication?
+- **Option 1: Polling**
+  - Client sends HTTP request to server to check for new messages.
+  - Server responds with new messages or empty response.
+  - Problem: Polling introduces latency, is costly and increases server load.
+  ![polling](../../images/whatsapp-design/polling.png)
+- **Option 2: Long Polling**
+  - Client sends HTTP request to server to check for new messages.
+  - Server holds the request until new messages arrive or timeout occurs.
+  - Server responds with new messages or empty response.
+  - Client immediately sends another request after receiving response.
+  - Problem: Still has overhead of HTTP and not truly bidirectional.
+  ![long-polling](../../images/whatsapp-design/long-polling.png)
+- **Option 3: WebSockets (WSS)**
+  - Starts as a HTTP handshake and then upgrades to WebSocket protocol.
+  - Both client and server can send messages to each other at any time.
+  - works even with firewalls and proxies as it uses standard HTTP ports (80 and 443).
+  - Low latency and efficient for real-time communication.
+  - Industry standard for chat applications.
+  ![websockets](../../images/whatsapp-design/websocket.png)
+
+---
+
+### High Level Architecture
+- Clients connect to Chat Service using WebSockets.
+- Other features like sign up, login, user profile etc use REST APIs (HTTP) via Load Balancer to Web Servers.
+
+- Chat system has 3 main components
+  - **Stateless Services**
+    - Public facing request/response services
+    - Used to manage login, signup, user profile, etc.
+    - Load Balancer + Web Servers
+    - Can be monolithic or microservices based
+    - Can be integrated with 3rd party services like OAuth, SMS gateway, Email service, etc.
+    - Example - Service Discovery, API Gateway, Auth Service
+  - **Stateful Services**
+    - Chat Service is the only stateful service
+    - Because each client maintains a persistent WebSocket connection with Chat Service
+    - Client normally doesn't switch Chat Service servers during a session
+    - Service discovery is needed to find the right Chat Service server
+  - **Third Party Integrations**
+    - Push Notification Service for offline message alerts
+    - Distributed File Storage for media files (images, audio, video)
+    - CDN for faster media file delivery
 
 
 
-### Tradeoffs
+  ![components](../../images/whatsapp-design/components.png)
 
-#### Storing the mapping in gateway service v/s Storing it in session service
-  - If we store the mapping in the gateway service then we can access it faster. To get the mappings from the session service we have to make a network call.
-  - Gateway services have limited memory. If we store the mapping of the gateway we have to reduce the number of TCP connections.
-  - Gateway service is distributed. So there are multiple servers. In that case, there will be a lot of duplication. Also every time there is an update we have to update the data on every server.
-  - So we can conclude that storing the mapping in the session service is a better idea.
-  
-#### Using HTTP for messaging v/s Websockets (WSS)
-  - HTTP can only send messages from client to server. The only way we can allow messaging is by constantly sending a request to the server to check if there is any new message (Long Polling).
-  - WSS is a peer-to-peer protocol that allows clients and servers to send messages to each other.
+---
 
-#### TCP/WebSocket v/s P2P connection
-  - For general chat applications, WebSocket (TCP) via a gateway/server is the preferred and industry-standard choice.
-  - P2P is better suited for specialized cases like video/audio streaming using WebRTC where lower latency is critical and the connection is temporary.
+### Architecture Diagram
 
-### Diagram
-![Alt text](./../../diagrams/wa-1.png)
+- Chat servers are distributed behind a Load Balancer.
+- Clients connect to Chat Service using WebSockets which facilitate bidirectional communication.
+- Presence servers manage online/last seen status.
+- API servers handle REST API requests for non-chat features.
+- Notification servers send push notifications.
+- Key-value store is used to store chat history and user data.
 
+
+  ![high-level-design](../../images/whatsapp-design/high-level-architecture.png)
+
+---
+
+### Storage Design
+> Q: Which database to use? (Relational database / NoSQL database) 
+
+- Two types of data exists in chat system
+  - Generic data: user profile, contacts, groups, etc.
+    - Structured data with relationships
+    - Requires ACID transactions
+  > _Relational database_ is suitable
+  - Chat data: chat history/messages, media files, etc.
+    - Enormous volume of unstructured data
+    - Requires high write throughput and low latency reads
+    - Only recent chats are accessed frequently
+    - Users might use features that need random access of data like search, view mentions, jump to specific message, etc.
+  > _Key-value store_ is suitable.
+
+#### Why key-value store for chat data?
+- Easy horizontal scaling by sharding data across multiple nodes.
+- Very low latency for reads/writes.
+- Relational databases dont handle long chat histories well.
+- Adopted by facebook messenger (HBase) and discord (Cassandra).
+
+
+---
+### Data Model
+- Message Table for 1:1 chats
+  - Primary Key: (message_id)
+  - messageId decided message sequence 
+  ![data-model-personal-chat](../../images/whatsapp-design/data-model-1-1.png)
+- GroupMessage Table for group chats
+  - Primary Key: (channel_id, message_id)
+  - 
+  ![data-model-group-chat](../../images/whatsapp-design/data-model-1-many.png)
+
+> Q: How to generate message_id?
+> - message_id ensures ordering of messages. It should satisfy
 
 ---
 
@@ -165,6 +245,17 @@ E.g. if the last seen of user X is 3sec and the threshold is 5sec then other use
 - Store File url in DB
 > We Use Distributed File System
 
+
+
+### Tradeoffs
+
+#### Using HTTP for messaging v/s Websockets (WSS)
+- HTTP can only send messages from client to server. The only way we can allow messaging is by constantly sending a request to the server to check if there is any new message (Long Polling).
+- WSS is a peer-to-peer protocol that allows clients and servers to send messages to each other.
+
+#### TCP/WebSocket v/s P2P connection
+- For general chat applications, WebSocket (TCP) via a gateway/server is the preferred and industry-standard choice.
+- P2P is better suited for specialized cases like video/audio streaming using WebRTC where lower latency is critical and the connection is temporary.
 
 
 ## Optimizations
