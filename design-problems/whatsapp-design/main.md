@@ -137,7 +137,7 @@
 ---
 
 ### Storage Design
-> Q: Which database to use? (Relational database / NoSQL database) 
+> Question: Which database to use? (Relational database / NoSQL database) 
 
 - Two types of data exists in chat system
   - Generic data: user profile, contacts, groups, etc.
@@ -169,8 +169,16 @@
   - 
   ![data-model-group-chat](../../images/whatsapp-design/data-model-1-many.png)
 
-> Q: How to generate message_id?
-> - message_id ensures ordering of messages. It should satisfy
+> Question: How to generate message_id?
+> - message_id ensures ordering of messages. It should satisfy the following properties:
+>   - IDs must be unique
+>   - IDs must be sortable by creation time
+> 
+> - Option 1: Use **Auto-incrementing IDs** in mysql
+> - Option 2: Use **global 64-bit sequence number generator** like Twitter Snowflake
+> - Option 3: Use **Local sequence number generator**. Local Ids are only unique per user or per group. 
+> 
+> Finally, option 3 is used as maintaining message sequence within one-on-one channel or group channel is sufficient. Combine with userID/groupID to get global uniqueness (if needed).
 
 ---
 
