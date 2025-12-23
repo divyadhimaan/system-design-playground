@@ -208,7 +208,14 @@
 
 ---
 
+## Step 3: Detailed Design
 
+- There are 3 main components we need to design in detail
+  - Service Discovery
+  - messaging flow
+  - Presence Service
+
+### 
 
 ### Tradeoffs
 
