@@ -399,7 +399,7 @@ message ID on the device.
 
 ---
 
-### End to End Encryption
+### End-to-End Encryption
 - WhatsApp uses end-to-end encryption (E2EE) for one-to-one chats and calls. 
 - Messages are encrypted on the sender’s device before being sent. 
 - Only the sender and the intended recipient possess the keys to decrypt the message. 
