@@ -34,7 +34,6 @@ This repository contains notes, diagrams, and code snippets created while learni
 ## System Design Problems
 - [Email Service](./design-problems/emailing-service/main.md)
 - [Tinder Design - Recommendation](./design-problems/tinder/main.md)
-- [Whatsapp Design - Chat Application](./design-problems/whatsapp-design/main.md)
 - [Google Docs - Collaborative Editor Design](./design-problems/google-docs/main.md)
 - [Uber - Cab Aggregator App](./design-problems/uber/main.md)
 - [Workflow Management and Recommendation](./design-problems/workflow-management/main.md)
@@ -47,6 +46,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Design a Web Crawler](./design-problems/web-crawler/main.md)
 - [Design a Notification System](./design-problems/notification-system/main.md)
 - [Design a News Feed System](./design-problems/news-feed-system/main.md)
+- [Design a Chat Application](./design-problems/whatsapp-design/main.md)
 
 ## Interview Related Resources
 - [Database Selection](./concepts/interview-specific/database-selection.md)
