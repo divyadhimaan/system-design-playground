@@ -212,10 +212,41 @@
 
 - There are 3 main components we need to design in detail
   - Service Discovery
-  - messaging flow
+  - Messaging flow
   - Presence Service
 
-### 
+### Service Discovery
+
+- recommends best chat server to client based on various factors (geographical location, server capacity, etc)
+- Apache Zookeeper: open source solution
+- Registers all chat servers and picks best one for client.
+
+![img.png](../../images/whatsapp-design/service-discover.png)
+
+---
+
+### Message Flows
+
+#### 1 on 1 chat flow
+
+![img.png](../../images/whatsapp-design/1-1-message-flow.png)
+
+1. User A sends a chat message to Chat server 1.
+2. Chat server 1 obtains a message ID from the ID generator.
+3. Chat server 1 sends the message to the message sync queue.
+4. The message is stored in a key-value store.
+5. Checks presence status 
+   1. If User B is online, the message is forwarded to Chat server 2 where User B is
+         connected. 
+   2. If User B is offline, a push notification is sent from push notification (PN) servers.
+6. Chat server 2 forwards the message to User B. There is a persistent WebSocket
+   connection between User B and Chat server 2.
+
+### Message Synchronization Across Devices
+
+![img.png](../../images/whatsapp-design/message-sync.png)
+
+
 
 ### Tradeoffs
 
