@@ -242,7 +242,7 @@
 6. Chat server 2 forwards the message to User B. There is a persistent WebSocket
    connection between User B and Chat server 2.
 
-### Message Synchronization Across Devices
+#### Message Synchronization Across Devices
 Let's suppose user A has two devices: a phone and a laptop.
 
 ![img.png](../../images/whatsapp-design/message-sync.png)
@@ -257,6 +257,62 @@ message ID on the device.
   
 - With distinct _cur_max_message_id_ on each device, message synchronization is easy as each device can get new messages from the KV store.
 
+#### Small group chat flow
+
+![img.png](../../images/whatsapp-design/group-chat-flow.png)
+
+- When User A sends a message in a group chat. 
+- Assume there are 3 members in the group (User A, User B and user C). 
+- First, the message from User A is copied to each group member’s message sync queue: one for User B and the second for User C. 
+- You can think of the message sync queue as an inbox for a recipient. 
+- This design choice is good for small group chat because:
+  - it simplifies message sync flow as each client only needs to check its own inbox to get
+  new messages.
+  - when the group number is small, storing a copy in each recipient’s inbox is not too
+  expensive.
+- WeChat uses a similar approach, and it limits a group to 500 members. 
+> However, for groups with a lot of users, storing a message copy for each member is not acceptable.
+  
+- On the recipient side, a recipient can receive messages from multiple users. 
+- Each recipient has an inbox (message sync queue) which contains messages from different senders.
+
+---
+
+### Online Presence 
+- Managing online status and communicating with clients via websockets.
+- Following flows trigger status change
+  - User login
+  - User logout
+  - User disconnection
+
+#### User Login
+- After a websocket connection is built between client and real-time service, User A's online status and last_active_at timestamp are saved in KV store.
+![login](../../images/whatsapp-design/login-user.png)
+
+#### User Logout
+- When user logs out, it goes through API servers.
+- The status is changed in KV store.
+
+![logout](../../images/whatsapp-design/logout-user.png)
+
+#### User Disconnection
+- When user disconnects from internet, persistent connection is lost.
+- We can change status in KV store, and change back when user connects.
+- **Problem**: But this would lead to poor user experience, as in case of bad internet the presence indicator will change too often.
+- **Solution**: Heartbeat Mechanism can be used here.
+  - Periodically, an online client sends a heartbeat event to presence servers. 
+  - If presence servers receive a heartbeat event within a certain time, say x seconds from the client, a user is considered as online. 
+  - Otherwise, it is offline.
+
+![disconnection](../../images/whatsapp-design/heartbeat-user-disconnection.png)
+
+
+#### Online Status Fanout
+
+- How would user A know about status change?
+- Presence servers use publish-subscribe model, in which each friend pair maintains a connection.
+
+![online-status-fanout](../../images/whatsapp-design/status-fanout.png)
 
 ### Tradeoffs
 
