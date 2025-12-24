@@ -266,6 +266,7 @@ message ID on the device.
 
 #### User Login
 - After a websocket connection is built between client and real-time service, User A's online status and last_active_at timestamp are saved in KV store.
+
 ![login](../../images/whatsapp-design/login-user.png)
 
 #### User Logout
