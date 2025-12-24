@@ -1,7 +1,5 @@
 # Whatsapp - Chat Application
 
-> Check the final architecture Diagram [here](./final-architecture.png)
-
 
 ## Step 1: Understand problem statement and requirements
 
