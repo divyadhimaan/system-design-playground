@@ -76,21 +76,24 @@
   - Client sends HTTP request to server to check for new messages.
   - Server responds with new messages or empty response.
   - Problem: Polling introduces latency, is costly and increases server load.
-  ![polling](../../images/whatsapp-design/polling.png)
+  
+![polling](../../images/whatsapp-design/polling.png)
 - **Option 2: Long Polling**
   - Client sends HTTP request to server to check for new messages.
   - Server holds the request until new messages arrive or timeout occurs.
   - Server responds with new messages or empty response.
   - Client immediately sends another request after receiving response.
   - Problem: Still has overhead of HTTP and not truly bidirectional.
-  ![long-polling](../../images/whatsapp-design/long-polling.png)
+  
+![long-polling](../../images/whatsapp-design/long-polling.png)
 - **Option 3: WebSockets (WSS)**
   - Starts as a HTTP handshake and then upgrades to WebSocket protocol.
   - Both client and server can send messages to each other at any time.
   - works even with firewalls and proxies as it uses standard HTTP ports (80 and 443).
   - Low latency and efficient for real-time communication.
   - Industry standard for chat applications.
-  ![websockets](../../images/whatsapp-design/websocket.png)
+
+![websockets](../../images/whatsapp-design/websocket.png)
 
 ---
 
