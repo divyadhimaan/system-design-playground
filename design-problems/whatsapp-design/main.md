@@ -183,31 +183,6 @@
 ---
 
 
-### Sending Images, Audio, Video Files
-
-- We can use a distributed file service to store the files as they are much more efficient and cost-effective compared to storing images as BLOBs in a database. 
-- Every time a user sends an image we can store it in the file service and when we can get the image when we need to send it.
-
-
-#### Features provided by database when store images as BLOB
-
-| Feature               | Requirement                                                                                                                                                                                        | 
-|-----------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Mutability            | When we store an image as a BLOB in database we can change its value. However, this is useless as because an update on image is not going to be a few bits. We can simply create a new image file. |
-| Transaction Guarantee | We are not going to do an atomic operation on the image. So this feature is useless.                                                                                                               | 
-| Indexes               | We are not going to search image by its content (which is just O's and 1's) so, this is useless.                                                                                                   | 
-| Access control        | Storing images as BLOB's in database provides us access control, but we can achieve the same mechanisms using the file system.                                                                     |
-
-
-#### Why file is better
-- File is cheaper
-- faster as store large files seperately
-- Use CDNs for faster access, since files are static
-- Store File url in DB
-> We Use Distributed File System
-
----
-
 ## Step 3: Detailed Design
 
 - There are 3 main components we need to design in detail
@@ -314,6 +289,112 @@ message ID on the device.
 
 ![online-status-fanout](../../images/whatsapp-design/status-fanout.png)
 
+- This approach is effective for small user group.
+- For larger groups, informing all members about online status is expensive and time-consuming.
+- Solution: fetch online status only when user enters a group or manually checks status.
+
+
+---
+
+### Support media files
+
+> **Problem**: 
+> - Media files (images, videos, audio) are large 
+> - They are immutable after upload 
+> - They are read-heavy, not write-heavy
+> Hence, media must be decoupled from message storage.
+
+- Principle: Never store media blobs inside your chat database. Store media in object storage, and store only references (URLs + metadata) in the chat system.
+
+### Architecture
+
+#### 1. Object Storage for Media
+
+- Use a distributed object storage system:
+  - AWS S3 / GCS / Azure Blob 
+  - HDFS (rare in modern systems)
+  - Self-hosted object store (MinIO)
+- Why object storage? 
+  - Designed for large binary files 
+  - Cheap per GB 
+  - High durability (11 9s in S3)
+  - Scales independently of chat traffic
+
+#### 2. CDN for Fast Media Delivery
+- Media is:
+  - Static
+  - Read-heavy
+  - Accessed from multiple geographies
+- So we put a CDN in front of object storage.
+
+> `Client → CDN → Object Storage`
+
+- Benefits
+  - Low latency
+  - Reduced load on storage
+
+#### 3. Chat Database Stores Only Metadata
+
+- Database stores only
+```json
+{
+  "messageId": 123,
+  "senderId": "A",
+  "receiverId": "B",
+  "type": "IMAGE",
+  "mediaUrl": "https://cdn.chatapp.com/media/abc.jpg",
+  "thumbnailUrl": "...",
+  "size": "2.4MB",
+  "mimeType": "image/jpeg"
+}
+```
+- Database choices
+  - Cassandra / DynamoDB / HBase
+- Optimized for:
+  - High write throughput
+  - Sequential reads
+  - Horizontal scaling
+
+#### File Upload Flow
+
+1. Client requests upload permission
+   - Calls backend: POST /media/upload/init
+2. Backend generates pre-signed URL 
+   - Time-limited 
+   - Write-only 
+3. Client uploads media directly to object storage 
+   - No chat server involvement 
+4. Client sends message with media URL 
+   - Normal chat message flow
+
+> Note
+> - Chat servers never handle large payloads 
+> - Prevents server memory pressure 
+> - Improves upload reliability
+
+#### Storage Considerations
+
+1. Deduplication
+   - Hash media content
+   - Avoid storing same file multiple times
+   - Useful for:
+     - Forwarded images
+     - Viral videos
+2. Lifecycle Policies
+   - Old media → cold storage
+   - Expired/temporary chats → auto delete
+   - Reduces storage cost
+3. For larger files: Chunked Uploads
+   - Break large videos into chunks
+   - Upload in parallel
+   - Resume on failure
+4. Access Scoping
+   - Private media: User-authenticated requests
+   - Public media: CDN cached
+
+
+
+---
 ### Tradeoffs
 
 #### Using HTTP for messaging v/s Websockets (WSS)
@@ -323,6 +404,15 @@ message ID on the device.
 #### TCP/WebSocket v/s P2P connection
 - For general chat applications, WebSocket (TCP) via a gateway/server is the preferred and industry-standard choice.
 - P2P is better suited for specialized cases like video/audio streaming using WebRTC where lower latency is critical and the connection is temporary.
+
+#### Why NOT Store Media as BLOBs in DB
+| Aspect      | Database BLOB       | Object Storage |
+|-------------|---------------------|----------------|
+| Cost        | Expensive           | Cheap          |
+| Scaling     | Hard                | Easy           |
+| CDN support | Poor                | Native         |
+| Performance | Bad for large files | Optimized      |
+| Backups     | Heavy               | Independent    |
 
 
 ## Optimizations
