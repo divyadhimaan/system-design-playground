@@ -397,6 +397,21 @@ message ID on the device.
    - Private media: User-authenticated requests
    - Public media: CDN cached
 
+---
+
+### End to End Encryption
+- WhatsApp uses end-to-end encryption (E2EE) for one-to-one chats and calls. 
+- Messages are encrypted on the sender’s device before being sent. 
+- Only the sender and the intended recipient possess the keys to decrypt the message. 
+- No third party can access the content:
+  - Not WhatsApp 
+  - Not servers 
+  - Not intermediaries
+- Even if data is intercepted in transit or stored on servers, it remains unreadable ciphertext.
+- Encryption and decryption happen automatically in the background.
+- Users do not need to enable any settings to activate encryption.
+- WhatsApp servers act only as a relay, not a message reader.
+- This guarantees confidentiality, integrity, and privacy of messages and calls.
 
 
 ---
