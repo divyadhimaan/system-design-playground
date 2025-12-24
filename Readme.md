@@ -48,6 +48,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Design a News Feed System](./design-problems/news-feed-system/main.md)
 - [Design a Chat Application](./design-problems/whatsapp-design/main.md)
 
+
 ## Interview Related Resources
 - [Database Selection](./concepts/interview-specific/database-selection.md)
 
