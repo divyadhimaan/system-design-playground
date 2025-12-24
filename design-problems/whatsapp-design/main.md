@@ -243,9 +243,19 @@
    connection between User B and Chat server 2.
 
 ### Message Synchronization Across Devices
+Let's suppose user A has two devices: a phone and a laptop.
 
 ![img.png](../../images/whatsapp-design/message-sync.png)
 
+- When User A logs in to the chat app with her phone, it establishes a WebSocket connection with Chat server 1. 
+- Similarly, there is a connection between the laptop and Chat server 1.
+- Each device maintains a variable called _cur_max_message_id_, which keeps track of the latest
+message ID on the device. 
+- Messages that satisfy the following two conditions are considered as news messages:
+  - The recipient ID is equal to the currently logged-in user ID.
+  - Message ID in the key-value store is larger than _cur_max_message_id_.
+  
+- With distinct _cur_max_message_id_ on each device, message synchronization is easy as each device can get new messages from the KV store.
 
 
 ### Tradeoffs
