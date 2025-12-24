@@ -163,11 +163,12 @@
 - Message Table for 1:1 chats
   - Primary Key: (message_id)
   - messageId decided message sequence 
-  ![data-model-personal-chat](../../images/whatsapp-design/data-model-1-1.png)
+
+![data-model-personal-chat](../../images/whatsapp-design/data-model-1-1.png)
 - GroupMessage Table for group chats
   - Primary Key: (channel_id, message_id)
-  - 
-  ![data-model-group-chat](../../images/whatsapp-design/data-model-1-many.png)
+
+![data-model-group-chat](../../images/whatsapp-design/data-model-1-many.png)
 
 > Question: How to generate message_id?
 > - message_id ensures ordering of messages. It should satisfy the following properties:
