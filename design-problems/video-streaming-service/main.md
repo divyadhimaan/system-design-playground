@@ -150,10 +150,10 @@ Video Uploading is done in 2 steps:
 
 
 - Popular video streaming protocols:
-  - MPEG-DASH: MPEG stands for "Moving picture Experts Group" and DASH stands for "Dynamic Adaptive Streaming over HTTP"
-  - Apple HLS: HLS stands for "HTTP Live Streaming"
-  - Microsoft Smooth Streaming
-  - Adobe HDS: HDS stands for "HTTP Dynamic Streaming"
+  - **MPEG-DASH**: MPEG stands for "Moving picture Experts Group" and DASH stands for "Dynamic Adaptive Streaming over HTTP"
+  - **Apple HLS**: HLS stands for "HTTP Live Streaming"
+  - **Microsoft Smooth Streaming**
+  - **Adobe HDS**: HDS stands for "HTTP Dynamic Streaming"
 
 - Videos are streamed directly from CDN to clients.
 - The edge server closest to the user serves the video.
@@ -163,6 +163,7 @@ Video Uploading is done in 2 steps:
 
 ---
 
+## Step 3: Detailed Design
 
 
 
