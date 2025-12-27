@@ -83,3 +83,80 @@ companies, it is recommended to leverage some of the existing cloud services.
 
 
 ## Step 2: High Level Design
+
+- We will use CDN and blob storage as cloud services to store and serve videos.
+- There are main 3 components in the design
+  - `Client`: mobile apps, web browsers, smart TV apps
+  - `CDN`: to cache and serve videos closer to users
+  - `API servers`: Everything else including feed recommendation, user management, video upload management, etc.
+
+![components](../../images/youtube/components.png)
+
+- There are 2 main workflows
+  - Video uploading flow
+  - Video streaming flow
+
+### 1. Video Uploading Flow
+
+- The Video uploading flow has the following components:
+  1. **User/Client**: A user watches YouTube on devices such as a computer, mobile phone, or smart TV.
+  2. **Load balancer**: A load balancer evenly distributes requests among API servers.
+  3. **API servers**: All user requests go through API servers except video streaming.
+  4. **Metadata DB**: Video metadata is stored in Metadata DB.It is `sharded` and replicated to meet performance and high availability requirements.
+  5. **Metadata cache**: For better performance, video metadata and user objects are cached.
+  6. **Original storage**: A `blob storage system` is used to store original videos.
+  7. **Transcoding servers**: Video transcoding is also called video encoding.It is the process of converting a video format to other formats (MPEG, HLS, etc.), which provide the best video streams possible for different devices and bandwidth capabilities.
+  8. **Transcoded storage**: It is a blob storage that stores transcoded video files.
+  9. **CDN**: Videos are cached in CDN. When you click the play button, a video is streamed from the CDN.
+  10. **Completion queue**: It is a message queue that stores information about video transcoding completion events.
+  11. **Completion handler**: This consists of a list of workers that pull event data from the completion queue and update metadata cache and database.
+    
+![video-uploading-flow](../../images/youtube/video-uploading-flow.png)
+
+Video Uploading is done in 2 steps:
+- **Upload Actual Video**
+- **Update Video metadata** (metadata stores info about the video title, url, description, size, resolution, format, user info, etc)
+
+#### Flow: Upload Actual Video
+
+1. Videos are uploaded to the original storage.
+2. Transcoding servers fetch videos from the original storage and start transcoding.
+3. Once transcoding is complete, the following two steps are executed in parallel:
+   3a. Transcoded videos are sent to transcoded storage.
+   3b. Transcoding completion events are queued in the completion queue.
+   3a.1. Transcoded videos are distributed to CDN.
+   3b.1. Completion handler contains a bunch of workers that continuously pull event data
+   from the queue.
+   3b.1.a. and 3b.1.b. Completion handler updates the metadata database and cache when
+   video transcoding is complete.
+4. API servers inform the client that the video is successfully uploaded and is ready for
+   streaming.
+
+![flow-upload-video](../../images/youtube/upload-video.png)
+
+#### Flow: Update Video Metadata
+
+- While the file is getting uploaded, in parallel, the client sends video metadata to API servers.
+- API servers update metadata cache and database.
+
+![update-metadata](../../images/youtube/update-metadata.png)
+
+
+### 2. Video Streaming Flow
+
+
+
+## FAQs
+
+> Question: Why use cloud Services instead of building everything from scratch?
+> 
+> Answer: 
+> - System Design interviews are not about low-level implementation details. 
+> - Building everything from scratch is unrealistic for most companies, and it is recommended to leverage some of the existing cloud services.
+> - Netflix leverages AWS services to store and serve videos.
+> - Facebook leverages Akamai CDN to serve videos.
+> - YouTube leverages Google Cloud Storage and Google CDN to store and serve videos.
+
+> Question: What is blob storage system?
+> 
+> Answer: A Binary Large Object (BLOB) is a collection of binary data stored as a single entity in a database management system
