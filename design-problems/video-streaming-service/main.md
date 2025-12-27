@@ -189,7 +189,8 @@ Video Uploading is done in 2 steps:
 - **Abstraction via pipelines**: Use configurable processing pipelines where tasks are defined dynamically.
 - **DAG-based execution**: Tasks are modeled as a Directed Acyclic Graph (DAG) to allow sequential and parallel execution, improving scalability and throughput.
 
-Following is a DAG fir video transcoding pipeline:
+Following is a DAG for video transcoding pipeline:
+
 ![DAG-pipeline](../../images/youtube/DAG-pipeline.png)
 
 ## FAQs
