@@ -52,3 +52,34 @@ Google, or Microsoft?
 > 
 > Interviewer: That is a great question. Building everything from scratch is unrealistic for most
 companies, it is recommended to leverage some of the existing cloud services.
+
+
+### Important points to note
+
+- Features supported
+  - Ability to upload videos fast 
+  - Smooth video streaming
+  - Ability to change video quality
+  - Low infrastructure cost
+  - High availability, scalability, and reliability requirements
+  - Clients supported: mobile apps, web browser, and smart TV
+
+### Estimations
+- Daily Active Users: 5 million
+- Average time spent per user: 30 minutes
+- 10% of users upload 1 video per day. 
+- Users watch an average of 5 videos per day.
+- Assume the average video size is 300 MB.
+- Total daily storage space needed: 5 million * 10% * 300 MB = 150TB
+
+### CDN cost estimation
+- Since there are alot of international users, we will use CDN to cache videos closer to users.
+- When cloud CDN serves a video, it charges for the data transfer out to the internet.
+- Assume 100% of users are from the United States.
+- Using AWS CloudFront as an example, the average cost per GB is $0.02
+- Cost of video streaming per day = 5 million * 5 videos * 0.3GB * $0.02 = $150,000 per day
+
+> Serving cost is very high for video streaming services. In the real world, companies negotiate with cloud providers to get a lower price. Still, we need to optimize the design to lower the serving cost.
+
+
+## Step 2: High Level Design
