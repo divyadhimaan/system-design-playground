@@ -165,7 +165,32 @@ Video Uploading is done in 2 steps:
 
 ## Step 3: Detailed Design
 
+### Video Transcoding
 
+- Video transcoding is the process of converting a video format to other formats (MPEG, HLS, etc.), which provides the best video streams possible for different devices and bandwidth capabilities.
+- For smoother video streaming, videos are encoded into compatible [bitrates](#bitrate) and formats.
+
+> Question: Why is video transcoding needed?
+> 
+> - **Storage optimization**: Raw videos are extremely large, transcoding compresses them to reduce storage usage. 
+> - **Device & browser compatibility**: Different devices support different formats, so videos are encoded into multiple formats.
+> - **Adaptive quality delivery**: Serve high resolution to users with good bandwidth and lower resolution to users with limited bandwidth.
+> - **Smooth playback on variable networks**: Enables automatic/manual quality switching when network conditions change, especially on mobile.
+
+- **Common video containers/formats**: MP4, AVI, MOV, MKV, WebM
+- **Common video codecs**: H.264, H.265 (HEVC), VP9, AV1
+
+#### Pipeline model for video transcoding
+
+> Question: What are the challenges in video transcoding and how to address them?
+- **High compute cost**: Video transcoding is CPU/GPU intensive and time-consuming. 
+- **Custom creator requirements**: Different creators need different processing (watermarks, custom thumbnails, HD/SD outputs).
+- **Flexible processing needed**: A single fixed pipeline does not work for all use cases. 
+- **Abstraction via pipelines**: Use configurable processing pipelines where tasks are defined dynamically.
+- **DAG-based execution**: Tasks are modeled as a Directed Acyclic Graph (DAG) to allow sequential and parallel execution, improving scalability and throughput.
+
+Following is a DAG fir video transcoding pipeline:
+![DAG-pipeline](../../images/youtube/DAG-pipeline.png)
 
 ## FAQs
 
@@ -181,3 +206,10 @@ Video Uploading is done in 2 steps:
 > Question: What is blob storage system?
 > 
 > Answer: A Binary Large Object (BLOB) is a collection of binary data stored as a single entity in a database management system
+
+
+## Glossary
+
+### Bitrate
+- Bitrate is the rate at which bits are processed over a unit of time in a video or audio file. 
+- A higher bitrate generally means better quality, but it also requires more bandwidth to stream or download the file.
