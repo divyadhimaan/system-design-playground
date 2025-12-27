@@ -144,6 +144,26 @@ Video Uploading is done in 2 steps:
 
 ### 2. Video Streaming Flow
 
+> `Downloading` means the whole video file is downloaded to the client device before playing.
+> 
+> `Streaming` means the video file is played while it is being downloaded. The client device only needs to download a small portion of the video file to start playing.
+
+
+- Popular video streaming protocols:
+  - MPEG-DASH: MPEG stands for "Moving picture Experts Group" and DASH stands for "Dynamic Adaptive Streaming over HTTP"
+  - Apple HLS: HLS stands for "HTTP Live Streaming"
+  - Microsoft Smooth Streaming
+  - Adobe HDS: HDS stands for "HTTP Dynamic Streaming"
+
+- Videos are streamed directly from CDN to clients.
+- The edge server closest to the user serves the video.
+- If the video is not cached in the edge server, it fetches the video from the origin server (transcoded storage) and caches it for future requests.
+
+![video-streaming-flow](../../images/youtube/video-streaming-flow.png)
+
+---
+
+
 
 
 ## FAQs
