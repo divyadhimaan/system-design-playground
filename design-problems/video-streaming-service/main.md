@@ -396,3 +396,16 @@ others might be discovered through user flagging.
 ### Bitrate
 - Bitrate is the rate at which bits are processed over a unit of time in a video or audio file. 
 - A higher bitrate generally means better quality, but it also requires more bandwidth to stream or download the file.
+
+
+### Streaming protocols
+
+| **Protocol**  | **Full Form**                        | **Latency**                            | **Compatibility**               | **Codec Support**     | **Security**         | **Scalability** | **Primary Use Case**       | **Best Choice When…**                              | **Ease of Implementation** |
+|---------------|--------------------------------------|----------------------------------------|---------------------------------|-----------------------|----------------------|-----------------|----------------------------|----------------------------------------------------|----------------------------|
+| **HLS**       | HTTP Live Streaming                  | High (15–30s) or Low (~2s with LL-HLS) | Excellent (iOS, browsers, TVs)  | H.264, H.265; AAC     | Good (HTTPS, DRM)    | Excellent       | Live & VOD streaming       | You need maximum device reach and CDN scalability  | Moderate                   |
+| **RTMP**      | Real-Time Messaging Protocol         | Low (~2–5s)                            | Limited playback, strong ingest | H.264; AAC            | Basic                | High (ingest)   | Live stream ingest         | Sending live streams to a platform for processing  | Easy                       |
+| **SRT**       | Secure Reliable Transport            | Very Low (~1–2s)                       | Growing ecosystem               | Codec-agnostic        | Excellent (AES, FEC) | Very High       | Secure contribution        | Secure, low-latency video over unreliable networks | Moderate                   |
+| **MSS**       | Microsoft Smooth Streaming           | Medium (~2–4s)                         | Obsolete                        | H.264, VC-1           | Decent               | Low             | Legacy streaming           | Maintaining legacy Microsoft-based systems         | Low                        |
+| **MPEG-DASH** | Dynamic Adaptive Streaming over HTTP | Medium–High (~5–20s)                   | Excellent (except iOS)          | H.264, H.265, VP9/AV1 | Good (DRM)           | Excellent       | Adaptive bitrate streaming | You want codec flexibility and standards-based ABR | Moderate                   |
+| **WebRTC**    | Web Real-Time Communication          | Ultra Low (<0.5s)                      | Excellent (browsers, mobile)    | H.264, VP8/VP9; Opus  | Strong (DTLS, SRTP)  | Good            | Interactive live video     | Sub-second latency is critical (calls, live Q&A)   | Complex                    |
+| **RTSP**      | Real-Time Streaming Protocol         | Low (~2–10s)                           | Good (players, devices)         | H.264/H.265; AAC      | Variable             | Medium          | Surveillance streams       | IP cameras or closed-network streaming             | Moderate                   |
