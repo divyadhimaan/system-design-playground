@@ -260,6 +260,55 @@ The main components are:
 ---
 
 
+### System Optimizations
+
+Includes optimizations for
+- speed
+- safety
+- cost savings
+
+#### Speed optimization
+
+1. **Parallelize video uploads**
+   - Uploading a full video at once is inefficient. 
+   - Split videos into `GOP-aligned chunks`. 
+   - Enables resumable uploads on failure.
+   - GOP splitting can be done client-side to improve upload speed.
+   - ![img.png](../../images/youtube/speed-opti-1.png)
+2. **Upload centers close to users**
+   - Deploy multiple global upload centers.
+   - Users upload to the nearest region (e.g., US → NA, China → Asia).
+   - Implemented using CDNs as upload endpoints.
+   - Reduces latency and improves throughput.
+3. **Parallelism everywhere**
+   - Build a loosely coupled system for low latency.
+   - Avoid strict step-by-step dependencies.
+   - Use `message queues` between modules:
+     - Before MQ: encoding waits for download to finish.
+     - After MQ: encoding consumes events and runs in parallel.
+     - ![speed-opti.png](../../images/youtube/speed-opti.png)
+   - Improves scalability and resource utilization.
+
+#### Safety optimization
+1. Pre-signed upload URLs
+   - Ensures only authorized users upload content.
+   - Flow:
+     - Client requests a pre-signed URL from API server.
+     - API server returns a time-bound, permission-scoped URL.
+     - Client uploads video directly using that URL.
+   - Prevents unauthorized uploads and bypasses API servers for large data transfer.
+   - ![safety-opti.png](../../images/youtube/safety-opti.png)
+2. Protecting videos from piracy
+   - **DRM systems**: Enforce playback restrictions (FairPlay, Widevine, PlayReady).
+   - **AES encryption**: Encrypt videos; decrypt only for authorized viewers.
+   - **Visual watermarking**: Overlay logos or identifiers to deter theft.
+
+
+#### Cost-Saving Optimizations
+
+1. **CDN cost challenge**: CDN ensures fast global delivery but is expensive for large video data. 
+2. **Observation (Long-tail distribution)**: Few videos get most views; majority have low or zero traffic.
+
 ## FAQs
 
 > Question: Why use cloud Services instead of building everything from scratch?
