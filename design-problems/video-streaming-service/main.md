@@ -229,20 +229,35 @@ The main components are:
     - **Parallelism**:
       - Tasks within the same stage can run in parallel, while stages execute sequentially.
 3. `Resource manager`:
-   - Responsibilities:
+   - **Responsibilities**:
      - Efficiently allocate and schedule resources for task execution.
-   - Components:
+   - **Components**:
      - Task queue: Priority queue of pending tasks.
      - Worker queue: Priority queue holding worker availability and utilization.
      - Running queue: Tracks currently running tasks and assigned workers.
      - Task scheduler: Selects optimal task–worker pairs and triggers execution.
-   - Workflow:
+   - **Workflow**:
      - Fetch highest-priority task from the task queue.
      - Select the optimal worker from the worker queue.
      - Assign the task to the chosen worker.
      - Record task–worker binding in the running queue.
      - Remove entry from the running queue upon task completion.
-
+    - ![resource-manager](../../images/youtube/resource-manager.png)
+4. `Task Workers`:
+   - Execute assigned tasks (video encoding, thumbnail generation, etc.).
+   - Report task completion status back to the resource manager.
+5. `Temporary storage`:
+   - **Multiple storage systems**: Used based on data characteristics and usage patterns.
+   - **Selection factors**: Data type, size, access frequency, and data lifespan.
+   - **Metadata storage**:
+     - Small in size and frequently accessed.
+     - Cached in memory for fast access by workers.
+   - **Media storage**:
+     - Large video/audio files stored in blob storage.
+   - **Temporary storage**:
+     - Holds intermediate data during processing.
+     - Automatically cleaned up after video processing completes.
+---
 
 
 ## FAQs
