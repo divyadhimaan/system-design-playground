@@ -374,6 +374,22 @@ Build a fault-tolerant system with fast recovery and graceful failure handling.
 > 
 > Answer: A Binary Large Object (BLOB) is a collection of binary data stored as a single entity in a database management system
 
+> Question: How will ypu handle Live Streaming?
+> 
+> Answer:
+> - Definition: Real-time recording and broadcasting of video. 
+> - Similarity to VOD: Both involve uploading, encoding, and streaming.
+> 
+> - Key Differences:
+>   - **Latency**: Much stricter latency requirements; often needs specialized streaming protocols. 
+>   - **Parallelism**: Lower parallelism needs since data is processed in small, real-time chunks. 
+>   - **Error handling**: Must be lightweight and fast; long retries or recovery steps are unacceptable.
+
+> Question: How to handle video takedowns?
+> 
+> Answer: Videos that violate copyrights, pornography, or other illegal acts shall
+be removed. Some can be discovered by the system during the upload process, while
+others might be discovered through user flagging.
 
 ## Glossary
 
