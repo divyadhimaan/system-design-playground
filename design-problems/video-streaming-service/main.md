@@ -193,6 +193,58 @@ Following is a DAG for video transcoding pipeline:
 
 ![DAG-pipeline](../../images/youtube/DAG-pipeline.png)
 
+- Inspection: Validate video quality and ensure files are not corrupted or malformed. 
+- Video encoding: Transcode videos into multiple resolutions, codecs, and bitrates for compatibility and adaptive streaming. (360p.mp4, 480p.mp4, 720p.mp4, 1080p.mp4, 4k.mp4)
+- Thumbnails: Use user-uploaded thumbnails or auto-generate them from video frames. 
+- Watermarking: Overlay identifying images/text on videos for branding or ownership.
+
+#### Video Transcoding Architecture
+
+![architecture](../../images/youtube/transcoding-architecture.png)
+
+The main components are:
+1. `Preprocessor`:
+    - **Video splitting**:
+      - Split video streams into smaller GOPs (Group of Pictures).
+      - Each GOP is an independently playable chunk, typically a few seconds long.
+    - **Backward compatibility**:
+      - Perform GOP-based splitting for older devices or browsers that do not support advanced video splitting.
+    - **DAG generation**:
+      - Generate a Directed Acyclic Graph (DAG) based on client-defined configuration files.
+      - DAG defines task execution order and parallelism in the processing pipeline.
+    - **Caching segmented data**:
+      - Temporarily store GOPs and metadata.
+      - Enables retry and recovery if video encoding fails, improving system reliability.
+2. `DAG scheduler`:
+    - **Stage-based execution**:
+      - DAG is divided into multiple stages of tasks based on dependencies.
+    - **Task queuing**:
+      - Tasks from each stage are placed into the resource manager’s task queue.
+    - **Example pipeline**:
+      - Stage 1: Split original upload into video, audio, and metadata.
+      - Stage 2:
+      - Video → video encoding + thumbnail generation
+      - Audio → audio encoding
+      - ![DAG-scheduler](../../images/youtube/DAG-scheduler.png)
+    - **Parallelism**:
+      - Tasks within the same stage can run in parallel, while stages execute sequentially.
+3. `Resource manager`:
+   - Responsibilities:
+     - Efficiently allocate and schedule resources for task execution.
+   - Components:
+     - Task queue: Priority queue of pending tasks.
+     - Worker queue: Priority queue holding worker availability and utilization.
+     - Running queue: Tracks currently running tasks and assigned workers.
+     - Task scheduler: Selects optimal task–worker pairs and triggers execution.
+   - Workflow:
+     - Fetch highest-priority task from the task queue.
+     - Select the optimal worker from the worker queue.
+     - Assign the task to the chosen worker.
+     - Record task–worker binding in the running queue.
+     - Remove entry from the running queue upon task completion.
+
+
+
 ## FAQs
 
 > Question: Why use cloud Services instead of building everything from scratch?
