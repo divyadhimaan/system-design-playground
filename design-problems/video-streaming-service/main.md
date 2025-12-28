@@ -309,6 +309,56 @@ Includes optimizations for
 1. **CDN cost challenge**: CDN ensures fast global delivery but is expensive for large video data. 
 2. **Observation (Long-tail distribution)**: Few videos get most views; majority have low or zero traffic.
 
+#### Optimizations based on access patterns:
+1. Selective CDN usage:
+   - Serve only popular videos via CDN.
+   - Deliver less popular videos from high-capacity origin/video servers.
+2. On-demand encoding:
+   - Avoid storing all encoded variants for low-traffic videos.
+   - Encode short or rarely accessed videos on demand.
+3. Region-aware distribution:
+   - Some videos are popular only in specific regions.
+   - Distribute content only to relevant regions, not globally.
+4. Build or partner for CDN:
+   - Large platforms can build their own CDN (e.g., Netflix model).
+   - Partner with ISPs (e.g., Comcast, AT&T, Verizon) to:
+     - Reduce bandwidth cost
+     - Improve proximity to users and playback performance
+
+---
+
+### Error Handling
+Build a fault-tolerant system with fast recovery and graceful failure handling.
+
+#### Types of Errors
+
+1. Recoverable errors
+   - Temporary failures (e.g., video segment fails to transcode).
+   - Action: Retry the operation a few times.
+   - If retries fail, return an appropriate error code to the client.
+2. Non-recoverable errors
+   - Permanent failures (e.g., malformed video format).
+   - Action: Stop all tasks related to the video and return an error to the client.
+
+#### Component-wise Error Playbook
+
+| **Component**          | **Failure Scenario**                  | **Handling Strategy**                              |
+|------------------------|---------------------------------------|----------------------------------------------------|
+| Upload                 | Upload fails                          | Retry upload a few times                           |
+| Video splitting        | Client cannot split video by GOP      | Upload full video; perform GOP splitting on server |
+| Transcoding            | Video/segment fails to transcode      | Retry transcoding task                             |
+| Preprocessor           | Preprocessor failure                  | Regenerate DAG                                     |
+| DAG Scheduler          | Task scheduling failure               | Reschedule the task                                |
+| Resource Manager Queue | Queue service down                    | Switch to replica queue                            |
+| Task Worker            | Worker crashes or becomes unavailable | Retry task on another worker                       |
+| API Server             | API server down                       | Route request to another stateless API server      |
+| Metadata Cache         | Cache node failure                    | Read from replicas; spin up replacement cache node |
+| Metadata DB – Master   | Master node down                      | Promote a slave to master                          |
+| Metadata DB – Slave    | Slave node down                       | Read from another slave; add new slave node        |
+
+
+---
+
 ## FAQs
 
 > Question: Why use cloud Services instead of building everything from scratch?
