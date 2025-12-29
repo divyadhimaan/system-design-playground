@@ -397,7 +397,6 @@ others might be discovered through user flagging.
 - Bitrate is the rate at which bits are processed over a unit of time in a video or audio file. 
 - A higher bitrate generally means better quality, but it also requires more bandwidth to stream or download the file.
 
-
 ### Streaming protocols
 
 | **Protocol**  | **Full Form**                        | **Latency**                            | **Compatibility**               | **Codec Support**     | **Security**         | **Scalability** | **Primary Use Case**       | **Best Choice When…**                              | **Ease of Implementation** |
