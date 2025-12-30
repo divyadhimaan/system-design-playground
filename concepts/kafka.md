@@ -1,6 +1,6 @@
 # Kafka
 
-> A distributed, durable, and scalable event-streaming platform used to publish, store, and consume streams of records in real time.
+> A distributed, [durable](#durable), and scalable event-streaming platform used to publish, store, and consume streams of records in real time.
 
 ## Pain Points Addressed by Kafka
 - Synchronous APIs cause high latency and cascading failures.
@@ -28,7 +28,7 @@
 ### Core Components
 
 - `Producer` – Publishes messages
-- `Topic` – Logical stream of messages
+- `Topic` – Logical stream of messages/events and durable
 - `Partition` – Ordered, append-only log
 - `Broker` – Kafka server storing partitions
 - `Consumer` – Reads messages
@@ -94,6 +94,10 @@
 
 
 ## Glossary
+
+### Durable
+
+- Events written to disk and are replicated across multiple brokers.
 
 ### ISR (in-sync replicas)
 - ISR (In-Sync Replicas) is the mechanism that directly controls write durability and fault tolerance.
