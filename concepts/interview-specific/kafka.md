@@ -23,7 +23,7 @@
 
 ## High Level Architecture
 
-![img.png](../images/kafka/architecture.png)
+![img.png](../../images/kafka/architecture.png)
 
 ### Core Components
 
@@ -110,7 +110,7 @@
 
 Replicas that fall behind are removed from ISR.
 
-![img.png](../images/kafka/ISR.png)
+![img.png](../../images/kafka/ISR.png)
 
 - **Durability is enforced via acks + ISR size**:
   - `acks=all`

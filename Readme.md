@@ -30,8 +30,9 @@ This repository contains notes, diagrams, and code snippets created while learni
 
 ## Additional Concepts
 - [API design](./concepts/api-design.md)
-- [Kafka](./concepts/kafka.md)
-- [Message Queue in Event Driven Architectures](./concepts/message-queue.md)
+- [Kafka](concepts/interview-specific/kafka.md)
+- [Message Queue in Event Driven Architectures](concepts/interview-specific/message-queue.md)
+- [Idempotency in Distributed Systems](concepts/interview-specific/idempotency.md)
 
 ## System Design Problems
 - [Email Service](./design-problems/emailing-service/main.md)

@@ -27,7 +27,7 @@
 
 ## High Level Architecture
 
-![img.png](../images/mq/arch.png)
+![img.png](../../images/mq/arch.png)
 
 ### Core Components
 
