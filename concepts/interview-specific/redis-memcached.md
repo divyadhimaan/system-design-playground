@@ -1,8 +1,10 @@
-# Redis Cache
+# Redis Cache and Memcached
 
+
+## Redis Overview
 > Redis is an in-memory, low-latency data store used primarily for caching, fast data access, coordination, and real-time workloads.
 
-## Problem
+### Problem
 
 | Problems at scale                         | how redis helps                                          |
 |-------------------------------------------|----------------------------------------------------------|
@@ -11,7 +13,7 @@
 | Stateless services need shared fast state | Enable fast, shared, ephemeral state                     |
 
 
-## Use Cases
+### Use Cases
 
 - Use Redis when you see:
   - High read-to-write ratio
@@ -22,7 +24,7 @@
   - Data must be permanently durable
   - Large objects or heavy analytical queries are required
 
-## High Level Architecture
+### High Level Architecture
 
 `Client → Service → Redis
                  ↓ (miss)
@@ -32,7 +34,7 @@
 `
 - Redis sits between application and database, absorbing read pressure.
 
-## Core Components & Responsibilities
+### Core Components & Responsibilities
 
 | Component             | Responsibility                 |
 |-----------------------|--------------------------------|
@@ -43,7 +45,7 @@
 | Replicas              | Read scaling & failover        |
 | Redis Cluster         | Horizontal sharding            |
 
-## Scalability
+### Scalability
 
 - Vertical scaling limited by RAM
 - Horizontal scaling via Redis Cluster (hash-slot sharding)
@@ -54,7 +56,7 @@
   - Hot keys
   - Single-threaded command execution
 
-## Reliability & Fault Tolerance
+### Reliability & Fault Tolerance
 
 - Redis improves performance but reduces reliability
   - Node failure → cache loss
@@ -66,7 +68,7 @@
   - DB as source of truth
 
 
-## Common Failure Scenarios
+### Common Failure Scenarios
 
 | Problem            | Impact               | Mitigation                                                                                                                                             |
 |--------------------|----------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -77,7 +79,7 @@
 | Redis restart      | Cold cache           | **Pre-Warming (Cold Cache Avoidance):** Load critical and frequently accessed keys into Redis before or immediately after traffic is routed.           |
 
 
-## FAQs
+### Design FAQs
 
 > `Question`: Cache-aside vs write-through?
 > 
@@ -115,7 +117,71 @@ Manual invalidation gives stronger consistency but increases operational complex
 > - I enable persistence only when cache rebuild is expensive or some temporary data loss is unacceptable.
 > - Persistence improves recovery time but slightly erodes Redis’s latency advantage.
 
-## Glossary
+---
+
+## Memcached Overview
+
+> Memcached is a distributed, in-memory key–value cache designed for extremely fast reads with simple data models and no persistence.
+
+### Problem?
+
+- At scale:
+  - Databases become read bottlenecks
+  - Repeated queries waste compute
+  - Low-latency reads are required (<1–2 ms)
+    Memcached offloads hot, simple data from the database to reduce latency and increase throughput.
+
+### When to Use Memcached
+
+- Use Memcached when:
+  - High read-to-write ratio
+  - Frequently accessed but rarely updated data
+  - Simple key–value data models
+  - Strict latency SLAs (<2 ms)
+- Avoid Memcached when:
+  - You need persistence
+  - Complex data structures are required
+  - Atomic operations or coordination are needed
+
+
+### Critical Design Decisions
+
+1. Cache-Aside Only
+   - Memcached supports cache-aside only
+   - No write-through or write-behind
+2. TTL Is Mandatory
+   - No manual invalidation guarantees
+   - TTL controls correctness window
+3. No Replication
+   - If a node dies → cache lost
+   - App must handle misses gracefully
+
+
+---
+
+## Memcached vs Redis
+
+| Aspect      | Memcached        | Redis                |
+|-------------|------------------|----------------------|
+| Data model  | Simple key–value | Rich structures      |
+| Persistence | None             | Optional             |
+| Replication | No               | Yes                  |
+| Latency     | Slightly lower   | Very low             |
+| Use case    | Pure cache       | Cache + coordination |
+
+---
+
+## FAQs
+ 
+> `Question`: Cache-aside vs write-through?
+>
+> `Answer`: I usually prefer cache-aside. The application reads from Redis first, and on a miss, it fetches from the database and populates the cache. Writes go directly to the database, keeping it as the source of truth.
+This keeps Redis as an optimization layer—if Redis fails, writes are unaffected. The trade-off is possible stale reads, which is acceptable for most read-heavy systems.
+>
+> I’d consider write-through only when strong read consistency is required and higher write latency is acceptable.
+
+
+### Glossary
 
 ### RDB vs AOF Persistence
 
