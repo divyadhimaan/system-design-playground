@@ -172,13 +172,30 @@ Manual invalidation gives stronger consistency but increases operational complex
 ---
 
 ## FAQs
- 
-> `Question`: Cache-aside vs write-through?
->
-> `Answer`: I usually prefer cache-aside. The application reads from Redis first, and on a miss, it fetches from the database and populates the cache. Writes go directly to the database, keeping it as the source of truth.
-This keeps Redis as an optimization layer—if Redis fails, writes are unaffected. The trade-off is possible stale reads, which is acceptable for most read-heavy systems.
->
-> I’d consider write-through only when strong read consistency is required and higher write latency is acceptable.
+
+| #  | Question                                                | Interview-Ready Answer                                                                                                                                                                                                                |
+|----|---------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1  | Why use Redis instead of directly hitting the database? | Redis reduces read latency and offloads traffic from the database by serving hot data from memory. This improves tail latency and prevents DB bottlenecks under read-heavy workloads, while the database remains the source of truth. |
+| 2  | Is Redis a database or a cache?                         | Redis is best treated as a cache or fast data store, not a primary database. Although it supports persistence, most production systems use it as an optimization layer and rely on a durable DB for correctness.                      |
+| 3  | What consistency guarantees does Redis provide?         | Redis typically provides eventual consistency, especially with replicas due to replication lag. Strong consistency is possible by reading from the primary only, but this reduces availability and increases latency.                 |
+| 4  | How do you prevent cache stampede in Redis?             | By using request coalescing so only one request recomputes a missing key, combined with TTL jitter and rate-limited database fallback.                                                                                                |
+| 5  | What happens if Redis goes down?                        | Cache misses increase and traffic falls back to the database. The system must degrade gracefully using DB fallback, rate limiting, and optionally serving stale or default responses.                                                 |
+| 6  | How does Redis scale?                                   | Redis scales vertically via RAM and horizontally using Redis Cluster, which shards keys across nodes using hash slots and supports replicas for availability.                                                                         |
+| 7  | What are hot keys and how do you handle them?           | Hot keys are frequently accessed keys that overload a single Redis node. They are mitigated using key sharding, request-level caching, or local in-process caches.                                                                    |
+| 8  | Do you enable persistence in Redis?                     | By default, no. Redis is treated as disposable. Persistence is enabled only when cache rebuild is expensive or temporary data loss is unacceptable, accepting the latency trade-off.                                                  |
+| 9  | What eviction policy would you choose and why?          | Typically `volatile-lru` or `allkeys-lru`, depending on whether all keys have TTLs. LRU policies help retain hot data under memory pressure.                                                                                          |
+| 10 | Can Redis be used for distributed locking?              | Yes, but carefully. Redis-based locks are suitable for best-effort coordination, not strict correctness. Timeouts and failure handling are critical to avoid deadlocks.                                                               |
+
+| # | Question                                          | Interview-Ready Answer                                                                                                                                              |
+|---|---------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 1 | When would you choose Memcached over Redis?       | When you need a pure, ultra-fast cache with simple key–value access, no persistence, no replication, and minimal operational complexity.                            |
+| 2 | What are the limitations of Memcached?            | It has no persistence, no replication, no complex data structures, and no coordination primitives. Node failures result in cache loss.                              |
+| 3 | How does Memcached scale?                         | Horizontally via client-side consistent hashing. Each node is independent, allowing linear scaling but causing cache churn when nodes are added or removed.         |
+| 4 | What happens when a Memcached node fails?         | All keys on that node are lost and requests fall back to the database. Systems must be designed assuming cache loss is normal.                                      |
+| 5 | How do you handle cache stampede with Memcached?  | At the application layer using request coalescing, TTL jitter, and rate-limited DB fallback, since Memcached has no coordination features.                          |
+| 6 | Is Memcached strongly consistent?                 | No. It provides eventual consistency only. Stale reads are expected and acceptable.                                                                                 |
+| 7 | Why is Memcached considered “simpler” than Redis? | It supports only basic key–value operations, has no persistence or replication, and no server-side logic, resulting in extremely low latency and simple operations. |
+| 8 | Can Memcached be used as a primary data store?    | No. Data loss is expected and unrecoverable. It must always sit in front of a durable database.                                                                     |
 
 
 ### Glossary
