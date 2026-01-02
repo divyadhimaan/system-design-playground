@@ -33,6 +33,8 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Kafka](concepts/interview-specific/kafka.md)
 - [Message Queue in Event Driven Architectures](concepts/interview-specific/message-queue.md)
 - [Idempotency in Distributed Systems](concepts/interview-specific/idempotency.md)
+- [Redis](concepts/interview-specific/redis.md)
+- [Memcached](concepts/interview-specific/memcached.md)
 
 ## System Design Problems
 - [Email Service](./design-problems/emailing-service/main.md)
