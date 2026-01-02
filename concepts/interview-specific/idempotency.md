@@ -2,6 +2,7 @@
 
 > Idempotency means performing the same operation multiple times results in the same final state as performing it once, even under retries, failures, or duplicates.
 
+![img.png](../../images/mq/idempotency-2.png)
 
 ## Pain Points
 
