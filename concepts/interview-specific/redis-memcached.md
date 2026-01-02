@@ -197,7 +197,7 @@ Manual invalidation gives stronger consistency but increases operational complex
 | 7 | Why is Memcached considered “simpler” than Redis? | It supports only basic key–value operations, has no persistence or replication, and no server-side logic, resulting in extremely low latency and simple operations. |
 | 8 | Can Memcached be used as a primary data store?    | No. Data loss is expected and unrecoverable. It must always sit in front of a durable database.                                                                     |
 
-
+---
 ### Glossary
 
 ### RDB vs AOF Persistence
