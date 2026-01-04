@@ -104,3 +104,29 @@ Google Drive is a file storage and synchronization service developed by Google. 
   - Params:
     - path: path of the file
     - limit: number of revisions to return
+
+### Scaling from single server to multiple servers
+
+- Our single server can handle 1TB of storage and 480 QPS.
+- To handle more traffic and storage, we need to scale our system.
+- We can add more web servers behind a load balancer to handle more QPS.
+- For metadata database, we can use a distributed database like Cassandra or DynamoDB.
+
+- Storage can be scaled by sharding based on userID.
+- But still potential data losses in case of storage server failure.
+- So we can use distributed file system like HDFS or cloud storage like AWS S3, GCP Cloud Storage.
+
+> Optimizations
+> 
+> 1. Load Balancer: Add a load balancer to distribute incoming requests across multiple web servers.
+> 2. Web servers: Add multiple web servers to handle increased traffic.
+> 3. Metadata Database: Move database out of server to avoid SPOF. Use a distributed database like Cassandra or DynamoDB to handle increased metadata storage and query load.
+> 4. File Storage: Amazon S3 is used for file storage to provide scalability, durability, and availability. To ensure durability, files are replicated across multiple availability zones.
+
+![img.png](../../images/googleDrive/high-level-design.png)
+
+### Sync conflicts
+- When a file is edited on multiple devices simultaneously, sync conflicts can occur.
+- To handle sync conflicts, we follow following strategy
+  - the first version that gets processed wins
+  - the other versions are saved as separate files with a timestamp appended to the filename.
