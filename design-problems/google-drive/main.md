@@ -74,28 +74,33 @@ Google Drive is a file storage and synchronization service developed by Google. 
 ### API Design
 
 - We primarily need 3 APIs
-  - `UploadFile(userID, file, uploadType)`: 
-    - Uploads a file for a user.
-    - Upload can be of 2 types
-      - Simple upload: for files smaller than 5MB
-      - Resumable upload: for files larger than 5MB, allows resuming upload if connection is lost.
-    - Endpoint:
-      - `/files/upload?uploadType={simple|resumable}`
-    - Params
-      - uploadType: simple or resumable
-      - file: local file to be uploaded
+  - upload
+  - download
+  - get revisions
+
+#### API Specifications
+- `UploadFile(userID, file, uploadType)`: 
+  - Uploads a file for a user.
+  - Upload can be of 2 types
+    - Simple upload: for files smaller than 5MB
+    - Resumable upload: for files larger than 5MB, allows resuming upload if connection is lost.
+  - Endpoint:
+    - `/files/upload?uploadType={simple|resumable}`
+  - Params
+    - uploadType: simple or resumable
+    - file: local file to be uploaded
+  
+- `DownloadFile(userID, path)`: 
+  - Downloads a file for a user.
+  - Endpoint:
+    - `/files/download?path={path}`
+  - Params:
+    - path: path of the file to be downloaded
     
-  - `DownloadFile(userID, path)`: 
-    - Downloads a file for a user.
-    - Endpoint:
-      - `/files/download?path={path}`
-    - Params:
-      - path: path of the file to be downloaded
-      
-  - `getRevisions(userID, path, limit)`:
-    - Gets the revisions for a file.
-    - Endpoint:
-      - `/files/revisions`
-    - Params:
-      - path: path of the file
-      - limit: number of revisions to return
+- `getRevisions(userID, path, limit)`:
+  - Gets the revisions for a file.
+  - Endpoint:
+    - `/files/revisions`
+  - Params:
+    - path: path of the file
+    - limit: number of revisions to return
