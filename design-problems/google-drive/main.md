@@ -60,3 +60,42 @@ Google Drive is a file storage and synchronization service developed by Google. 
 > Total Space Allocated: 50M * 10GB = 500 PB
 > QPS for upload: 10M * 2 / 86400 = 232 ~ 240 QPS
 > Peak QPS = QPS * 2 = 480 QPS
+
+## Step 2: High-Level Design
+
+- Start with a single server.
+- We need 3 main components
+  - web server: to upload and download files
+  - metadata database: to store file and user metadata
+  - file storage: to store the actual files. We allocate 1TB of storage.
+
+- For the start, use Apache web server, MySQL database, and local file system for storage.
+
+### API Design
+
+- We primarily need 3 APIs
+  - `UploadFile(userID, file, uploadType)`: 
+    - Uploads a file for a user.
+    - Upload can be of 2 types
+      - Simple upload: for files smaller than 5MB
+      - Resumable upload: for files larger than 5MB, allows resuming upload if connection is lost.
+    - Endpoint:
+      - `/files/upload?uploadType={simple|resumable}`
+    - Params
+      - uploadType: simple or resumable
+      - file: local file to be uploaded
+    
+  - `DownloadFile(userID, path)`: 
+    - Downloads a file for a user.
+    - Endpoint:
+      - `/files/download?path={path}`
+    - Params:
+      - path: path of the file to be downloaded
+      
+  - `getRevisions(userID, path, limit)`:
+    - Gets the revisions for a file.
+    - Endpoint:
+      - `/files/revisions`
+    - Params:
+      - path: path of the file
+      - limit: number of revisions to return
