@@ -133,7 +133,7 @@ Google Drive is a file storage and synchronization service developed by Google. 
 
 ### High level Design
 
-![img.png](../../images/googleDrive/high-level-designn.png)
+![high-level-design](../../images/googleDrive/high-level-designn.png)
 
 #### Components
 - **User**: A user uses the application either through a browser or mobile app.
