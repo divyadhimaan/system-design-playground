@@ -130,3 +130,30 @@ Google Drive is a file storage and synchronization service developed by Google. 
 - To handle sync conflicts, we follow following strategy
   - the first version that gets processed wins
   - the other versions are saved as separate files with a timestamp appended to the filename.
+
+### High level Design
+
+![img.png](../../images/googleDrive/high-level-designn.png)
+
+#### Components
+- **User**: A user uses the application either through a browser or mobile app.
+- **Block servers**: Block servers upload blocks to cloud storage. Block storage, referred to as
+block-level storage, is a technology to store data files on cloud-based environments. A file
+can be split into several blocks, each with a unique hash value, stored in our metadata
+database. Each block is treated as an independent object and stored in our storage system
+(S3). To reconstruct a file, blocks are joined in a particular order. As for the block size, we
+use Dropbox as a reference: it sets the maximal size of a block to 4MB.
+- **Cloud storage**: A file is split into smaller blocks and stored in cloud storage.
+- **Cold storage**: Cold storage is a computer system designed for storing inactive data, meaning
+files are not accessed for a long time.
+- **Load balancer**: A load balancer evenly distributes requests among API servers.
+- **API servers**: These are responsible for almost everything other than the uploading flow. API
+servers are used for user authentication, managing user profile, updating file metadata, etc.
+- **Metadata database**: It stores metadata of users, files, blocks, versions, etc. Please note that
+files are stored in the cloud and the metadata database only contains metadata.
+- **Metadata cache**: Some of the metadata are cached for fast retrieval.
+- **Notification service**: It is a publisher/subscriber system that allows data to be transferred
+from notification service to clients as certain events happen. In our specific case, notification
+service notifies relevant clients when a file is added/edited/removed elsewhere so they can
+pull the latest changes.
+- **Offline backup queue**: If a client is offline and cannot pull the latest file changes, the offline
