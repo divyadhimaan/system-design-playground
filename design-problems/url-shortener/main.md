@@ -1,6 +1,3 @@
-# URL Shortener: Table of Content
-
-
 # URL Shortener
 
 A URL shortener is a service that takes a long URL and converts it into a shorter, more manageable URL. This is often used for sharing links on social media, in emails, or in text messages where space is limited.
