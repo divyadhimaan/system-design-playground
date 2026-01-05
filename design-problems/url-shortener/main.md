@@ -7,7 +7,7 @@ A URL shortener is a service that takes a long URL and converts it into a shorte
 > Q. Can you give an example of a URL shortening service?
 >
 > A. Assume URL https://www.systeminterview.com/q=chatsystem&c=loggedin&v=v3&l=long is the original
-URL. Your service creates an alias with shorter length: https://tinyurl.com/ y7keocwj. If you
+URL. Your service creates an alias with shorter length: https://tinyurl.com/y7keocwj. If you
 click the alias, it redirects you to the original URL.
 
 > Q. What is the traffic volume?
