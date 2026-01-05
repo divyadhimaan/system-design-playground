@@ -52,6 +52,7 @@ This repository contains notes, diagrams, and code snippets created while learni
 - [Design a News Feed System](./design-problems/news-feed-system/main.md)
 - [Design a Chat Application](./design-problems/whatsapp-design/main.md)
 - [Design a Youtube-like Video Streaming Service](./design-problems/video-streaming-service/main.md)
+- [Design Google Drive](./design-problems/google-drive/main.md)
 
 ## Interview Related Resources
 - [Database Selection](./concepts/interview-specific/database-selection.md)
