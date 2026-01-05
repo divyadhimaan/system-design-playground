@@ -283,3 +283,18 @@ Similar flow when file is edited.
   - Move it to cheaper storage
   - Example: Amazon S3 Glacier
   - Reduces cost compared to regular storage (S3)
+
+
+### Failure handling
+
+| **Component**              | **Failure Scenario**                   | **Handling / Recovery Strategy**                                                                                |
+|----------------------------|----------------------------------------|-----------------------------------------------------------------------------------------------------------------|
+| Load Balancer              | Primary load balancer goes down        | Secondary load balancer becomes active using **heartbeat-based monitoring**; traffic is automatically picked up |
+| Block Server               | Block server fails during uploads/jobs | Other block servers **pick up unfinished or pending jobs**                                                      |
+| Cloud Storage (S3)         | Region or bucket unavailable           | Files fetched from **replicated copies in other regions**                                                       |
+| API Server                 | API server crashes                     | Since API servers are **stateless**, load balancer redirects traffic to healthy servers                         |
+| Metadata Cache             | Cache node goes down                   | Access data from **replica cache nodes**; spin up a new cache node to replace failed one                        |
+| Metadata Database – Master | Master DB node fails                   | **Promote a slave** to master; add a new slave for replication                                                  |
+| Metadata Database – Slave  | Slave DB node fails                    | Use another slave for reads; **add a new slave** to restore redundancy                                          |
+| Notification Service       | Notification server fails              | Clients **reconnect to another server**; reconnections are gradual due to high number of long-poll connections  |
+| Offline Backup Queue       | Queue node fails                       | Switch to **replicated backup queue**; consumers re-subscribe to the backup queue                               |
