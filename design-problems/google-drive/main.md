@@ -172,4 +172,83 @@ Google Drive is a file storage and synchronization service developed by Google. 
 
 > Only modified blocks are uploaded during file updates to save bandwidth. 
 
+### High Consistency for File Operations
+
+- We need strong consistency for file operations to ensure that users always see the latest version of their files.
+- Possible by:
+  - Data in cache is always consistent with data in database.
+  - Invalidate cache on DB writes
+- Use relational database like MySQL or PostgreSQL to store metadata.
+- Relational databases provide strong consistency guarantees, as it supports ACID transactions.
+
+### Metadata Database
+
+- Store metadata only (users, files, blocks, versions, etc.). Actual file data resides in cloud storage.
+- Use relational database like MySQL or PostgreSQL to store metadata.
+- Relational databases provide strong consistency guarantees, as it supports ACID transactions.
+- Database schema
+  - User: The user table contains basic information about the user such as username, email,
+    profile photo, etc. 
+  - Device: Device table stores device info. Push_id is used for sending and receiving mobile
+    push notifications. Please note a user can have multiple devices.
+  - Namespace: A namespace is the root directory of a user.
+  - File: File table stores everything related to the latest file.
+  - File_version: It stores version history of a file. Existing rows are read-only to keep the
+    integrity of the file revision history.
+  - Block: It stores everything related to a file block. A file of any version can be reconstructed
+    by joining all the blocks in the correct order.
+
+### Upload Flow
+
+![img.png](../../images/googleDrive/upload-flow.png)
+
+- Two requests are sent in parallel: add file metadata and upload the file to cloud storage.Both requests originate from client 1.
+- Add file metadata.
+  1. Client 1 sends a request to add the metadata of the new file.
+  2. Store the new file metadata in metadata DB and change the file upload status to "pending".
+  3. Notify the notification service that a new file is being added.
+  4. The notification service notifies relevant clients (client 2) that a file is being
+     uploaded.
+- Upload files to cloud storage.
+  - 2.1 Client 1 uploads the content of the file to block servers.
+  - 2.2 Block servers chunk the files into blocks, compress, encrypt the blocks, and
+       upload them to cloud storage.
+  - 2.3 Once the file is uploaded, cloud storage triggers upload completion callback. The
+       request is sent to API servers.
+  - 2.4 File status changed to “uploaded” in Metadata DB.
+  - 2.5 Notify the notification service that a file status is changed to "uploaded"
+  - 2.6 The notification service notifies relevant clients (client 2) that a file is fully
+       uploaded.
+
+Similar flow when file is edited.
+
+### Download Flow
+
+- Download flow is triggered when the file is added or edited.
+- Two ways for client to find out:
+  - If client A is online, notification service sends a push notification to client A.
+  - If client A is offline, notification service adds a message to offline backup queue.
+- When client knows that a file is added or edited, it sends a request to API servers to download the metadata first and then downloads blocks to construct the file.
+
+![img.png](../../images/googleDrive/download-flow.png)
+
+1. Notification service informs client 2 that a file is changed somewhere else.
+2. Once client 2 knows that new updates are available, it sends a request to fetch metadata.
+3. API servers call metadata DB to fetch metadata of the changes.
+4. Metadata is returned to the API servers.
+5. Client 2 gets the metadata.
+6. Once the client receives the metadata, it sends requests to block servers to download
+   blocks.
+7. Block servers first download blocks from cloud storage.
+8. Cloud storage returns blocks to the block servers.
+9. Client 2 downloads all the new blocks to reconstruct the file.
+
+### Notification Service
+
+- Notification service is responsible for notifying clients when files are added, edited, or removed so they can sync the latest changes.
+- It is implemented as a Pub/Sub system.
+- Two options:
+  - Long polling: clients send a request to the server and the server holds the request until there is new data available or a timeout occurs.
+  - WebSockets: a persistent connection between the client and server that allows for real-time communication
+- We use Long polling, as communication is mostly one-way (server to client) and it is easier to implement and scale.
 
