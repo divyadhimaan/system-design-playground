@@ -252,3 +252,34 @@ Similar flow when file is edited.
   - WebSockets: a persistent connection between the client and server that allows for real-time communication
 - We use Long polling, as communication is mostly one-way (server to client) and it is easier to implement and scale.
 
+### Optimization for Storage Space
+
+#### Problem
+
+- File version history requires storing multiple versions across multiple data centers
+- Frequent backups can quickly consume storage
+
+#### Techniques to Reduce Storage Cost
+
+1. Data Block De-duplication
+   - Split files into blocks
+   - Store only unique blocks
+   - Identify duplicates using hash values
+   - De-duplication is done at account level
+2. Intelligent Backup Strategy
+   - Version Limit
+     - Set a maximum number of versions per file
+     - When limit is reached:
+       - Delete oldest version
+       - Keep latest version
+   - Store Only Valuable Versions
+     - Some files change very frequently
+     - Avoid saving every minor edit
+     - Give higher priority to recent versions
+     - Limit total stored versions per file
+     - Use experimentation to decide optimal version count 
+3. Cold Storage for Inactive Data
+  - Identify cold data (unused for months/years)
+  - Move it to cheaper storage
+  - Example: Amazon S3 Glacier
+  - Reduces cost compared to regular storage (S3)
