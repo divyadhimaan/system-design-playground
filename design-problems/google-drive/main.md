@@ -136,24 +136,17 @@ Google Drive is a file storage and synchronization service developed by Google. 
 ![high-level-design](../../images/googleDrive/high-level-designn.png)
 
 #### Components
-- **User**: A user uses the application either through a browser or mobile app.
-- **Block servers**: Block servers upload blocks to cloud storage. Block storage, referred to as
-block-level storage, is a technology to store data files on cloud-based environments. A file
-can be split into several blocks, each with a unique hash value, stored in our metadata
-database. Each block is treated as an independent object and stored in our storage system
-(S3). To reconstruct a file, blocks are joined in a particular order. As for the block size, we
-use Dropbox as a reference: it sets the maximal size of a block to 4MB.
-- **Cloud storage**: A file is split into smaller blocks and stored in cloud storage.
-- **Cold storage**: Cold storage is a computer system designed for storing inactive data, meaning
-files are not accessed for a long time.
-- **Load balancer**: A load balancer evenly distributes requests among API servers.
-- **API servers**: These are responsible for almost everything other than the uploading flow. API
-servers are used for user authentication, managing user profile, updating file metadata, etc.
-- **Metadata database**: It stores metadata of users, files, blocks, versions, etc. Please note that
-files are stored in the cloud and the metadata database only contains metadata.
-- **Metadata cache**: Some of the metadata are cached for fast retrieval.
-- **Notification service**: It is a publisher/subscriber system that allows data to be transferred
-from notification service to clients as certain events happen. In our specific case, notification
-service notifies relevant clients when a file is added/edited/removed elsewhere so they can
-pull the latest changes.
-- **Offline backup queue**: If a client is offline and cannot pull the latest file changes, the offline
+| **Component**            | **Description**                                                                                                                                                                                                                                                           |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **User**                 | Uses the application via a web browser or mobile app.                                                                                                                                                                                                                     |
+| **Block Servers**        | Upload file blocks to cloud storage. Files are split into independent blocks (max size ~4 MB, inspired by Dropbox), each identified by a unique hash and stored as separate objects (e.g., in S3). File reconstruction is done by joining blocks in order using metadata. |
+| **Cloud Storage**        | Stores file data as smaller blocks uploaded by block servers.                                                                                                                                                                                                             |
+| **Cold Storage**         | Stores inactive or rarely accessed files for long-term, cost-efficient storage.                                                                                                                                                                                           |
+| **Load Balancer**        | Distributes incoming requests evenly across API servers to improve availability and scalability.                                                                                                                                                                          |
+| **API Servers**          | Handle all non-upload logic such as user authentication, profile management, file metadata updates, and coordination between services.                                                                                                                                    |
+| **Metadata Database**    | Stores metadata only (users, files, blocks, versions, etc.). Actual file data resides in cloud storage.                                                                                                                                                                   |
+| **Metadata Cache**       | Caches frequently accessed metadata to reduce database load and improve read latency.                                                                                                                                                                                     |
+| **Notification Service** | Pub/Sub system that notifies clients when files are added, edited, or removed so they can sync the latest changes.                                                                                                                                                        |
+| **Offline Backup Queue** | Queues file change notifications for offline clients so updates can be delivered when they reconnect.                                                                                                                                                                     |
+
+
