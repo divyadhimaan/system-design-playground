@@ -150,3 +150,26 @@ Google Drive is a file storage and synchronization service developed by Google. 
 | **Offline Backup Queue** | Queues file change notifications for offline clients so updates can be delivered when they reconnect.                                                                                                                                                                     |
 
 
+## Step 3: Detailed Design
+
+
+### Block Servers
+
+- For large files, sending whole file on each update is inefficient.
+- Two possible optimizations:
+  - Delta sync: only send the changes made to the file.
+  - Compression: compress the file before sending it.
+- Block Servers upload file blocks to cloud storage. 
+- Files are split into independent blocks (max size ~4 MB, inspired by Dropbox), each identified by a unique hash and stored as separate objects (e.g., in S3). 
+- File reconstruction is done by joining blocks in order using metadata.
+
+![img.png](../../images/googleDrive/block-servers.png)
+- A file is split into smaller blocks.
+- Each block is compressed using compression algorithms.
+- To ensure security, each block is encrypted before it is sent to cloud storage.
+- Blocks are uploaded to the cloud storage.
+
+
+> Only modified blocks are uploaded during file updates to save bandwidth. 
+
+
