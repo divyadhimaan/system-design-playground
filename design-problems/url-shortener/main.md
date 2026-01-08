@@ -106,6 +106,7 @@ click the alias, it redirects you to the original URL.
   - GET longURL: `longURL = hashTable.get(shortURL)`
   - Once you get longURL, perform the URL redirect
 
+
 ### URL Shortening
 
 - Let us assume short URL: `www.tinyurl.com/{hashValue}`
